@@ -4,7 +4,6 @@ Este plano foi desenhado especificamente para a realidade de **8 pessoas** traba
 
 ---
 
-```markdown
 # Plano Unificado de MVP — Organização Inteligente de Conteúdo Técnico
 **Hackathon ONE (Alura + Oracle) | Grupo G9 — Time 13**
 **Versão:** 2.0 (Otimizada para 6 semanas)  
@@ -274,7 +273,3 @@ Garante clareza absoluta na leitura do histórico de desenvolvimento do projeto:
 2. **Minuto 1.0 a 2.5 (A Inteligência — Tech Lead Dados):** Demonstração visual rápida das métricas obtidas no notebook de Ciência de Dados (Acurácia/F1-score) explicando sucintamente o funcionamento do pipeline TF-IDF + Regressão Logística.
 3. **Minuto 2.5 a 5.0 (A Solução Real — Tech Leads Dev):** Exibição da aplicação funcionando em tempo real na URL pública hospedada na OCI. Submissão sequencial dos **3 exemplos obrigatórios de teste** previstos no edital para validação imediata da banca examinadora.
 4. **Minuto 5.0 a 6.0 (Infraestrutura e Encerramento — Cloud Architect & PO):** Demonstração do painel de controle da OCI comprovando o uso de serviços nativos (Object Storage/Compute) operando perfeitamente sob os limites do plano gratuito e considerações finais de mercado.
-
-```
-
-```
