@@ -33,3 +33,20 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Node / React (frontend) ###
+node_modules/
+dist/
+.env
+.env.local
+
+### Python / FastAPI (ia) ###
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.joblib
+
+### Segredos e infra ###
+.env
+*.pem

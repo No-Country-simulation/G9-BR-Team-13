@@ -11,8 +11,8 @@
 	<groupId>com.example</groupId>
 	<artifactId>TechContentClassifier</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>TechContentClassifier</name>
+	<description>API REST (Spring Boot) que recebe titulo e texto de conteudo tecnico, delega a classificacao a um servico de ML (FastAPI) e devolve categoria, probabilidade e palavras-chave.</description>
 	<url/>
 	<licenses>
 		<license/>
