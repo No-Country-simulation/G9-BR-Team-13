@@ -488,7 +488,7 @@ Formato completo recomendado: prefixo, escopo entre parênteses e descrição cu
 
 | Etapa | O que fazer | Por quê |
 |---|---|---|
-| Coleta | Reunir 60-100 exemplos de conteúdo técnico rotulados por categoria (Backend, Frontend, Dados, DevOps/Cloud, etc.), de fontes públicas de documentação e produção própria da equipe | Volume mínimo do edital; múltiplas fontes evitam viés de vocabulário |
+| Coleta | Reunir 1000-5000 (justificado no item 13.2) exemplos de conteúdo técnico rotulados por categoria (Backend, Frontend, Dados, DevOps/Cloud, etc.), de fontes públicas de documentação e produção própria da equipe | Volume mínimo do edital; múltiplas fontes evitam viés de vocabulário |
 | EDA | Contar exemplos por categoria, tamanho médio dos textos, palavras mais frequentes | Detecta desbalanceamento de classes antes de treinar |
 | Limpeza | Lowercase, remoção de pontuação e stopwords em português, tokenização simples | Reduz ruído sem exigir NLP avançado |
 | Normalização | Remover acentuação apenas se necessário; manter termos técnicos (ex.: 'API', 'Spring') intactos | Termos técnicos são o principal sinal discriminante entre categorias |
@@ -500,6 +500,54 @@ Formato completo recomendado: prefixo, escopo entre parênteses e descrição cu
 ### 13.1 Extração de palavras-chave (`informacoes_adicionais`)
 
 Em vez de um segundo modelo, o time reaproveita o próprio vetorizador TF-IDF: para cada texto recebido, calculam-se os pesos TF-IDF de cada termo e retornam-se os N termos de maior peso como palavras-chave. Essa abordagem é sugerida pelo edital ("identificação de palavras-chave"), não exige treinar nada além do que já existe e resolve o campo `informacoes_adicionais` do contrato com esforço mínimo.
+
+### 13.2 Justificativa para a quantidade de dados para treinamento
+
+Para o cenário de um Hackathon, onde o tempo é curto e o objetivo é entregar um **MVP (Mínimo Produto Viável) funcional**, a quantidade ideal de itens não precisa ser massiva (como milhões de dados), mas sim **qualitativa e equilibrada**.
+
+Aqui está a recomendação de quantidade ideal dividida por abordagem de Ciência de Dados para o seu projeto:
+
+---
+
+## 1. Para Classificação de Texto (Supervisionado)
+
+Se você vai usar **Regressão Logística, Naive Bayes ou SVM** (com TF-IDF) para classificar os textos em categorias (ex: *Backend, Frontend, DevOps, Data Science*):
+
+* **Quantidade Ideal:** Entre **1.000 e 5.000 itens** no total.
+* **Por Categoria:** Pelo menos **200 a 500 exemplos por classe**.
+* **Regra de Ouro:** O mais importante aqui é o **equilíbrio**. Se você tiver 2.000 exemplos de *Backend* e apenas 20 de *DevOps*, o seu modelo ficará viciado (viesado) e assumirá que quase tudo é Backend. Garanta que todas as categorias tenham volumes parecidos.
+
+---
+
+## 2. Para Agrupamento (Clustering / Não Supervisionado)
+
+Se a sua abordagem for usar **K-Means** para agrupar assuntos semelhantes automaticamente sem categorias pré-definidas:
+
+* **Quantidade Ideal:** Entre **500 e 2.000 itens**.
+* **Motivo:** O agrupamento precisa de volume suficiente para que o algoritmo identifique padrões de similaridade textual, mas dados demais (ex: +10.000) podem tornar a interpretação humana dos clusters gerados muito difícil para o dia da apresentação.
+
+---
+
+## 3. Para Busca Semântica ou Recomendação (Embeddings)
+
+Se você optar por usar modelos pré-treinados (como **BERT**, **SpaCy** ou os embeddings da própria Oracle Cloud AI) para calcular a similaridade de cosseno e recomendar conteúdos relacionados:
+
+* **Quantidade Ideal:** A partir de **100 a 500 itens**.
+* **Motivo:** Como esses modelos já foram pré-treinados com bilhões de palavras na internet, eles já "entendem" o contexto da linguagem. Você só precisa de uma base pequena/média de artigos para servir como o seu "catálogo" onde a busca será realizada.
+
+---
+
+## 📊 Resumo da Estratégia para o Hackathon
+
+Não tente abraçar o mundo coletando 50.000 artigos. No contexto do Hackathon, foque no seguinte balanço:
+
+| Métrica | Meta para o MVP | Motivo |
+| --- | --- | --- |
+| **Volume Total** | **~1.500 a 3.000 linhas** | Rápido de baixar via API, processa em segundos no notebook e não estoura a memória. |
+| **Divisão de Treino/Teste** | **80% treino / 20% teste** | Padrão de mercado para validar se as métricas (Acurácia, F1-Score) estão reais. |
+| **Tamanho do Texto** | **Frases de 2 a 5 linhas** | Evite pegar o artigo inteiro de 10 páginas. O título + a descrição curta (resumo) são mais do que suficientes para o TF-IDF funcionar bem. |
+
+Uma base limpa, bem tratada (sem HTML, sem stop-words) e com 2.000 registros vai gerar um modelo muito mais preciso na sua API do que uma base de 20.000 registros bagunçados!
 
 ---
 
