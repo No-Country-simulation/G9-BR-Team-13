@@ -1,16 +1,74 @@
-# React + Vite
+# InfoHub AI — Front-end
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface do projeto **InfoHub AI**, desenvolvida em React para organização e classificação de conteúdo técnico.
 
-Currently, two official plugins are available:
+## Tecnologias
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- Vite
+- Tailwind CSS
+- Lucide React
+- JavaScript
+- Fetch API
 
-## React Compiler
+## Requisitos
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Tenha instalado:
 
-## Expanding the ESLint configuration
+- Node.js 22 ou superior
+- npm 10 ou superior
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Confira com:
+
+```bash
+node -v
+npm -v
+```
+
+## Como executar
+
+Clone o repositório e entre na pasta do front-end:
+
+```bash
+cd infohub-ai
+```
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Crie o arquivo `.env` na raiz do front-end:
+
+```env
+VITE_API_URL=http://localhost:8080
+```
+
+Inicie o projeto:
+
+```bash
+npm run dev
+```
+
+Abra no navegador:
+
+```text
+http://localhost:5173
+```
+
+## Observação
+
+O front-end se comunica apenas com o backend Java pelo endpoint:
+
+```text
+POST /conteudo
+```
+
+O serviço de Machine Learning não deve ser chamado diretamente pelo React.
+
+## Status atual
+
+A interface está funcional e preparada para integração com o backend.
+
+Caso o backend não esteja em execução, será exibida uma mensagem de erro ao tentar analisar um conteúdo.

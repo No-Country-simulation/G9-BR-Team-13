@@ -1,4 +1,4 @@
-import { Cloud, Database, Server, FileJson } from "lucide-react";
+import { Cloud, Database, FileJson, Server } from "lucide-react";
 
 function StatusCards() {
   const cards = [
@@ -46,23 +46,23 @@ function StatusCards() {
             key={card.title}
             className="rounded-3xl border border-white/10 bg-slate-900 p-5 shadow-xl shadow-slate-950/30"
           >
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex items-center">
               <div
                 className={`flex h-11 w-11 items-center justify-center rounded-2xl ${card.bg} ${card.color}`}
               >
                 <Icon size={22} />
               </div>
-
-              <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-400">
-                MVP
-              </span>
             </div>
 
             <p className="text-sm text-slate-400">{card.title}</p>
+
             <h3 className={`mt-1 text-xl font-bold ${card.color}`}>
               {card.value}
             </h3>
-            <p className="mt-1 text-sm text-slate-500">{card.description}</p>
+
+            <p className="mt-1 text-sm text-slate-500">
+              {card.description}
+            </p>
           </div>
         );
       })}
