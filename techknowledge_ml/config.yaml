@@ -1,7 +1,0 @@
-tfidf:
-  stop_words: "english"   # Use "portuguese" se tiver nltk instalado e o stopwords-pt
-  ngram_range: [1, 2]
-  max_df: 0.9
-  min_df: 2
-svc:
-  C: 1.0
