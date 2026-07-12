@@ -5,7 +5,7 @@ import os
 import json
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
 
@@ -29,7 +29,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # 3. Determinar número de folds dinamicamente
-# O número de folds não pode exceder o número mínimo de amostras por classe
 min_samples = min(y_train.value_counts())
 cv_folds = min(5, min_samples)
 print(f"\nUsando {cv_folds} folds na validação cruzada (mínimo de amostras por classe: {min_samples})")
@@ -42,10 +41,12 @@ pipeline = Pipeline([
         max_df=config['tfidf']['max_df'],
         min_df=config['tfidf']['min_df']
     )),
-    ('clf', LinearSVC(
-        C=config['svc']['C'],
+    ('clf', LogisticRegression(
+        C=config['model']['C'],
         class_weight='balanced',
-        random_state=42
+        random_state=42,
+        max_iter=1000,
+        solver='lbfgs'
     ))
 ])
 
@@ -64,13 +65,16 @@ report = classification_report(y_test, y_pred, output_dict=True)
 print("\nMelhores parâmetros:", grid.best_params_)
 print("Acurácia:", grid.score(X_test, y_test))
 
-# 6. Salvar o modelo (pipeline completo)
+# 6. Salvar vetorizador e modelo separadamente
 os.makedirs("models", exist_ok=True)
-joblib.dump(grid.best_estimator_, "models/pipeline_classificador.pkl")
+best_pipeline = grid.best_estimator_
+joblib.dump(best_pipeline.named_steps['tfidf'], "models/vectorizer.joblib")
+joblib.dump(best_pipeline.named_steps['clf'], "models/modelo.joblib")
 
 # 7. Salvar métricas para monitoramento
 with open("models/metrics.json", "w") as f:
     json.dump(report, f, indent=4)
 
-print("\n✅ Modelo treinado e salvo em 'models/pipeline_classificador.pkl'")
-print("📊 Métricas salvas em 'models/metrics.json'")
+print("\n[OK] Vetorizador salvo em 'models/vectorizer.joblib'")
+print("[OK] Modelo salvo em 'models/modelo.joblib'")
+print("[OK] Metricas salvas em 'models/metrics.json'")
