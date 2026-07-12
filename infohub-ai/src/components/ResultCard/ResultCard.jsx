@@ -1,13 +1,17 @@
 import { Brain, CheckCircle, Gauge, Tags } from "lucide-react";
 
-function ResultCard() {
-  const result = {
-    categoria: "Backend",
-    probabilidade: 0.94,
-    palavrasChave: ["Java", "Spring Boot", "API REST"],
-    modelo: "TF-IDF + Regressão Logística",
-    status: "Modelo carregado",
-  };
+function ResultCard({ result }) {
+  if (!result) {
+    return (
+      <section className="rounded-3xl border border-white/10 bg-slate-900 p-6">
+        <h3 className="text-xl font-bold text-white">Resultado da análise</h3>
+
+        <p className="mt-2 text-slate-400">
+          O resultado aparecerá aqui após o processamento.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40">
@@ -17,7 +21,10 @@ function ResultCard() {
         </div>
 
         <div>
-          <h3 className="text-xl font-bold text-white">Resultado da análise</h3>
+          <h3 className="text-xl font-bold text-white">
+            Resultado da análise
+          </h3>
+
           <p className="text-sm text-slate-400">
             Informações retornadas pelo modelo de classificação.
           </p>
@@ -30,7 +37,10 @@ function ResultCard() {
             <Brain size={18} />
             <span className="text-sm">Categoria</span>
           </div>
-          <p className="text-xl font-bold text-cyan-300">{result.categoria}</p>
+
+          <p className="text-xl font-bold text-cyan-300">
+            {result.categoria}
+          </p>
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-slate-950 p-4">
@@ -38,6 +48,7 @@ function ResultCard() {
             <Gauge size={18} />
             <span className="text-sm">Probabilidade</span>
           </div>
+
           <p className="text-xl font-bold text-emerald-300">
             {Math.round(result.probabilidade * 100)}%
           </p>
@@ -69,6 +80,7 @@ function ResultCard() {
         </div>
 
         <p className="font-semibold text-emerald-300">{result.status}</p>
+
         <p className="mt-1 text-sm text-slate-500">{result.modelo}</p>
       </div>
     </section>
