@@ -5,6 +5,7 @@ import JsonViewer from "../../components/JsonViewer/JsonViewer";
 import RelatedContent from "../../components/RelatedContent/RelatedContent";
 import ResultCard from "../../components/ResultCard/ResultCard";
 import StatusCards from "../../components/StatusCards/StatusCards";
+import { analyzeContent } from "../../services/api";
 
 const initialResult = {
   categoria: "Backend",
@@ -42,15 +43,47 @@ const initialRelatedContents = [
 ];
 
 function Home() {
-  const [result] = useState(initialResult);
-  const [relatedContents] = useState(initialRelatedContents);
+  const [result, setResult] = useState(initialResult);
+  const [relatedContents, setRelatedContents] = useState(
+    initialRelatedContents,
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function handleAnalyze(payload) {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await analyzeContent(payload);
+
+      setResult(response);
+
+      if (Array.isArray(response.conteudosRelacionados)) {
+        setRelatedContents(response.conteudosRelacionados);
+      }
+    } catch (requestError) {
+      console.error(requestError);
+
+      setError(
+        "Não foi possível analisar o conteúdo. Verifique se o backend está disponível.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <>
       <StatusCards />
 
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <AnalysisForm />
+        <AnalysisForm
+          onSubmit={handleAnalyze}
+          isLoading={isLoading}
+          error={error}
+        />
+
         <ResultCard result={result} />
       </section>
 
