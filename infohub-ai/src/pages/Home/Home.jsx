@@ -1,5 +1,6 @@
-import JsonViewer from "../../components/JsonViewer/JsonViewer";
 import AnalysisForm from "../../components/AnalysisForm/AnalysisForm";
+import JsonViewer from "../../components/JsonViewer/JsonViewer";
+import RelatedContent from "../../components/RelatedContent/RelatedContent";
 import ResultCard from "../../components/ResultCard/ResultCard";
 import StatusCards from "../../components/StatusCards/StatusCards";
 
@@ -12,7 +13,10 @@ function Home() {
         <AnalysisForm />
         <ResultCard />
       </section>
+
       <JsonViewer />
+
+      <RelatedContent />
     </>
   );
 }
