@@ -1,40 +1,74 @@
-# frontend/
+# InfoHub AI — Front-end
 
-Aplicação React que consome a API do backend (`/conteudo`) e mostra o resultado da classificação para o usuário.
+Interface do projeto **InfoHub AI**, desenvolvida em React para organização e classificação de conteúdo técnico.
 
-**Regra importante:** o frontend fala **apenas** com o Backend Java (`backend/`). Nunca chama o serviço de ML (`ia/`) diretamente.
+## Tecnologias
 
-## Stack
+- React
+- Vite
+- Tailwind CSS
+- Lucide React
+- JavaScript
+- Fetch API
 
-- React + Vite
-- `fetch` nativo para chamadas HTTP (sem necessidade de biblioteca extra)
+## Requisitos
 
-## Como começar
+Tenha instalado:
 
-Dentro desta pasta:
+- Node.js 22 ou superior
+- npm 10 ou superior
+
+Confira com:
 
 ```bash
-npm create vite@latest . -- --template react
+node -v
+npm -v
+```
+
+## Como executar
+
+Clone o repositório e entre na pasta do front-end:
+
+```bash
+cd frontend
+```
+
+Instale as dependências:
+
+```bash
 npm install
+```
+
+Crie o arquivo `.env` na raiz do front-end:
+
+```env
+VITE_API_URL=http://localhost:8080
+```
+
+Inicie o projeto:
+
+```bash
 npm run dev
 ```
 
-## Estrutura esperada
+Abra no navegador:
 
-```
-frontend/
-├── src/
-│   ├── components/   # componentes reutilizáveis (Form, ResultCard, Loader)
-│   ├── pages/         # telas (Home)
-│   ├── services/       # chamadas à API (api.js) — nunca faça fetch direto dentro de um componente
-│   └── App.jsx
-└── package.json
+```text
+http://localhost:5173
 ```
 
-## Padrões de código
+## Observação
 
-- Componentes funcionais com Hooks, nunca class components.
-- Estado de loading e erro sempre explícito (`isLoading`, `error`) — nunca inferido pela ausência de dados.
-- Chamadas de API isoladas em `src/services/api.js`.
+O front-end se comunica apenas com o backend Java pelo endpoint:
 
-Mais contexto (contrato da API, exemplos de request/response): veja [`docs/DOCUMENTACAO_PROJETO.md`](../docs/DOCUMENTACAO_PROJETO.md), seção 14.
+```text
+POST /conteudo
+```
+
+O serviço de Machine Learning não deve ser chamado diretamente pelo React.
+
+## Status atual
+
+A interface está funcional e preparada para integração com o backend.
+
+Caso o backend não esteja em execução, será exibida uma mensagem de erro ao tentar analisar um conteúdo.
