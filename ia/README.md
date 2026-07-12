@@ -2,20 +2,20 @@
 
 Serviço de Ciência de Dados / Machine Learning: treina o modelo de classificação de conteúdo técnico e expõe um serviço interno de inferência (FastAPI) chamado pelo backend Java via `POST /predict`.
 
-## Status atual
-
-Já existe código real aqui (recuperado da branch `marcusdev/ml`, removendo uma pasta `.venv` que tinha sido commitada por engano). **Antes de usar como está, o time de Dados precisa resolver os pontos abaixo** — nenhum é um bug de sintaxe, são decisões/qualidade que afetam o resultado:
-
-1. **Dataset sintético.** `data/dataset.csv` (400 linhas) foi gerado por template (`scripts/generate_data.py` combina prefixo + tema + sufixo de listas fixas por categoria), não é conteúdo técnico real. Isso explica o F1-score de 1.0 em `models/metrics.json` — é sinal de que o modelo decorou o vocabulário do template, não de que ele generaliza bem. Precisa complementar/substituir por exemplos reais antes da entrega (ver seção 13 da documentação).
-2. **Falta o notebook.** O edital exige um notebook de Ciência de Dados (EDA, limpeza, treino, métricas, serialização) como entregável obrigatório. O pipeline aqui está em scripts `.py` (`scripts/train.py`, `scripts/evaluate.py`) — funcional, mas precisa ser consolidado em um notebook (`notebooks/eda_treino_modelo.ipynb`) para cumprir o requisito literal do edital.
-3. **Algoritmo.** `scripts/train.py` usa `LinearSVC`. A documentação e o edital sugerem `LogisticRegression`. A "probabilidade" retornada hoje é uma aproximação manual (softmax sobre `decision_function`), não uma probabilidade calibrada de verdade. Vale decidir com o time se troca para `LogisticRegression` (tem `predict_proba` nativo) ou se mantém `LinearSVC` documentando a aproximação.
-4. **Stopwords erradas.** `config.yaml` está configurado com `stop_words: "english"`, mas o texto é em português — na prática isso não filtra quase nada.
-5. **Contrato do endpoint.** `app/main.py` já implementa `POST /predict` de acordo com o padrão do doc (título+texto → categoria+probabilidade+palavras-chave), mas o campo de resposta se chama `palavrasChave` — confirmar com o Backend antes de integrar, e ver seção 14.2 do doc para o contrato final exposto ao usuário (que usa `informacoes_adicionais`). Um arquivo `Integração_Backend.md` que vinha junto com esse código sugeria um endpoint público (`/api/v1/classify`) diferente do contrato oficial (`POST /conteudo`) — não foi trazido para o repositório por causa disso; **não usem ele como referência**, o contrato oficial é a seção 14 do [`docs/DOCUMENTACAO_PROJETO.md`](../docs/DOCUMENTACAO_PROJETO.md).
-
 ## Stack
 
 - Python 3.11, FastAPI, Scikit-Learn, `joblib`
-- OCI Object Storage (`app/main.py` já baixa o modelo de lá se `OCI_NAMESPACE` estiver configurado; roda localmente sem OCI se `models/pipeline_classificador.pkl` já existir)
+- Algoritmo: TF-IDF + **LogisticRegression** (multinomial, `predict_proba` nativo)
+- Stopwords: **português** (lista curada inline no `config.yaml`)
+- OCI Object Storage (`app/model_loader.py` baixa os artefatos de lá se `OCI_NAMESPACE` estiver configurado; roda localmente sem OCI se `models/modelo.joblib` e `models/vectorizer.joblib` já existirem)
+
+## Status
+
+- **Modelo treinado:** TF-IDF + LogisticRegression (multinomial)
+- **Acurácia atual:** ~75-95% (F1-weighted: ~0.75-0.95, varia conforme amostragem do dataset)
+- **Stopwords:** português (lista curada no `config.yaml`)
+- **Contrato:** campo `informacoes_adicionais` conforme seção 14.2 do doc
+- **Dataset:** 200 exemplos realistas de documentação técnica (50 por categoria, 4 categorias), gerados por `scripts/generate_realistic_dataset.py`
 
 ## Como rodar localmente
 
@@ -24,39 +24,81 @@ cd ia
 python -m venv .venv
 .venv\Scripts\activate        # Windows
 pip install -r requirements.txt
+pip install -r requirements-dev.txt   # (opcional) para rodar o notebook
 cp .env.example .env          # ajuste as variáveis se for usar OCI
 uvicorn app.main:app --reload --port 8000
 ```
 
-Para treinar o modelo do zero: `python scripts/train.py` (lê `data/dataset.csv`, salva `models/pipeline_classificador.pkl` e `models/metrics.json`).
+Para treinar o modelo do zero:
+
+```bash
+python scripts/generate_realistic_dataset.py   # gera dataset com exemplos realistas (preferencial)
+python scripts/train.py                        # treina e salva models/modelo.joblib + models/vectorizer.joblib
+```
+
+Para acompanhar EDA + treino no notebook:
+
+```bash
+pip install -r requirements-dev.txt
+jupyter notebook notebooks/eda_treino_modelo.ipynb
+```
 
 ## Estrutura
 
 ```
 ia/
+├── notebooks/
+│   └── eda_treino_modelo.ipynb   # notebook EDA + treino + avaliação (entregável obrigatório)
 ├── app/
-│   ├── main.py       # FastAPI app, endpoint POST /predict, download do modelo via OCI
-│   └── utils.py       # extração de palavras-chave a partir dos coeficientes do classificador
+│   ├── __init__.py
+│   ├── main.py                   # FastAPI app, endpoint POST /predict
+│   ├── schemas.py                # Pydantic models (TextInput, PredictionOutput)
+│   ├── model_loader.py           # download do OCI + carga dos artefatos .joblib
+│   └── keywords.py               # extração de palavras-chave a partir dos coeficientes do classificador
 ├── scripts/
-│   ├── generate_data.py   # gera dataset sintético (ver ressalva nº 1 acima)
-│   ├── train.py            # treina o pipeline (TF-IDF + LinearSVC) e salva métricas
-│   └── evaluate.py         # testa o modelo salvo manualmente via input no terminal
+│   ├── generate_realistic_dataset.py  # gera dataset com exemplos realistas de documentação técnica
+│   ├── train.py                   # treina o pipeline (TF-IDF + LogisticRegression) e salva métricas
+│   └── evaluate.py                # testa o modelo salvo manualmente via input no terminal
 ├── data/
-│   └── dataset.csv, dataset_200.csv, dataset_400.csv
+│   └── dataset.csv                # dataset principal (200 exemplos realistas)
 ├── models/
-│   ├── pipeline_classificador.pkl   # modelo + vetorizador num único objeto sklearn Pipeline
+│   ├── modelo.joblib              # classificador LogisticRegression serializado
+│   ├── vectorizer.joblib           # vetorizador TF-IDF serializado
 │   └── metrics.json
-├── config.yaml         # hiperparâmetros do TF-IDF/SVC
+├── config.yaml                    # hiperparâmetros do TF-IDF / LogisticRegression + stopwords pt
 ├── requirements.txt
+├── requirements-dev.txt   # dependências para o notebook (matplotlib, seaborn, jupyter)
 ├── Dockerfile
 └── .env.example
 ```
 
-> Nota: o doc oficial (seção 5) sugere separar `modelo.joblib` e `vectorizer.joblib` e ter uma pasta `notebooks/`. O que existe hoje empacota os dois num único `Pipeline` serializado e usa scripts em vez de notebook — funcionalmente equivalente, mas pendente dos ajustes 1–3 acima e da criação do notebook para bater com o entregável do edital.
+
+## Contrato do endpoint
+
+O serviço expõe o endpoint interno `POST /predict` (consumido pelo backend Java):
+
+**Request:**
+```json
+{
+  "titulo": "Introdução ao Spring Boot",
+  "texto": "Neste conteúdo são apresentados os conceitos..."
+}
+```
+
+**Response 200:**
+```json
+{
+  "categoria": "Backend",
+  "probabilidade": 0.89,
+  "informacoes_adicionais": ["Java", "Spring Boot", "API REST"]
+}
+```
+
+O campo `informacoes_adicionais` segue o contrato oficial da seção 14.2 de [`docs/DOCUMENTACAO_PROJETO.md`](../docs/DOCUMENTACAO_PROJETO.md).
 
 ## Regras importantes
 
-- O modelo é carregado **uma única vez** na inicialização do processo (`@app.on_event("startup")`), nunca a cada requisição.
+- O modelo é carregado **uma única vez** na inicialização do processo (`lifespan`), nunca a cada requisição.
 - `.env` real (com credenciais) nunca vai para o Git — só `.env.example`. `.venv/`, `__pycache__/` e `*.pyc` já estão no `.gitignore` da raiz.
 
-Mais contexto (estratégia de ciência de dados, contrato do `/predict`): veja [`docs/DOCUMENTACAO_PROJETO.md`](../docs/DOCUMENTACAO_PROJETO.md), seções 13 e 16.
+Mais contexto (estratégia de ciência de dados): veja [`docs/DOCUMENTACAO_PROJETO.md`](../docs/DOCUMENTACAO_PROJETO.md), seções 13 e 16.
