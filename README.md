@@ -1,4 +1,4 @@
-# Time 13 — Organização Inteligente de Conteúdo Técnico
+# Time 13 - Organização Inteligente de Conteúdo Técnico
 
 Hackathon ONE (Alura + Oracle) · Grupo G9 · Time 13
 
