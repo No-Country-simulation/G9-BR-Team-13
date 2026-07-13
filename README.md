@@ -1,99 +1,352 @@
-# Time 13 - Organização Inteligente de Conteúdo Técnico
+# 🚀 Time 13 - Organização Inteligente de Conteúdo Técnico
 
-Hackathon ONE (Alura + Oracle) · Grupo G9 · Time 13
+<div align="center">
 
-## 1. Sobre o projeto
+## 🤖 Hackathon ONE
 
-Solução que recebe conteúdo técnico (título + texto) e devolve, via API REST, a categoria temática, a probabilidade da classificação e palavras-chave — usando TF-IDF + Regressão Logística treinados em cima de um dataset de exemplos técnicos. O Backend (Java/Spring Boot) expõe a API pública e delega a inferência a um serviço interno de Machine Learning (Python/FastAPI), persistindo o histórico em PostgreSQL/MySQL e publicando o modelo no OCI Object Storage.
+### Alura + Oracle | Grupo G9 | Time 13
 
-A documentação completa do projeto (arquitetura detalhada, backlog, cronograma, padrões de código, especificação da API, riscos, etc.) está em [`docs/DOCUMENTACAO_PROJETO.md`](docs/DOCUMENTACAO_PROJETO.md) — leiam esse arquivo antes de começar a codar na sua área.
+**Transformando conteúdos técnicos em conhecimento organizado através de Inteligência Artificial.**
 
-## 2. Arquitetura
+</div>
+
+---
+
+# 🌟 Sobre o Projeto
+
+## 🧠 Uma solução inteligente para classificar conteúdos técnicos
+
+Nosso projeto nasceu com um objetivo simples:
+
+> **Organizar conhecimento técnico automaticamente usando Inteligência Artificial. 🚀**
+
+A plataforma recebe um conteúdo técnico contendo:
+
+📝 **Título**
+📄 **Texto do conteúdo**
+
+E através de um modelo de Machine Learning realiza:
+
+✅ Classificação automática por categoria
+📊 Cálculo da probabilidade da previsão
+🔎 Extração de palavras-chave relevantes
+💾 Armazenamento do histórico das análises
+
+---
+
+## ⚙️ Como nossa inteligência funciona?
+
+Utilizamos técnicas de Ciência de Dados para transformar texto em informação:
+
+🔹 **TF-IDF**
+
+> Responsável por identificar a importância das palavras dentro dos conteúdos analisados.
+
+🔹 **Regressão Logística**
+
+> Modelo utilizado para realizar a classificação das categorias técnicas.
+
+🔹 **Dataset de exemplos técnicos**
+
+> Base utilizada para treinar o modelo e melhorar a precisão das respostas.
+
+---
+
+# 🏗️ Arquitetura da Solução
+
+Nossa aplicação utiliza uma arquitetura moderna, separando responsabilidades para garantir escalabilidade e organização.
 
 ```
-Frontend (React) ──HTTPS──► Backend API (Spring Boot) ──HTTP interno──► ML Service (FastAPI)
-                                     │                                          │
-                                     │ grava resultado (best-effort)            │ lê artefato na subida
-                                     ▼                                          ▼
-                            PostgreSQL / MySQL                        OCI Object Storage
-                            (container Docker na                     (modelo.joblib,
-                             mesma VM OCI Compute)                     vectorizer.joblib)
+              🌐 Usuário
+                  |
+                  |
+                  ▼
+        🖥️ Frontend React
+                  |
+              HTTPS
+                  |
+                  ▼
+        ⚙️ Backend Spring Boot
+                  |
+            HTTP interno
+                  |
+                  ▼
+        🤖 Serviço IA FastAPI
+                  |
+        ┌─────────┴─────────┐
+        ▼                   ▼
+ 🗄️ PostgreSQL/MySQL    ☁️ OCI Storage
+ Histórico             Modelo IA
+                        (.joblib)
 ```
 
-O Backend valida a entrada, chama o serviço de ML, formata a resposta no contrato do edital e grava o histórico no banco sem bloquear a resposta ao usuário. Detalhes completos do fluxo: seção 3 da [documentação](docs/DOCUMENTACAO_PROJETO.md).
+---
 
-## 3. Estrutura do monorepo
+# 🔄 Fluxo da Aplicação
+
+### 1️⃣ Usuário envia conteúdo
+
+Exemplo:
 
 ```
-G9-BR-Team-13/
-├── frontend/   # React + Vite — consome só o Backend, nunca o ML Service direto
-├── backend/    # Java 17 + Spring Boot — API pública, validação, persistência
-├── ia/         # Python + FastAPI + Scikit-Learn — notebook de treino e serviço de inferência
-├── infra/      # scripts de deploy e integração OCI (Object Storage / Compute)
-├── docs/       # documentação completa do projeto
-├── README.md         # este arquivo
-└── CONTRIBUTING.md    # fluxo de branches, commits e Pull Requests
+Título:
+"Introdução ao Spring Boot"
+
+Texto:
+"Framework Java utilizado para criação
+de aplicações backend."
 ```
 
-Cada pasta (`frontend/`, `ia/`, `infra/`) tem seu próprio README com o passo a passo de como começar — comece por ali se você for o Tech Lead daquela área.
+⬇️
 
-## 4. Como executar localmente
+### 2️⃣ Backend recebe e valida
 
-### Backend (Spring Boot)
+O Spring Boot:
 
-Pré-requisitos: Java 17+, Maven (ou use o wrapper incluído).
+✔ Verifica os dados enviados
+✔ Controla a comunicação com a IA
+✔ Trata possíveis erros
+
+⬇️
+
+### 3️⃣ Inteligência Artificial analisa
+
+O serviço Python:
+
+🤖 Processa o texto
+📚 Consulta o modelo treinado
+🎯 Retorna a classificação
+
+⬇️
+
+### 4️⃣ Resultado entregue ao usuário
+
+Resposta:
+
+```json
+{
+ "categoria": "Backend",
+ "probabilidade": 0.89,
+ "informacoes_adicionais": [
+   "Java",
+   "Spring Boot"
+ ]
+}
+```
+
+---
+
+# 📂 Organização do Projeto
+
+```
+📦 G9-BR-Team-13
+
+├── 🎨 frontend
+│   └── React + Vite
+│       Interface do usuário
+
+├── ⚙️ backend
+│   └── Java 17 + Spring Boot
+│       API principal
+
+├── 🤖 ia
+│   └── Python + FastAPI
+│       Modelo Machine Learning
+
+├── ☁️ infra
+│   └── Scripts OCI
+│       Deploy e infraestrutura
+
+├── 📚 docs
+│   └── Documentação completa
+
+├── 📄 README.md
+
+└── 🤝 CONTRIBUTING.md
+```
+
+---
+
+# 🛠️ Tecnologias Utilizadas
+
+## 🎨 Frontend
+
+🔹 React
+🔹 Vite
+🔹 Consumo da API REST
+
+---
+
+## ⚙️ Backend
+
+🔹 Java 17
+🔹 Spring Boot
+🔹 API REST
+🔹 Validação de dados
+🔹 Persistência no banco
+
+---
+
+## 🤖 Inteligência Artificial
+
+🔹 Python
+🔹 FastAPI
+🔹 Scikit-Learn
+🔹 TF-IDF
+🔹 Regressão Logística
+
+---
+
+## ☁️ Cloud
+
+🔹 Oracle Cloud Infrastructure (OCI)
+
+Utilizando:
+
+☁️ Object Storage
+🖥️ Compute Instance
+🐳 Containers Docker
+
+---
+
+# 🚀 Executando o Projeto
+
+## ⚙️ Backend
+
+Pré-requisitos:
+
+✔ Java 17+
+✔ Maven instalado
+
+Execute:
 
 ```bash
 cd backend
-./mvnw.cmd spring-boot:run    # Windows
-./mvnw spring-boot:run         # Linux/Mac
+
+./mvnw.cmd spring-boot:run
 ```
 
-A API sobe em `http://localhost:8080`.
-
-### Frontend e serviço de ML
-
-Ainda não têm código neste repositório — siga as instruções em [`frontend/README.md`](frontend/README.md) e [`ia/README.md`](ia/README.md) para bootstrapar cada um.
-
-## 5. Como usar a API
-
-Ver especificação completa (endpoints, contrato de request/response, validações, códigos de erro) na seção 14 de [`docs/DOCUMENTACAO_PROJETO.md`](docs/DOCUMENTACAO_PROJETO.md).
-
-Contrato principal:
+Servidor disponível:
 
 ```
-POST /conteudo
-Request:  { "titulo": "...", "texto": "..." }
-Response: { "categoria": "Backend", "probabilidade": 0.89, "informacoes_adicionais": ["Java", "Spring Boot"] }
+http://localhost:8080
 ```
 
-## 6. Exemplos de uso (obrigatórios pelo edital)
+---
 
-| # | Título de entrada | Categoria esperada |
-|---|---|---|
-| 1 | Introdução ao Spring Boot | Backend |
-| 2 | Como criar componentes reutilizáveis em React | Frontend |
-| 3 | Treinando um modelo de classificação com Scikit-Learn | Dados |
+# 🔌 API REST
 
-## 7. Time e papéis
+## 📌 Endpoint principal
 
-| Área | Papel |
-|---|---|
-| Product Owner | Prioriza backlog, valida entregas contra o edital, conduz sprint planning e demo |
-| Backend (Java) | Tech Lead Backend — contratos de API, validação, tratamento de erros |
-| Ciência de Dados | Tech Lead Dados — EDA, treino, avaliação e serialização do modelo |
-| Frontend | Tech Lead Frontend — componentes, consumo da API |
-| OCI/Cloud | Arquiteto OCI — Object Storage, Compute, deploy |
-| QA | Especialista em Testes — valida os 3 exemplos obrigatórios, reporta bugs |
-| DevOps | Engenheiro DevOps — pipeline de deploy |
-| Documentação | Especialista em Hackathons — mantém README e roteiro de demo atualizados |
+### ➡️ POST /conteudo
 
-Detalhes de responsabilidades por área: seção 6 de [`docs/DOCUMENTACAO_PROJETO.md`](docs/DOCUMENTACAO_PROJETO.md).
+Envia um conteúdo para classificação.
 
-## 8. Contribuindo
+### 📥 Entrada:
 
-Antes de abrir uma branch ou um Pull Request, leia [`CONTRIBUTING.md`](CONTRIBUTING.md) — define o fluxo Git simplificado do time (sem branch `develop`) e o padrão de commits.
+```json
+{
+ "titulo":"Como criar componentes React",
+ "texto":"Aprenda sobre componentes reutilizáveis"
+}
+```
 
-## 9. Documentação completa
+### 📤 Retorno:
 
-Toda a documentação oficial do projeto (arquitetura, backlog, cronograma, padrões de código, riscos, plano B e melhorias futuras) está em [`docs/DOCUMENTACAO_PROJETO.md`](docs/DOCUMENTACAO_PROJETO.md).
+```json
+{
+ "categoria":"Frontend",
+ "probabilidade":0.92,
+ "informacoes_adicionais":[
+    "React",
+    "Componentes"
+ ]
+}
+```
+
+---
+
+# 🧪 Exemplos de Validação
+
+| Nº   | Entrada                              | Resultado esperado |
+| ---- | ------------------------------------ | ------------------ |
+| 🚀 1 | Introdução ao Spring Boot            | Backend            |
+| ⚛️ 2 | Componentes reutilizáveis em React   | Frontend           |
+| 📊 3 | Modelo de classificação Scikit-Learn | Dados              |
+
+---
+
+# 👥 Nosso Time
+
+Cada integrante possui uma missão importante:
+
+| Área                | Responsabilidade                         |
+| ------------------- | ---------------------------------------- |
+| 🎯 Product Owner    | Organiza prioridades, backlog e entregas |
+| ⚙️ Backend          | Desenvolve APIs e regras de negócio      |
+| 🧠 Ciência de Dados | Treina e avalia modelos de IA            |
+| 🎨 Frontend         | Cria interfaces e experiência do usuário |
+| ☁️ OCI Cloud        | Infraestrutura e deploy                  |
+| 🧪 QA               | Testes e qualidade da solução            |
+| 🚀 DevOps           | Automação e pipelines                    |
+| 📚 Documentação     | Organização dos materiais do projeto     |
+
+---
+
+# 🤝 Como Contribuir
+
+Antes de começar:
+
+📖 Leia a documentação oficial:
+
+```
+docs/DOCUMENTACAO_PROJETO.md
+```
+
+Depois:
+
+1️⃣ Crie sua branch
+2️⃣ Desenvolva sua funcionalidade
+3️⃣ Faça commits organizados
+4️⃣ Abra um Pull Request
+
+---
+
+# 📚 Documentação Oficial
+
+Toda a evolução do projeto está documentada:
+
+📌 Arquitetura
+📌 Backlog
+📌 Cronograma
+📌 Padrões de código
+📌 Riscos
+📌 Melhorias futuras
+
+---
+
+<div align="center">
+
+# 🚀 Time 13
+
+## 💡 Inteligência Artificial transformando informação em conhecimento.
+
+### 🤖 Classifique. Organize. Evolua.
+
+</div>
+
+---
+
+## 🔘 Navegação rápida
+
+[🚀 Projeto](#-sobre-o-projeto)
+[🏗️ Arquitetura](#-arquitetura-da-solução)
+[📂 Estrutura](#-organização-do-projeto)
+[⚙️ Tecnologias](#-tecnologias-utilizadas)
+[🔌 API](#-api-rest)
+[👥 Time](#-nosso-time)
+
+---
+
+Ficou com uma aparência mais próxima de **README profissional de projeto de Hackathon/portfólio GitHub**, com storytelling e destaque para a solução. 🚀
+
