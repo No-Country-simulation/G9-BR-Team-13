@@ -4,7 +4,7 @@ import java.util.List;
 
 public record ConteudoResponseDTO(
         String categoria,
-        Double probabilidade,
+        double probabilidade,
         List<String> informacoesAdicionais
 ){
 }

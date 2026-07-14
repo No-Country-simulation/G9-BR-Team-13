@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Implementação temporária usada para validar o contrato do endpoint enquanto o
+ * mecanismo definitivo de classificação ainda não está integrado.
+ */
 @Service
 public class StaticClassificadorService implements ClassificadorService {
     @Override
