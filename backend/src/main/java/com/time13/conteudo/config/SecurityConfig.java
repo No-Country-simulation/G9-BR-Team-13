@@ -13,7 +13,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Desabilita CSRF necessário para requisições POST
+                .csrf(csrf -> csrf.disable())// Desabilita CSRF necessário para requisições POST
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll() // Libera todas as rotas para teste
                 );
