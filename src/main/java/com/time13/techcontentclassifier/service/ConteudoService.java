@@ -11,34 +11,42 @@ import java.util.List;
 @Service
 public class ConteudoService {
     private final ConteudoRepository conteudoRepository;
+    private final ClassificadorService classificadorService;
 
-    public ConteudoService(ConteudoRepository conteudoRepository) {
+    public ConteudoService(ConteudoRepository conteudoRepository,
+                           ClassificadorService classificadorService) {
         this.conteudoRepository = conteudoRepository;
+        this.classificadorService = classificadorService;
     }
+
     public ConteudoResponseDTO classificar(ConteudoRequestDTO request) {
 
-        // Simulação da classificação (depois será substituída pela IA)
-        String categoria = "Backend";
-        Double probabilidade = 0.98;
-        List<String> informacoes = List.of("Java", "Spring Boot", "API REST");
+        // Obtém a classificação (por enquanto do Mock)
+        ConteudoResponseDTO resposta = classificadorService.classificar(request);
 
         // Cria a entidade
-        Conteudo conteudo = Conteudo.builder()
-                .titulo(request.titulo())
-                .texto(request.texto())
-                .categoria(categoria)
-                .probabilidade(probabilidade)
-                .informacoesAdicionais(String.join(", ", informacoes))
-                .build();
+        Conteudo conteudo = criarConteudo(request, resposta);
 
         // Salva no banco
         conteudoRepository.save(conteudo);
 
         // Retorna a resposta para o cliente
-        return new ConteudoResponseDTO(
-                categoria,
-                probabilidade,
-                informacoes
-        );
+        return resposta;
+    }
+
+    /**
+     * Converte os DTOs em uma entidade Conteudo.
+     */
+    private Conteudo criarConteudo(ConteudoRequestDTO request,
+                                   ConteudoResponseDTO resposta) {
+
+        return Conteudo.builder()
+                .titulo(request.titulo())
+                .texto(request.texto())
+                .categoria(resposta.categoria())
+                .probabilidade(resposta.probabilidade())
+                .informacoesAdicionais(
+                        String.join(", ", resposta.informacoesAdicionais()))
+                .build();
     }
 }
