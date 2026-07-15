@@ -10,9 +10,7 @@ import { analyzeContent } from "../../services/api";
 const initialResult = {
   categoria: "Backend",
   probabilidade: 0.94,
-  palavrasChave: ["Java", "Spring Boot", "API REST"],
-  modelo: "TF-IDF + Regressão Logística",
-  status: "Modelo carregado",
+  informacoesAdicionais: ["Java", "Spring Boot", "API REST"],
 };
 
 const initialRelatedContents = [
@@ -63,11 +61,13 @@ function Home() {
         setRelatedContents(response.conteudosRelacionados);
       }
     } catch (requestError) {
-      console.error(requestError);
+  console.error(requestError);
 
-      setError(
-        "Não foi possível analisar o conteúdo. Verifique se o backend está disponível.",
-      );
+  setError(
+    requestError.message ||
+      "Não foi possível analisar o conteúdo."
+  );
+
     } finally {
       setIsLoading(false);
     }
