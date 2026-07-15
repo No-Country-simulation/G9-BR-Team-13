@@ -7,12 +7,6 @@ import ResultCard from "../../components/ResultCard/ResultCard";
 import StatusCards from "../../components/StatusCards/StatusCards";
 import { analyzeContent } from "../../services/api";
 
-const initialResult = {
-  categoria: "Backend",
-  probabilidade: 0.94,
-  informacoesAdicionais: ["Java", "Spring Boot", "API REST"],
-};
-
 const initialRelatedContents = [
   {
     id: 1,
@@ -41,7 +35,7 @@ const initialRelatedContents = [
 ];
 
 function Home() {
-  const [result, setResult] = useState(initialResult);
+  const [result, setResult] = useState(null);
   const [relatedContents, setRelatedContents] = useState(
     initialRelatedContents,
   );
@@ -61,13 +55,12 @@ function Home() {
         setRelatedContents(response.conteudosRelacionados);
       }
     } catch (requestError) {
-  console.error(requestError);
+      console.error(requestError);
 
-  setError(
-    requestError.message ||
-      "Não foi possível analisar o conteúdo."
-  );
-
+      setError(
+        requestError.message ||
+          "Não foi possível analisar o conteúdo.",
+      );
     } finally {
       setIsLoading(false);
     }
