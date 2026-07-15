@@ -3,50 +3,51 @@ package com.time13.techcontentclassifier.service;
 import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
 import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
 import com.time13.techcontentclassifier.entity.Conteudo;
+import com.time13.techcontentclassifier.mapper.ConteudoMapper;
 import com.time13.techcontentclassifier.repository.ConteudoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class ConteudoService {
     private final ConteudoRepository conteudoRepository;
     private final ClassificadorService classificadorService;
+    private final ConteudoMapper conteudoMapper;
 
     public ConteudoService(ConteudoRepository conteudoRepository,
-                           ClassificadorService classificadorService) {
+                           ClassificadorService classificadorService,
+                           ConteudoMapper conteudoMapper) {
         this.conteudoRepository = conteudoRepository;
         this.classificadorService = classificadorService;
+        this.conteudoMapper = conteudoMapper;
     }
 
     public ConteudoResponseDTO classificar(ConteudoRequestDTO request) {
 
-        // Obtém a classificação (por enquanto do Mock)
-        ConteudoResponseDTO resposta = classificadorService.classificar(request);
+        // Classifica o conteúdo
+        ConteudoResponseDTO resposta =
+                classificadorService.classificar(request);
 
-        // Cria a entidade
-        Conteudo conteudo = criarConteudo(request, resposta);
+        // Converte para entidade
+        Conteudo conteudo =
+                conteudoMapper.toEntity(request, resposta);
 
-        // Salva no banco
-        conteudoRepository.save(conteudo);
+        // Melhor esforço para persistência
+        try {
 
-        // Retorna a resposta para o cliente
+            conteudoRepository.save(conteudo);
+
+            log.info("Conteúdo salvo com sucesso.");
+
+        } catch (Exception e) {
+
+            log.error("Erro ao salvar conteúdo no banco.", e);
+
+        }
+
         return resposta;
-    }
-
-    /**
-     * Converte os DTOs em uma entidade Conteudo.
-     */
-    private Conteudo criarConteudo(ConteudoRequestDTO request,
-                                   ConteudoResponseDTO resposta) {
-
-        return Conteudo.builder()
-                .titulo(request.titulo())
-                .texto(request.texto())
-                .categoria(resposta.categoria())
-                .probabilidade(resposta.probabilidade())
-                .informacoesAdicionais(
-                        String.join(", ", resposta.informacoesAdicionais()))
-                .build();
     }
 }

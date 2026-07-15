@@ -11,10 +11,18 @@ import java.util.List;
 public class StaticClassificadorService implements ClassificadorService {
     @Override
     public ConteudoResponseDTO classificar(ConteudoRequestDTO request) {
+
         return new ConteudoResponseDTO(
+
                 "Backend",
+
                 0.98,
-                List.of("Java", "Spring Boot", "API REST")
+
+                List.of(
+                        "Java",
+                        "Spring Boot",
+                        "API REST"
+                )
         );
     }
 }

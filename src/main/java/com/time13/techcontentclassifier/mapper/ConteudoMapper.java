@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ConteudoMapper {
+
     public Conteudo toEntity(
             ConteudoRequestDTO request,
             ConteudoResponseDTO resposta) {
