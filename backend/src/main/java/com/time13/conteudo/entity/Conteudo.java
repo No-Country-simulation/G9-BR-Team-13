@@ -2,11 +2,17 @@ package com.time13.conteudo.entity;
 
 import com.time13.conteudo.dto.TipoDocumento;
 import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_conteudos")
+@Table(name = "conteudos")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Conteudo {
     @Id
     @Column(name = "id_conteudo")
@@ -20,51 +26,31 @@ public class Conteudo {
     private String texto;
 
     @Column(nullable = false)
-    private String autor;
-
-    @Column(nullable = false)
     private LocalDateTime data;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_documento", nullable = false)
-    private TipoDocumento tipoDocumento;
-
     private String categoria;
     private Double probabilidade;
 
-    // Armazena a lista de tags como elementos em uma tabela auxiliar integrada
-    @ElementCollection
-    @CollectionTable(name = "tb_conteudo_tags", joinColumns = @JoinColumn(name = "id_conteudo"))
-    @Column(name = "tag")
-    private List<String> tagsSugeridas;
+    @Column(name = "informacoes_adicionais", length = 500)
+    private String informacoesAdicionais;
 
-    @Column(name = "resumo_automatico", columnDefinition = "TEXT")
-    private String resumoAutomatico;
+    // Armazena a lista de tags como elementos em uma tabela
+    @ManyToMany
+    @JoinTable(
+            name = "conteudo_tags",
+            joinColumns = @JoinColumn(name = "id_conteudo"),
+            inverseJoinColumns = @JoinColumn(name = "id_tag")
+    )
+    private List<Tags> tagsSugeridas;
 
-    public Conteudo() {}
-
-    public Conteudo(String titulo, String texto, String autor, LocalDateTime data,
-                    TipoDocumento tipoDocumento, String categoria, Double probabilidade,
-                    List<String> tagsSugeridas, String resumoAutomatico) {
+    public Conteudo(String titulo, String texto, LocalDateTime data,
+                                        TipoDocumento tipoDocumento, String categoria, Double probabilidade, String informacoesAdicionais,
+                                        List<Tags> tagsSugeridas) {
         this.titulo = titulo;
         this.texto = texto;
-        this.autor = autor;
         this.data = data;
-        this.tipoDocumento = tipoDocumento;
         this.categoria = categoria;
         this.probabilidade = probabilidade;
+        this.informacoesAdicionais = informacoesAdicionais;
         this.tagsSugeridas = tagsSugeridas;
-        this.resumoAutomatico = resumoAutomatico;
     }
-
-    public Long getIdConteudo() { return idConteudo; }
-    public String getTitulo() { return titulo; }
-    public String getTexto() { return texto; }
-    public String getAutor() { return autor; }
-    public LocalDateTime getData() { return data; }
-    public TipoDocumento getTipoDocumento() { return tipoDocumento; }
-    public String getCategoria() { return categoria; }
-    public Double getProbabilidade() { return probabilidade; }
-    public List<String> getTagsSugeridas() { return tagsSugeridas; }
-    public String getResumoAutomatico() { return resumoAutomatico; }
 }
