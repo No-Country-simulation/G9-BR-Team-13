@@ -3,8 +3,9 @@ package com.time13.conteudo.mapper;
 import com.time13.conteudo.dto.ConteudoRequestDTO;
 import com.time13.conteudo.dto.ConteudoResponseDTO;
 import com.time13.conteudo.entity.Conteudo;
+import com.time13.conteudo.entity.Tags;
 import org.springframework.stereotype.Component;
-
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -19,13 +20,20 @@ public class ConteudoMapper {
             ConteudoRequestDTO request,
             ConteudoResponseDTO resposta) {
 
+        // Converte as strings vindas de 'tagsSugeridas' do DTO para objetos 'Tags'
+        List<Tags> tags = List.of();
+        if (resposta.informacoesAdicionais() != null) {
+            tags = resposta.informacoesAdicionais().stream()
+                    .map(Tags::new)
+                    .toList();
+        }
         return Conteudo.builder()
                 .titulo(request.titulo())
                 .texto(request.texto())
                 .categoria(resposta.categoria())
                 .probabilidade(resposta.probabilidade())
-                .informacoesAdicionais(
-                        String.join(", ", resposta.informacoesAdicionais()))
+                .informacoesAdicionais(null)
+                .tagsSugeridas(tags) //adiciona Tags
                 .build();
     }
 
@@ -35,12 +43,24 @@ public class ConteudoMapper {
      * devolve diretamente o resultado produzido pelo classificador.
      */
     public ConteudoResponseDTO toResponseDTO(Conteudo entity) {
+        // Recupera as informações adicionais
+        List<String> infoAdicionais = entity.getInformacoesAdicionais() != null
+                ? new ArrayList<>(List.of(entity.getInformacoesAdicionais().split(", ")))
+                : new ArrayList<>();
+
+        // Recupera as Tags e extrai os nomes
+        if (entity.getTagsSugeridas() != null) {
+            List<String> tagsNomes = entity.getTagsSugeridas().stream()
+                    .map(Tags::getNome)
+                    .toList();
+
+            // Adiciona os nomes das tags diretamente dentro da lista de informações adicionais
+            infoAdicionais.addAll(tagsNomes);
+        }
         return new ConteudoResponseDTO(
                 entity.getCategoria(),
                 entity.getProbabilidade(),
-                entity.getInformacoesAdicionais() != null
-                        ? List.of(entity.getInformacoesAdicionais().split(", "))
-                        : List.of()
+                infoAdicionais // Envia a lista unificada para o DTO
         );
     }
 }
