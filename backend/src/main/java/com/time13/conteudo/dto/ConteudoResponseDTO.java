@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public record ConteudoResponseDTO(
-        @JsonProperty("id_conteudo") Long idConteudo,
-        ClassificacaoDTO classificacao,
-        @JsonProperty("resumo_automatico") String resumoAutomatico,
-        @JsonProperty("conteudos_relacionados") List<ConteudoRelacionadoDTO> conteudosRelacionados
+        @JsonProperty("categoria") String categoriaPrincipal,
+        Double probabilidade,
+        @JsonProperty("informacoes_adicionais") List<String> informacoesAdicionais,
+        @JsonProperty("tags_sugeridas") List<String> tagsSugeridas
 ) {}
