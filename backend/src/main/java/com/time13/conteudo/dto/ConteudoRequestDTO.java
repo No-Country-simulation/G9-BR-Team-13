@@ -15,9 +15,6 @@ public record ConteudoRequestDTO(
         @Size(min = 20, message = "O texto deve ter pelo menos {min} caracteres para uma análise precisa.")
         String texto,
 
-        @NotBlank(message = "O autor é obrigatório.")
-        String autor,
-
         @NotNull(message = "O tipo de documento deve ser informado.")
         @JsonProperty("tipo_documento")
         TipoDocumento tipoDocumento
