@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/analises")
+@RequestMapping("/conteudo")
 public class ConteudoController {
 
     private final ConteudoService analiseService;
@@ -20,12 +20,12 @@ public class ConteudoController {
     }
 
     @PostMapping
-    public ResponseEntity<ConteudoResponseDTO> analisarTextoTecnico(@Valid @RequestBody ConteudoRequestDTO request) {
+    public ResponseEntity<ConteudoResponseDTO> classificar(@Valid @RequestBody ConteudoRequestDTO request) {
 
         System.out.println("Entrou no controller");
         ConteudoResponseDTO response = analiseService.processarEOrganizar(request);
 
-        // Retorna o status HTTP 200 OK junto com o JSON de resposta
+        // Retorna o status HTTP 200 OK junto ao JSON de resposta
         return ResponseEntity.ok(response);
     }
 }
