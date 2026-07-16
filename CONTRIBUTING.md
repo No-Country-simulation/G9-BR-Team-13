@@ -26,7 +26,7 @@ git pull origin main
 git checkout -b feature/backend-endpoint-conteudo
 
 # 3. Trabalhe, commitando em pequenos passos (ver padrão de commits abaixo)
-git add . 
+git add . <arquivos>
 git commit -m "feat(backend): adiciona endpoint POST /conteudo"
 
 # 4. Suba a branch
