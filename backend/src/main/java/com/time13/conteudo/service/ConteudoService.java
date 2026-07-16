@@ -2,58 +2,44 @@ package com.time13.conteudo.service;
 
 import com.time13.conteudo.dto.*;
 import com.time13.conteudo.entity.Conteudo;
+import com.time13.conteudo.mapper.ConteudoMapper;
 import com.time13.conteudo.repository.ConteudoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class ConteudoService {
+    private static final Logger log = LoggerFactory.getLogger(ConteudoService.class); //importado do grupo
     private final ConteudoRepository conteudoRepository;
-    public ConteudoService(ConteudoRepository conteudoRepository) {
+    private final ClassificadorService classificadorService; //importado do grupo
+    private final ConteudoMapper conteudoMapper; //importado do grupo
+
+    //importado do grupo
+    public ConteudoService(ConteudoRepository conteudoRepository,
+                           ClassificadorService classificadorService,
+                           ConteudoMapper conteudoMapper) {
         this.conteudoRepository = conteudoRepository;
+        this.classificadorService = classificadorService;
+        this.conteudoMapper = conteudoMapper;
     }
 
-    public ConteudoResponseDTO processarEOrganizar(ConteudoRequestDTO request) {
-        //Simulação do retorno do ML
-        System.out.println("Entrou no service");
-        String categoriaSugerida = "Backend";
-        Double precisao = 0.89;
-        List<String> tags = List.of("Java", "Spring Boot", "API REST");
-        String resumo = "O Spring Boot revolucionou o desenvolvimento em Java...";
+    //importado do grupo
+    /**
+     * Coordena o caso de uso completo: classifica o texto e responde ao cliente.
+     * A persistência é melhor-esforço (seção 3.5 do doc): uma falha ao salvar não
+     * pode impedir a resposta da classificação, que já foi calculada com sucesso.
+     */
+    public ConteudoResponseDTO classificar(ConteudoRequestDTO request) {
+        ConteudoResponseDTO resposta = classificadorService.classificar(request);
 
-        //Simulação de entrada de Dados
-        String titulo = "Springboot: Primeiros passos";
-        String texto = "O Spring Boot revolucionou o desenvolvimento em Java ao tornar a criação de aplicações web e APIs muito mais ágil e intuitiva.";
-        String autor = "Eduardo Lopes";
-        TipoDocumento tipoDocumento = TipoDocumento.valueOf("CURSO");
-        Conteudo novoConteudo = new Conteudo(
-                titulo,
-                texto,
-                autor,
-                LocalDateTime.now(),
-                tipoDocumento,
-                categoriaSugerida,
-                precisao,
-                tags,
-                resumo
-        );
+        try {
+            Conteudo conteudo = conteudoMapper.toEntity(request, resposta);
+            conteudoRepository.save(conteudo);
+        } catch (Exception e) {
+            log.error("Falha ao persistir conteudo classificado (best-effort, resposta segue normalmente)", e);
+        }
 
-        //Salvar no banco de dados
-        Conteudo conteudoSalvo = conteudoRepository.save(novoConteudo);
-
-        //Simulação de busca dos conteúdos relacionados
-        List<ConteudoRelacionadoDTO> relacionados = List.of(
-                new ConteudoRelacionadoDTO("042", "Spring Boot Microsservicos na pratica", 0.76)
-        );
-
-        //Devolve o ConteudoResponseDTO para o controller
-        return new ConteudoResponseDTO(
-                conteudoSalvo.getIdConteudo(),
-                new ClassificacaoDTO(conteudoSalvo.getCategoria(), conteudoSalvo.getProbabilidade(), conteudoSalvo.getTagsSugeridas()),
-                conteudoSalvo.getResumoAutomatico(),
-                relacionados
-        );
+        return resposta;
     }
 }
