@@ -13,10 +13,6 @@ public record ConteudoRequestDTO(
 
         @NotBlank(message = "O texto técnico não pode estar vazio.")
         @Size(min = 20, message = "O texto deve ter pelo menos {min} caracteres para uma análise precisa.")
-        String texto,
-
-        @NotNull(message = "O tipo de documento deve ser informado.")
-        @JsonProperty("tipo_documento")
-        TipoDocumento tipoDocumento
+        String texto
 ) {
 }
