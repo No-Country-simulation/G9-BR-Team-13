@@ -12,6 +12,13 @@ public class Tags {
     @Column(unique = true, nullable = false)
     private String nome;
 
+    public Tags() {
+    }
+
+    public Tags(String nome) {
+        this.nome = nome;
+    }
+
     public Long getId() {
         return id;
     }
