@@ -7,29 +7,34 @@ import {
   Settings,
   Wifi,
 } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 function Sidebar() {
   const menuItems = [
     {
       label: "Dashboard",
       icon: BarChart3,
-      active: true,
+      to: "/dashboard",
     },
     {
       label: "Analisar Conteúdo",
       icon: FileSearch,
+      to: "/analisar",
     },
     {
       label: "Base de Conhecimento",
       icon: BookOpen,
+      to: "/base-conhecimento",
     },
     {
       label: "Histórico",
       icon: History,
+      to: "/historico",
     },
     {
       label: "Configurações",
       icon: Settings,
+      to: "/configuracoes",
     },
   ];
 
@@ -41,7 +46,10 @@ function Sidebar() {
         </div>
 
         <div>
-          <h1 className="text-xl font-bold text-white">InfoHub AI</h1>
+         <h1 className="text-xl font-bold">
+            <span className="text-white">InfoHub </span>
+            <span className="text-cyan-400">AI</span>
+        </h1>
 
           <p className="mt-1 text-xs leading-5 text-slate-400">
             Plataforma de Organização de Conteúdo Técnico
@@ -54,18 +62,20 @@ function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <button
+            <NavLink
               key={item.label}
-              type="button"
-              className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium transition ${
-                item.active
-                  ? "bg-cyan-400/10 text-cyan-300"
-                  : "text-slate-300 hover:bg-white/5 hover:text-white"
-              }`}
+              to={item.to}
+              className={({ isActive }) =>
+                `flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium transition ${
+                  isActive
+                    ? "bg-cyan-400/10 text-cyan-300"
+                    : "text-slate-300 hover:bg-white/5 hover:text-white"
+                }`
+              }
             >
               <Icon size={19} />
               {item.label}
-            </button>
+            </NavLink>
           );
         })}
       </nav>
