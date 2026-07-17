@@ -2,6 +2,9 @@ package com.time13.conteudo.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "tb_tags")
 public class Tags {
@@ -11,6 +14,12 @@ public class Tags {
 
     @Column(unique = true, nullable = false)
     private String nome;
+
+    /*
+    //para no futuro listar os conteúdos associados a uma Tag
+    @ManyToMany(mappedBy = "tags")
+    private List<Conteudo> conteudos = new ArrayList<>();
+    */
 
     public Tags() {
     }

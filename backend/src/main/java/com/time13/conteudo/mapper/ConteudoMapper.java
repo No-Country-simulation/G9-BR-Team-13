@@ -52,9 +52,7 @@ public class ConteudoMapper {
         if (entity.getTagsSugeridas() != null) {
             List<String> tagsNomes = entity.getTagsSugeridas().stream()
                     .map(Tags::getNome)
-                    .toList();
-
-            // Adiciona os nomes das tags diretamente dentro da lista de informações adicionais
+                    .toList(); // Adiciona os nomes das tags diretamente dentro da lista de informações adicionais
             infoAdicionais.addAll(tagsNomes);
         }
         return new ConteudoResponseDTO(
