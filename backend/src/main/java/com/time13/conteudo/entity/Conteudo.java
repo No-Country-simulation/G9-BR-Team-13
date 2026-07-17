@@ -25,15 +25,21 @@ public class Conteudo {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String texto;
 
-    @Column(nullable = false)
-    private LocalDateTime data;
+    @Column(name = "criado_em", nullable = false)
+    private LocalDateTime criadoEm;
+
+    @PrePersist
+    public void prePersist(){
+        this.criadoEm = LocalDateTime.now();
+    }
+
     private String categoria;
     private Double probabilidade;
 
     @Column(name = "informacoes_adicionais", length = 500)
     private String informacoesAdicionais;
 
-    // Armazena a lista de tags como elementos em uma tabela
+    // Relacionamento muitos-para-muitos entre Conteúdo e Tags
     @ManyToMany
     @JoinTable(
             name = "conteudo_tags",
@@ -42,12 +48,12 @@ public class Conteudo {
     )
     private List<Tags> tagsSugeridas;
 
-    public Conteudo(String titulo, String texto, LocalDateTime data,
+    public Conteudo(String titulo, String texto, LocalDateTime criadoEm,
                                         TipoDocumento tipoDocumento, String categoria, Double probabilidade, String informacoesAdicionais,
                                         List<Tags> tagsSugeridas) {
         this.titulo = titulo;
         this.texto = texto;
-        this.data = data;
+        this.criadoEm = criadoEm;
         this.categoria = categoria;
         this.probabilidade = probabilidade;
         this.informacoesAdicionais = informacoesAdicionais;
