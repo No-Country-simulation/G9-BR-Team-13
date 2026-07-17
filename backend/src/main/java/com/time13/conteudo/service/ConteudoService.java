@@ -2,11 +2,16 @@ package com.time13.conteudo.service;
 
 import com.time13.conteudo.dto.*;
 import com.time13.conteudo.entity.Conteudo;
+import com.time13.conteudo.entity.Tags;
 import com.time13.conteudo.mapper.ConteudoMapper;
 import com.time13.conteudo.repository.ConteudoRepository;
+import com.time13.conteudo.repository.TagsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ConteudoService {
@@ -14,14 +19,28 @@ public class ConteudoService {
     private final ConteudoRepository conteudoRepository;
     private final ClassificadorService classificadorService; //importado do grupo
     private final ConteudoMapper conteudoMapper; //importado do grupo
+    private final TagsRepository tagsRepository;
 
     //importado do grupo
     public ConteudoService(ConteudoRepository conteudoRepository,
                            ClassificadorService classificadorService,
-                           ConteudoMapper conteudoMapper) {
+                           ConteudoMapper conteudoMapper, TagsRepository tagsRepository) {
         this.conteudoRepository = conteudoRepository;
         this.classificadorService = classificadorService;
         this.conteudoMapper = conteudoMapper;
+        this.tagsRepository = tagsRepository; //acrescentei o tagsRepository
+    }
+
+    //persistência das Tags para saber se existem e depois salvar
+    private List<Tags> obterOuCriarTags(List<Tags> tags) {
+        List<Tags> resultado = new ArrayList<>();
+
+        for (Tags tag : tags) {
+            Tags persistida = tagsRepository.findByNome(tag.getNome())
+                    .orElseGet(() -> tagsRepository.save(tag));
+            resultado.add(persistida);
+        }
+        return resultado;
     }
 
     //importado do grupo
@@ -35,6 +54,9 @@ public class ConteudoService {
 
         try {
             Conteudo conteudo = conteudoMapper.toEntity(request, resposta);
+            conteudo.setTagsSugeridas(
+                    obterOuCriarTags(conteudo.getTagsSugeridas())
+            );
             conteudoRepository.save(conteudo);
         } catch (Exception e) {
             log.error("Falha ao persistir conteudo classificado (best-effort, resposta segue normalmente)", e);
