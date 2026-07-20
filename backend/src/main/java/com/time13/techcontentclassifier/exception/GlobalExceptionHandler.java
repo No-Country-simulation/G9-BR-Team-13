@@ -23,4 +23,14 @@ public class GlobalExceptionHandler {
 
         return erros;
     }
+
+    @ExceptionHandler(MlServiceException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public Map<String, String> tratarErroServicoIa(MlServiceException ex) {
+        Map<String, String> erro = new HashMap<>();
+        erro.put("erro", "ML_SERVICE_UNAVAILABLE");
+        erro.put("mensagem", ex.getMessage());
+        return erro;
+    }
 }
+
