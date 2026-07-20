@@ -30,7 +30,7 @@ npm -v
 Clone o repositório e entre na pasta do front-end:
 
 ```bash
-cd infohub-ai
+cd frontend
 ```
 
 Instale as dependências:

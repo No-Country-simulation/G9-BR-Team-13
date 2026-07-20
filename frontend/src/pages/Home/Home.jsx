@@ -7,6 +7,14 @@ import ResultCard from "../../components/ResultCard/ResultCard";
 import StatusCards from "../../components/StatusCards/StatusCards";
 import { analyzeContent } from "../../services/api";
 
+const initialResult = {
+  categoria: "Backend",
+  probabilidade: 0.94,
+  informacoes_adicionais: ["Java", "Spring Boot", "API REST"],
+  modelo: "TF-IDF + Regressão Logística",
+  status: "Modelo carregado",
+};
+
 const initialRelatedContents = [
   {
     id: 1,
@@ -35,7 +43,7 @@ const initialRelatedContents = [
 ];
 
 function Home() {
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState(initialResult);
   const [relatedContents, setRelatedContents] = useState(
     initialRelatedContents,
   );
@@ -58,8 +66,7 @@ function Home() {
       console.error(requestError);
 
       setError(
-        requestError.message ||
-          "Não foi possível analisar o conteúdo.",
+        "Não foi possível analisar o conteúdo. Verifique se o backend está disponível.",
       );
     } finally {
       setIsLoading(false);
