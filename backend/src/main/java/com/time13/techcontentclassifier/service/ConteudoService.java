@@ -1,5 +1,7 @@
 package com.time13.techcontentclassifier.service;
 
+import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
+import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
 import com.time13.techcontentclassifier.dto.*;
 import com.time13.techcontentclassifier.entity.Conteudo;
 import com.time13.techcontentclassifier.entity.Tags;
@@ -15,13 +17,13 @@ import java.util.List;
 
 @Service
 public class ConteudoService {
-    private static final Logger log = LoggerFactory.getLogger(ConteudoService.class); //importado do grupo
+    private static final Logger log = LoggerFactory.getLogger(ConteudoService.class);
+
     private final ConteudoRepository conteudoRepository;
-    private final ClassificadorService classificadorService; //importado do grupo
-    private final ConteudoMapper conteudoMapper; //importado do grupo
+    private final ClassificadorService classificadorService;
+    private final ConteudoMapper conteudoMapper;
     private final TagsRepository tagsRepository;
 
-    //importado do grupo
     public ConteudoService(ConteudoRepository conteudoRepository,
                            ClassificadorService classificadorService,
                            ConteudoMapper conteudoMapper, TagsRepository tagsRepository) {
@@ -43,7 +45,6 @@ public class ConteudoService {
         return resultado;
     }
 
-    //importado do grupo
     /**
      * Coordena o caso de uso completo: classifica o texto e responde ao cliente.
      * A persistência é melhor-esforço (seção 3.5 do doc): uma falha ao salvar não
@@ -63,5 +64,16 @@ public class ConteudoService {
         }
 
         return resposta;
+    }
+
+    /**
+     * Busca conteúdos já processados que contenham a palavra-chave informada
+     * no título, texto, categoria ou informações adicionais.
+     */
+    public List<ConteudoResponseDTO> buscarPorPalavraChave(String termo) {
+        List<Conteudo> resultados = conteudoRepository.buscarPorPalavraChave(termo);
+        return resultados.stream()
+                .map(conteudoMapper::toResponseDTO)
+                .toList();
     }
 }

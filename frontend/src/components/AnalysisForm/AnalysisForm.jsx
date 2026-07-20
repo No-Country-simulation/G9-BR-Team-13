@@ -5,12 +5,27 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  const trimmedTitle = title.trim();
+  const trimmedContent = content.trim();
+
+  const isTitleValid =
+    trimmedTitle.length >= 3 && trimmedTitle.length <= 200;
+
+  const isContentValid =
+    trimmedContent.length >= 20 && trimmedContent.length <= 5000;
+
+  const isFormValid = isTitleValid && isContentValid;
+
   async function handleSubmit(event) {
     event.preventDefault();
 
+    if (!isFormValid || isLoading) {
+      return;
+    }
+
     await onSubmit({
-      titulo: title.trim(),
-      texto: content.trim(),
+      titulo: trimmedTitle,
+      texto: trimmedContent,
     });
   }
 
@@ -49,9 +64,27 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
             onChange={(event) => setTitle(event.target.value)}
             disabled={isLoading}
             required
+            minLength={3}
+            maxLength={200}
             placeholder="Ex: Introdução ao Spring Boot"
             className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
           />
+
+          <div className="mt-2 flex items-center justify-between gap-4 text-xs">
+            <span
+              className={
+                title.length > 0 && !isTitleValid
+                  ? "text-red-300"
+                  : "text-slate-500"
+              }
+            >
+              O título deve ter entre 3 e 200 caracteres.
+            </span>
+
+            <span className="shrink-0 text-slate-500">
+              {title.length}/200
+            </span>
+          </div>
         </div>
 
         <div>
@@ -69,14 +102,32 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
             onChange={(event) => setContent(event.target.value)}
             disabled={isLoading}
             required
+            minLength={20}
+            maxLength={5000}
             placeholder="Cole aqui documentação, anotação, artigo ou material técnico..."
             className="min-h-52 w-full resize-none rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
           />
+
+          <div className="mt-2 flex items-center justify-between gap-4 text-xs">
+            <span
+              className={
+                content.length > 0 && !isContentValid
+                  ? "text-red-300"
+                  : "text-slate-500"
+              }
+            >
+              O texto deve ter entre 20 e 5000 caracteres.
+            </span>
+
+            <span className="shrink-0 text-slate-500">
+              {content.length}/5000
+            </span>
+          </div>
         </div>
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !isFormValid}
           className="flex w-full items-center justify-center gap-2 rounded-2xl bg-cyan-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isLoading ? (

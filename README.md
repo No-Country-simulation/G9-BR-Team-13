@@ -1,4 +1,4 @@
-# Time 13 — Organização Inteligente de Conteúdo Técnico
+# Time 13 - Organização Inteligente de Conteúdo Técnico
 
 Hackathon ONE (Alura + Oracle) · Grupo G9 · Time 13
 
@@ -6,7 +6,7 @@ Hackathon ONE (Alura + Oracle) · Grupo G9 · Time 13
 
 Solução que recebe conteúdo técnico (título + texto) e devolve, via API REST, a categoria temática, a probabilidade da classificação e palavras-chave — usando TF-IDF + Regressão Logística treinados em cima de um dataset de exemplos técnicos. O Backend (Java/Spring Boot) expõe a API pública e delega a inferência a um serviço interno de Machine Learning (Python/FastAPI), persistindo o histórico em PostgreSQL/MySQL e publicando o modelo no OCI Object Storage.
 
-A documentação completa do projeto (arquitetura detalhada, backlog, cronograma, padrões de código, especificação da API, riscos, etc.) está em [`docs/DOCUMENTACAO_PROJETO.md`](docs/DOCUMENTACAO_PROJETO.md) — leiam esse arquivo antes de começar a codar na sua área.
+A documentação completa do projeto (arquitetura detalhada, backlog, cronograma, padrões de código, especificação da API, riscos, etc.) está em [`docs/DOCUMENTACAO_PROJETO.md`](docs/DOCUMENTACAO_PROJETO.md) - leiam esse arquivo antes de começar a codar na sua área.
 
 ## 2. Arquitetura
 
@@ -26,8 +26,8 @@ O Backend valida a entrada, chama o serviço de ML, formata a resposta no contra
 
 ```
 G9-BR-Team-13/
-├── frontend/   # React + Vite — consome só o Backend, nunca o ML Service direto
-├── backend/    # Java 17 + Spring Boot — API pública, validação, persistência
+├── frontend/   # React + Vite - consome só o Backend, nunca o ML Service direto
+├── backend/    # Java 17 + Spring Boot - API pública, validação, persistência
 ├── ia/         # Python + FastAPI + Scikit-Learn — notebook de treino e serviço de inferência
 ├── infra/      # scripts de deploy e integração OCI (Object Storage / Compute)
 ├── docs/       # documentação completa do projeto

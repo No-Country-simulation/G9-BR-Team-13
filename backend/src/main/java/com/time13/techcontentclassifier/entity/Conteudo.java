@@ -1,8 +1,8 @@
 package com.time13.techcontentclassifier.entity;
 
-import com.time13.techcontentclassifier.dto.TipoDocumento;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,10 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Conteudo {
+
     @Id
-    @Column(name = "id_conteudo")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idConteudo;
+    private Long id;
 
     @Column(nullable = false, length = 200)
     private String titulo;
@@ -25,19 +25,22 @@ public class Conteudo {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String texto;
 
-    @Column(name = "criado_em", nullable = false)
-    private LocalDateTime criadoEm;
-
-    @PrePersist
-    public void prePersist(){
-        this.criadoEm = LocalDateTime.now();
-    }
-
+    @Column(nullable = false, length = 50)
     private String categoria;
+
+    @Column(nullable = false)
     private Double probabilidade;
 
     @Column(name = "informacoes_adicionais", length = 500)
     private String informacoesAdicionais;
+
+    @Column(name = "criado_em", nullable = false)
+    private LocalDateTime criadoEm;
+
+    @PrePersist
+    public void prePersist() {
+        this.criadoEm = LocalDateTime.now();
+    }
 
     // Relacionamento muitos-para-muitos entre Conteúdo e Tags
     @ManyToMany
@@ -48,8 +51,7 @@ public class Conteudo {
     )
     private List<Tags> tagsSugeridas;
 
-    public Conteudo(String titulo, String texto, LocalDateTime criadoEm,
-                                        TipoDocumento tipoDocumento, String categoria, Double probabilidade, String informacoesAdicionais,
+    public Conteudo(String titulo, String texto, LocalDateTime criadoEm, String categoria, Double probabilidade, String informacoesAdicionais,
                                         List<Tags> tagsSugeridas) {
         this.titulo = titulo;
         this.texto = texto;

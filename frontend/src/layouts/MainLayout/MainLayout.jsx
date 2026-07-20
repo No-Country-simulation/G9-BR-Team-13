@@ -1,6 +1,7 @@
-import Sidebar from "../../components/Sidebar/Sidebar";
+import { Outlet } from "react-router-dom";
+
 import Header from "../../components/Header/Header";
-import Home from "../../pages/Home/Home";
+import Sidebar from "../../components/Sidebar/Sidebar";
 
 function MainLayout() {
   return (
@@ -10,7 +11,7 @@ function MainLayout() {
 
         <main className="flex-1 p-6 lg:p-8">
           <Header />
-          <Home />
+          <Outlet />
         </main>
       </div>
     </div>
