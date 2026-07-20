@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ConteudoService {
     private static final Logger log = LoggerFactory.getLogger(ConteudoService.class);
@@ -41,5 +43,16 @@ public class ConteudoService {
         }
 
         return resposta;
+    }
+
+    /**
+     * Busca conteúdos já processados que contenham a palavra-chave informada
+     * no título, texto, categoria ou informações adicionais.
+     */
+    public List<ConteudoResponseDTO> buscarPorPalavraChave(String termo) {
+        List<Conteudo> resultados = conteudoRepository.buscarPorPalavraChave(termo);
+        return resultados.stream()
+                .map(conteudoMapper::toResponseDTO)
+                .toList();
     }
 }

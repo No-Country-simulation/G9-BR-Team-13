@@ -13,7 +13,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -87,6 +89,44 @@ class ConteudoControllerTest {
                                     "titulo": ""
                                 }
                                 """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveBuscarConteudosPorPalavraChaveComSucesso() throws Exception {
+        List<ConteudoResponseDTO> resultadosMock = List.of(
+                new ConteudoResponseDTO("Backend", 0.92, List.of("Java", "Spring Boot")),
+                new ConteudoResponseDTO("Backend", 0.88, List.of("API", "REST"))
+        );
+
+        when(conteudoService.buscarPorPalavraChave(eq("Spring"))).thenReturn(resultadosMock);
+
+        mockMvc.perform(get("/conteudo")
+                        .param("palavra-chave", "Spring"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].categoria").value("Backend"))
+                .andExpect(jsonPath("$[0].probabilidade").value(0.92))
+                .andExpect(jsonPath("$[0].informacoes_adicionais[0]").value("Java"))
+                .andExpect(jsonPath("$[1].categoria").value("Backend"))
+                .andExpect(jsonPath("$[1].probabilidade").value(0.88));
+    }
+
+    @Test
+    void deveRetornarListaVaziaQuandoNenhumResultadoEncontrado() throws Exception {
+        when(conteudoService.buscarPorPalavraChave(eq("Inexistente"))).thenReturn(List.of());
+
+        mockMvc.perform(get("/conteudo")
+                        .param("palavra-chave", "Inexistente"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    void deveRetornarBadRequestQuandoParametroPalavraChaveAusente() throws Exception {
+        mockMvc.perform(get("/conteudo"))
                 .andExpect(status().isBadRequest());
     }
 }
