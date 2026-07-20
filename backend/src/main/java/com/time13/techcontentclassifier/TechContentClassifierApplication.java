@@ -9,8 +9,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 @SpringBootApplication
 public class TechContentClassifierApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TechContentClassifierApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TechContentClassifierApplication.class, args);
+    }
 
 }
