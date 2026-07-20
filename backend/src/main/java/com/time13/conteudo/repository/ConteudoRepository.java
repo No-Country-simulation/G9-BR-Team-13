@@ -1,6 +1,6 @@
-package com.time13.conteudo.repository;
+package com.time13.techcontentclassifier.repository;
 
-import com.time13.conteudo.entity.Conteudo;
+import com.time13.techcontentclassifier.entity.Conteudo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,11 +1,11 @@
-package com.time13.conteudo.service;
+package com.time13.techcontentclassifier.service;
 
-import com.time13.conteudo.dto.*;
-import com.time13.conteudo.entity.Conteudo;
-import com.time13.conteudo.entity.Tags;
-import com.time13.conteudo.mapper.ConteudoMapper;
-import com.time13.conteudo.repository.ConteudoRepository;
-import com.time13.conteudo.repository.TagsRepository;
+import com.time13.techcontentclassifier.dto.*;
+import com.time13.techcontentclassifier.entity.Conteudo;
+import com.time13.techcontentclassifier.entity.Tags;
+import com.time13.techcontentclassifier.mapper.ConteudoMapper;
+import com.time13.techcontentclassifier.repository.ConteudoRepository;
+import com.time13.techcontentclassifier.repository.TagsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

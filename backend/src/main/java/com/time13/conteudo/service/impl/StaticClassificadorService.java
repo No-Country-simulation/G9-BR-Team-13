@@ -1,8 +1,8 @@
-package com.time13.conteudo.service.impl;
+package com.time13.techcontentclassifier.service.impl;
 
-import com.time13.conteudo.dto.ConteudoRequestDTO;
-import com.time13.conteudo.dto.ConteudoResponseDTO;
-import com.time13.conteudo.service.ClassificadorService;
+import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
+import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
+import com.time13.techcontentclassifier.service.ClassificadorService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

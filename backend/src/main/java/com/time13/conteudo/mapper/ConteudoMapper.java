@@ -1,9 +1,9 @@
-package com.time13.conteudo.mapper;
+package com.time13.techcontentclassifier.mapper;
 
-import com.time13.conteudo.dto.ConteudoRequestDTO;
-import com.time13.conteudo.dto.ConteudoResponseDTO;
-import com.time13.conteudo.entity.Conteudo;
-import com.time13.conteudo.entity.Tags;
+import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
+import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
+import com.time13.techcontentclassifier.entity.Conteudo;
+import com.time13.techcontentclassifier.entity.Tags;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;

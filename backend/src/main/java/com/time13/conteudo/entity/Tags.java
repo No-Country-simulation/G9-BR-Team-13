@@ -1,9 +1,6 @@
-package com.time13.conteudo.entity;
+package com.time13.techcontentclassifier.entity;
 
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "tb_tags")

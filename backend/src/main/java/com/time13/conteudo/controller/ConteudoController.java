@@ -1,7 +1,7 @@
-package com.time13.conteudo.controller;
-import com.time13.conteudo.dto.ConteudoRequestDTO;
-import com.time13.conteudo.dto.ConteudoResponseDTO;
-import com.time13.conteudo.service.ConteudoService;
+package com.time13.techcontentclassifier.controller;
+import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
+import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
+import com.time13.techcontentclassifier.service.ConteudoService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

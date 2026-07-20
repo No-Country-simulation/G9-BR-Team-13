@@ -1,6 +1,6 @@
-package com.time13.conteudo.entity;
+package com.time13.techcontentclassifier.entity;
 
-import com.time13.conteudo.dto.TipoDocumento;
+import com.time13.techcontentclassifier.dto.TipoDocumento;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;

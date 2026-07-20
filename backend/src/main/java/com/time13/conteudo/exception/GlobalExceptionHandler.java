@@ -1,4 +1,4 @@
-package com.time13.conteudo.exception;
+package com.time13.techcontentclassifier.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;

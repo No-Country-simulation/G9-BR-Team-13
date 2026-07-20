@@ -1,4 +1,4 @@
-package com.time13.conteudo.dto;
+package com.time13.techcontentclassifier.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
