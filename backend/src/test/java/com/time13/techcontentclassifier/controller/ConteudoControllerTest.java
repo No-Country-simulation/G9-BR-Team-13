@@ -2,6 +2,7 @@ package com.time13.techcontentclassifier.controller;
 
 import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
 import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
+import com.time13.techcontentclassifier.exception.MlServiceException;
 import com.time13.techcontentclassifier.service.ConteudoService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,27 @@ class ConteudoControllerTest {
                 .andExpect(jsonPath("$.probabilidade").value(0.95))
                 .andExpect(jsonPath("$.informacoes_adicionais").isArray())
                 .andExpect(jsonPath("$.informacoes_adicionais[0]").value("Java"));
+    }
+
+    @Test
+    void deveRetornar503QuandoServicoDeMlIndisponivel() throws Exception {
+        when(conteudoService.classificar(any(ConteudoRequestDTO.class)))
+                .thenThrow(new MlServiceException(
+                        "Não foi possível processar o conteúdo no momento. Tente novamente.",
+                        new RuntimeException("timeout")));
+
+        mockMvc.perform(post("/conteudo")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "titulo": "Título válido",
+                                    "texto": "Texto de exemplo com tamanho suficiente para passar na validação"
+                                }
+                                """))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.erro").value("ML_SERVICE_UNAVAILABLE"))
+                .andExpect(jsonPath("$.mensagem").value(
+                        "Não foi possível processar o conteúdo no momento. Tente novamente."));
     }
 
     @Test
