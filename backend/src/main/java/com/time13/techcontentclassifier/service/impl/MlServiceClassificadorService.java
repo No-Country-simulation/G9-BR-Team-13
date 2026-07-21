@@ -7,6 +7,7 @@ import com.time13.techcontentclassifier.service.ClassificadorService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -16,9 +17,18 @@ public class MlServiceClassificadorService implements ClassificadorService {
 
     private final RestClient restClient;
 
-    public MlServiceClassificadorService(@Value("${ia.service.url}") String iaServiceUrl) {
+    public MlServiceClassificadorService(
+            @Value("${ia.service.url}") String iaServiceUrl,
+            @Value("${ia.service.timeout.connect}") int connectTimeoutMs,
+            @Value("${ia.service.timeout.read}") int readTimeoutMs) {
+
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(connectTimeoutMs);
+        requestFactory.setReadTimeout(readTimeoutMs);
+
         this.restClient = RestClient.builder()
                 .baseUrl(iaServiceUrl)
+                .requestFactory(requestFactory)
                 .build();
     }
 
