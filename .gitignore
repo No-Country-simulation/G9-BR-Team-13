@@ -50,3 +50,5 @@ venv/
 ### Segredos e infra ###
 .env
 *.pem
+*-local.properties
+*local.properties
