@@ -8,19 +8,26 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Componente responsável por mapear e converter dados entre os DTOs da API
+ * e a entidade de banco de dados (Conteudo).
+ */
 @Component
 public class ConteudoMapper {
 
     /**
-     * Reúne os dados recebidos pela API e o resultado da classificação na entidade
-     * que será persistida. Enquanto o banco mantiver as informações adicionais em
-     * uma única coluna textual, os itens são armazenados separados por vírgula.
+     * Reúne os dados recebidos pela API (ConteudoRequestDTO) e o resultado da classificação (ConteudoResponseDTO)
+     * construindo a entidade Conteudo que será persistida no banco de dados.
+     * 
+     * @param request DTO com os dados originais enviados pelo cliente
+     * @param resposta DTO contendo a resposta retornada pela IA
+     * @return Objeto Conteudo pronto para ser salvo no banco
      */
     public Conteudo toEntity(
             ConteudoRequestDTO request,
             ConteudoResponseDTO resposta) {
 
-        // Converte as strings vindas de 'tagsSugeridas' do DTO para objetos 'Tags'
+        // Converte as strings de tags recebidas na resposta da IA em objetos da entidade Tags
         List<Tags> tags = List.of();
         if (resposta.informacoesAdicionais() != null) {
             tags = resposta.informacoesAdicionais().stream()
@@ -33,32 +40,35 @@ public class ConteudoMapper {
                 .categoria(resposta.categoria())
                 .probabilidade(resposta.probabilidade())
                 .informacoesAdicionais(null)
-                .tagsSugeridas(tags) //adiciona Tags
+                .tagsSugeridas(tags) // Atribui as tags convertidas à entidade
                 .build();
     }
 
     /**
-     * Reconstrói o contrato de resposta a partir de um conteúdo persistido.
-     * Este método fica disponível para futuros endpoints de consulta; o POST atual
-     * devolve diretamente o resultado produzido pelo classificador.
+     * Converte uma entidade Conteudo recuperada do banco de dados em um DTO de resposta (ConteudoResponseDTO).
+     * Reúne informações adicionais textuais e os nomes das tags associadas.
+     * 
+     * @param entity Entidade Conteudo vinda do repositório
+     * @return Objeto ConteudoResponseDTO formatado para ser retornado na API
      */
     public ConteudoResponseDTO toResponseDTO(Conteudo entity) {
-        // Recupera as informações adicionais
+        // Recupera as informações adicionais gravadas na coluna de texto
         List<String> infoAdicionais = entity.getInformacoesAdicionais() != null
                 ? new ArrayList<>(List.of(entity.getInformacoesAdicionais().split(", ")))
                 : new ArrayList<>();
 
-        // Recupera as Tags e extrai os nomes
+        // Extrai os nomes das Tags vinculadas e adiciona à lista de informações adicionais
         if (entity.getTagsSugeridas() != null) {
             List<String> tagsNomes = entity.getTagsSugeridas().stream()
                     .map(Tags::getNome)
-                    .toList(); // Adiciona os nomes das tags diretamente dentro da lista de informações adicionais
+                    .toList();
             infoAdicionais.addAll(tagsNomes);
         }
         return new ConteudoResponseDTO(
                 entity.getCategoria(),
                 entity.getProbabilidade(),
-                infoAdicionais // Envia a lista unificada para o DTO
+                infoAdicionais // Retorna a lista completa para a resposta DTO
         );
     }
 }
+

@@ -2,9 +2,15 @@ package com.time13.techcontentclassifier.entity;
 
 import jakarta.persistence.*;
 
+/**
+ * Entidade JPA referente à tabela "tb_tags".
+ * 
+ * Armazena as palavras-chave e tags únicas geradas ou associadas aos conteúdos.
+ */
 @Entity
 @Table(name = "tb_tags")
 public class Tags {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -13,8 +19,8 @@ public class Tags {
     private String nome;
 
     /*
-    //para no futuro listar os conteúdos associados a uma Tag
-    @ManyToMany(mappedBy = "tags")
+    // Espaço reservado para futura listagem bidirecional dos conteúdos associados a uma Tag
+    @ManyToMany(mappedBy = "tagsSugeridas")
     private List<Conteudo> conteudos = new ArrayList<>();
     */
 
@@ -41,3 +47,4 @@ public class Tags {
         this.nome = nome;
     }
 }
+

@@ -8,9 +8,20 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Repositório Spring Data JPA para gerenciamento das operações no banco de dados
+ * referente à entidade Conteudo.
+ */
 @Repository
 public interface ConteudoRepository extends JpaRepository<Conteudo, Long> {
 
+    /**
+     * Consulta JPQL para busca case-insensitive por palavra-chave.
+     * Pesquisa o termo nos campos titulo, texto, categoria, informacoesAdicionais e no nome das tags associadas.
+     * 
+     * @param termo Palavra-chave enviada pelo usuário
+     * @return Lista de conteúdos encontrados ordenada pela data de criação em ordem decrescente (mais recentes primeiro)
+     */
     @Query("""
         SELECT DISTINCT c FROM Conteudo c
         LEFT JOIN c.tagsSugeridas t
@@ -23,3 +34,4 @@ public interface ConteudoRepository extends JpaRepository<Conteudo, Long> {
         """)
     List<Conteudo> buscarPorPalavraChave(@Param("termo") String termo);
 }
+
