@@ -1,8 +1,8 @@
 {
     "Backend": {
-        "precision": 0.7777777777777778,
+        "precision": 0.875,
         "recall": 0.7,
-        "f1-score": 0.7368421052631579,
+        "f1-score": 0.7777777777777778,
         "support": 10.0
     },
     "DataScience": {
@@ -12,28 +12,28 @@
         "support": 10.0
     },
     "DevOps": {
-        "precision": 0.8181818181818182,
+        "precision": 0.9,
         "recall": 0.9,
-        "f1-score": 0.8571428571428571,
+        "f1-score": 0.9,
         "support": 10.0
     },
     "Frontend": {
-        "precision": 0.7,
-        "recall": 0.7,
-        "f1-score": 0.7,
+        "precision": 0.75,
+        "recall": 0.9,
+        "f1-score": 0.8181818181818182,
         "support": 10.0
     },
-    "accuracy": 0.8,
+    "accuracy": 0.85,
     "macro avg": {
-        "precision": 0.7989898989898989,
-        "recall": 0.8,
-        "f1-score": 0.7984962406015037,
+        "precision": 0.85625,
+        "recall": 0.85,
+        "f1-score": 0.8489898989898991,
         "support": 40.0
     },
     "weighted avg": {
-        "precision": 0.7989898989898989,
-        "recall": 0.8,
-        "f1-score": 0.7984962406015038,
+        "precision": 0.85625,
+        "recall": 0.85,
+        "f1-score": 0.848989898989899,
         "support": 40.0
     }
 }
