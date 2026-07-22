@@ -1,6 +1,18 @@
 import { Copy, FileJson } from "lucide-react";
 
+/**
+ * Componente JsonViewer.
+ * 
+ * Exibe a resposta JSON retornada pelo backend formatada com recuo (2 espaços)
+ * e inclui a funcionalidade de copiar o conteúdo JSON para a área de transferência.
+ * 
+ * @param {Object} props
+ * @param {Object|null} props.data Dados JSON a serem exibidos e copiados
+ */
 function JsonViewer({ data }) {
+  /**
+   * Copia a string JSON formatada para a área de transferência do sistema (clipboard).
+   */
   async function handleCopy() {
     if (!data) return;
 

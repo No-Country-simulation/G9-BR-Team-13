@@ -9,7 +9,14 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
+/**
+ * Componente Sidebar (Navegação Lateral).
+ * 
+ * Exibe o menu principal de navegação da aplicação com suporte a destaque visual
+ * para a rota ativa via React Router NavLink.
+ */
 function Sidebar() {
+  // Itens do menu de navegação lateral
   const menuItems = [
     {
       label: "Dashboard",
@@ -37,6 +44,7 @@ function Sidebar() {
       to: "/configuracoes",
     },
   ];
+
 
   return (
     <aside className="hidden min-h-screen w-72 flex-col border-r border-white/10 bg-slate-950 px-6 py-6 lg:flex">

@@ -1,6 +1,11 @@
 import { BookOpen, Search } from "lucide-react";
 
+/**
+ * Componente da Página Base de Conhecimento (Library).
+ * Permite buscar e explorar conteúdos técnicos catalogados na plataforma.
+ */
 function Library() {
+
   return (
     <section>
       <div className="mb-6">

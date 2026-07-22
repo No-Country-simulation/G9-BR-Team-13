@@ -1,5 +1,15 @@
 import { Brain, CheckCircle, Gauge, Tags } from "lucide-react";
 
+/**
+ * Componente ResultCard.
+ * 
+ * Exibe os detalhes da análise retornados pelo serviço de Machine Learning:
+ * Categoria predita, percentual de probabilidade/confiança, lista de tags (informações adicionais)
+ * e modelo utilizado.
+ * 
+ * @param {Object} props
+ * @param {Object|null} props.result Objeto contendo os dados de resultado da análise
+ */
 function ResultCard({ result }) {
   if (!result) {
     return (
@@ -12,6 +22,7 @@ function ResultCard({ result }) {
       </section>
     );
   }
+
 
   return (
     <section className="rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40">

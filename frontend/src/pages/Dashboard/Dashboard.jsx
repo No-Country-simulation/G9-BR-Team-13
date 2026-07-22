@@ -5,7 +5,12 @@ import {
   Clock3,
 } from "lucide-react";
 
+/**
+ * Componente da Página de Dashboard.
+ * Exibe uma visão geral com métricas sintetizadas da plataforma.
+ */
 function Dashboard() {
+
   const summaryCards = [
     {
       title: "Análises realizadas",
