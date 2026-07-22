@@ -1,22 +1,3 @@
-# Time 13 - Organização Inteligente de Conteúdo Técnico
-
-Hackathon ONE (Alura + Oracle) · Grupo G9 · Time 13
-
-## 1. Sobre o projeto
-
-Solução que recebe conteúdo técnico (título + texto) e devolve, via API REST, a categoria temática, a probabilidade da classificação e palavras-chave — usando TF-IDF + Regressão Logística treinados em cima de um dataset de exemplos técnicos. O Backend (Java/Spring Boot) expõe a API pública e delega a inferência a um serviço interno de Machine Learning (Python/FastAPI), persistindo o histórico em PostgreSQL/MySQL e publicando o modelo no OCI Object Storage.
-
-A documentação completa do projeto (arquitetura detalhada, backlog, cronograma, padrões de código, especificação da API, riscos, etc.) está em [`docs/DOCUMENTACAO_PROJETO.md`](docs/DOCUMENTACAO_PROJETO.md) - leiam esse arquivo antes de começar a codar na sua área.
-
-## 2. Arquitetura
-
-```
-Frontend (React) ──HTTPS──► Backend API (Spring Boot) ──HTTP interno──► ML Service (FastAPI)
-                                     │                                          │
-                                     │ grava resultado (best-effort)            │ lê artefato na subida
-                                     ▼                                          ▼
-                            PostgreSQL / MySQL                        OCI Object Storage
-                            (container Docker na                     (modelo.joblib,
                              mesma VM OCI Compute)                     vectorizer.joblib)
 ```
 
