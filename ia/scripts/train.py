@@ -15,7 +15,8 @@ with open("config.yaml", "r") as f:
 
 # 1. Carregar dados
 df = pd.read_csv("data/dataset.csv")
-X = df["texto"].astype(str).fillna("")
+df["texto_completo"] = df["titulo"].astype(str).fillna("") + " " + df["texto"].astype(str).fillna("")
+X = df["texto_completo"]
 y = df["categoria"]
 
 # Verificar distribuição das classes
