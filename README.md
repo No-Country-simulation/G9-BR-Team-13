@@ -1,4 +1,45 @@
-                             mesma VM OCI Compute)                     vectorizer.joblib)
+# 🚀 Time 13 - Organização Inteligente de Conteúdo Técnico
+
+<div align="center">
+
+# 🧠 TechMind
+
+### 🚀 Hackathon ONE | Alura + Oracle
+
+### 👥 Grupo G9 • Time 13
+
+**Transformando conteúdos técnicos em conhecimento organizado através da Inteligência Artificial.**
+
+---
+
+![Java](https://img.shields.io/badge/Java-17-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen)
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
+![React](https://img.shields.io/badge/React-19-61DAFB)
+![Oracle Cloud](https://img.shields.io/badge/Oracle%20Cloud-OCI-red)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED)
+
+</div>
+
+---
+
+# 🌟 Sobre o Projeto
+
+O **TechMind** é uma solução desenvolvida durante o **Hackathon ONE (Oracle + Alura)** com o objetivo de organizar automaticamente conteúdos técnicos utilizando técnicas de **Ciência de Dados** e **Machine Learning**.
+
+A plataforma recebe um conteúdo composto por um **título** e um **texto**, analisa essas informações e devolve uma resposta estruturada em formato **JSON**, permitindo que outras aplicações utilizem os resultados.
+
+## 🎯 Principais funcionalidades
+
+* 🤖 Classificação automática de conteúdos técnicos
+* 📊 Cálculo da probabilidade da classificação
+* 🔍 Extração de palavras-chave relevantes
+* 💾 Persistência do histórico das análises
+* ☁️ Integração com Oracle Cloud Infrastructure (OCI)
+* 🔗 API REST para integração com outros sistemas
+
+---                             mesma VM OCI Compute)                     vectorizer.joblib)
 ```
 
 O Backend valida a entrada, chama o serviço de ML, formata a resposta no contrato do edital e grava o histórico no banco sem bloquear a resposta ao usuário. Detalhes completos do fluxo: seção 3 da [documentação](docs/DOCUMENTACAO_PROJETO.md).
