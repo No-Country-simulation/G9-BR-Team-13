@@ -1,6 +1,13 @@
 import { Cloud, Database, FileJson, Server } from "lucide-react";
 
+/**
+ * Componente StatusCards.
+ * 
+ * Renderiza um painel com cards informativos sobre os módulos da arquitetura:
+ * API REST (Spring Boot), OCI Object Storage, Banco de Dados e Saída JSON.
+ */
 function StatusCards() {
+  // Lista de cards informativos do status dos componentes do sistema
   const cards = [
     {
       title: "API REST",
@@ -35,6 +42,7 @@ function StatusCards() {
       bg: "bg-amber-400/10",
     },
   ];
+
 
   return (
     <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

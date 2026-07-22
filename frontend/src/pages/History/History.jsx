@@ -1,6 +1,11 @@
 import { Clock3, History as HistoryIcon } from "lucide-react";
 
+/**
+ * Componente da Página de Histórico.
+ * Responsável por apresentar a lista de análises realizadas anteriormente no sistema.
+ */
 function History() {
+
   return (
     <section>
       <div className="mb-6">

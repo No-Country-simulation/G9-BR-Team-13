@@ -5,12 +5,22 @@ import {
   Layers3,
 } from "lucide-react";
 
+// Mapeamento de tipos de conteúdo para ícones correspondentes do Lucide Icons
 const iconMap = {
   repository: GitBranch,
   database: Layers3,
   documentation: BookOpen,
 };
 
+/**
+ * Componente RelatedContent.
+ * 
+ * Exibe um grid de sugestões de materiais/conteúdos relacionados recomendados
+ * com base na categoria e tags do item analisado.
+ * 
+ * @param {Object} props
+ * @param {Array<Object>} props.items Lista de conteúdos sugeridos
+ */
 function RelatedContent({ items = [] }) {
   return (
     <section className="mt-6 rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40">

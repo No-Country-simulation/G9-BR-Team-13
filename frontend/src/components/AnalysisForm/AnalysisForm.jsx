@@ -1,13 +1,27 @@
 import { FileText, LoaderCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
 
+/**
+ * Componente de Formulário para Envio e Validação de Conteúdo Técnico.
+ * 
+ * Realiza validações locais em tempo real de tamanho mínimo e máximo do título e do texto,
+ * e aciona a função de submissão recebida via props.
+ * 
+ * @param {Object} props
+ * @param {Function} props.onSubmit Função callback assíncrona executada ao enviar o formulário
+ * @param {boolean} props.isLoading Indica se a requisição HTTP de classificação está em andamento
+ * @param {string|null} props.error Mensagem de erro a ser exibida caso o envio falhe
+ */
 function AnalysisForm({ onSubmit, isLoading, error }) {
+  // Estados para capturar os valores dos campos do formulário
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  // Remoção de espaços em branco antes e depois do texto
   const trimmedTitle = title.trim();
   const trimmedContent = content.trim();
 
+  // Regras de validação idênticas às regras das anotações @Size do backend
   const isTitleValid =
     trimmedTitle.length >= 3 && trimmedTitle.length <= 200;
 
@@ -16,6 +30,9 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
 
   const isFormValid = isTitleValid && isContentValid;
 
+  /**
+   * Manipulador do evento de submissão do formulário.
+   */
   async function handleSubmit(event) {
     event.preventDefault();
 

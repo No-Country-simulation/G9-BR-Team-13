@@ -1,3 +1,7 @@
+/**
+ * Componente Header.
+ * Exibe o título principal da plataforma, descrição geral e badge de status da API.
+ */
 function Header() {
   return (
     <header className="mb-8 flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-6 lg:flex-row lg:items-center lg:justify-between">

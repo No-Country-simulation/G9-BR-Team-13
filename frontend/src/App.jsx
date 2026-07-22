@@ -7,11 +7,18 @@ import History from "./pages/History/History";
 import Library from "./pages/Library/Library";
 import Settings from "./pages/Settings/Settings";
 
+/**
+ * Componente Raiz da Aplicação.
+ * 
+ * Configura o roteamento utilizando React Router DOM com suporte a layout aninhado (MainLayout).
+ */
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Rota pai usando MainLayout com Sidebar e Header fixos */}
         <Route element={<MainLayout />}>
+          {/* Redirecionamento padrão da raiz para o Dashboard */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/analisar" element={<Analysis />} />

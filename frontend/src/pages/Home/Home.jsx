@@ -7,6 +7,7 @@ import ResultCard from "../../components/ResultCard/ResultCard";
 import StatusCards from "../../components/StatusCards/StatusCards";
 import { analyzeContent } from "../../services/api";
 
+// Estado inicial padrão exibido antes da primeira análise realizada
 const initialResult = {
   categoria: "Backend",
   probabilidade: 0.94,
@@ -15,6 +16,7 @@ const initialResult = {
   status: "Modelo carregado",
 };
 
+// Conteúdos sugeridos padrão
 const initialRelatedContents = [
   {
     id: 1,
@@ -42,6 +44,12 @@ const initialRelatedContents = [
   },
 ];
 
+/**
+ * Página Principal (Home / Análise).
+ * 
+ * Orquestra o envio do formulário de análise, chamada à API HTTP (`analyzeContent`),
+ * controle de estado de carregamento e exibição do resultado e JSON.
+ */
 function Home() {
   const [result, setResult] = useState(initialResult);
   const [relatedContents, setRelatedContents] = useState(
@@ -50,6 +58,11 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  /**
+   * Envia o texto para a API REST do backend e atualiza a interface com o resultado.
+   * 
+   * @param {Object} payload Dados do formulário `{ titulo, texto }`
+   */
   async function handleAnalyze(payload) {
     setIsLoading(true);
     setError(null);
@@ -72,6 +85,7 @@ function Home() {
       setIsLoading(false);
     }
   }
+
 
   return (
     <>

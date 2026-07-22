@@ -1,6 +1,11 @@
 import { Database, Server, Settings as SettingsIcon } from "lucide-react";
 
+/**
+ * Componente da Página de Configurações.
+ * Exibe parâmetros do sistema como URL da API backend e informações da versão.
+ */
 function Settings() {
+
   return (
     <section>
       <div className="mb-6">
