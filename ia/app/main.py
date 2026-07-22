@@ -1,7 +1,8 @@
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
-from app.schemas import TextInput, PredictionOutput
+from fastapi.middleware.cors import CORSMiddleware
+from app.schemas import TextInput, PredictionOutput, HealthOutput, CATEGORIAS
 from app import model_loader
 from app.keywords import extract_keywords
 
@@ -16,6 +17,30 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="TechKnowledge ML Service", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/health", response_model=HealthOutput)
+async def health():
+    return HealthOutput(
+        status="ok",
+        modelo_carregado=model_loader.modelo is not None and model_loader.vectorizer is not None,
+        categorias=list(model_loader.modelo.classes_) if model_loader.modelo is not None else CATEGORIAS
+    )
+
+
+@app.get("/categorias")
+async def listar_categorias():
+    if model_loader.modelo is not None:
+        return {"categorias": list(model_loader.modelo.classes_)}
+    return {"categorias": CATEGORIAS}
 
 
 @app.post("/predict", response_model=PredictionOutput)
