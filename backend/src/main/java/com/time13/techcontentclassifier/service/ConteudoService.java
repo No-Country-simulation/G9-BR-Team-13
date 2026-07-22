@@ -2,7 +2,6 @@ package com.time13.techcontentclassifier.service;
 
 import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
 import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
-import com.time13.techcontentclassifier.dto.*;
 import com.time13.techcontentclassifier.entity.Conteudo;
 import com.time13.techcontentclassifier.entity.Tags;
 import com.time13.techcontentclassifier.mapper.ConteudoMapper;
@@ -15,6 +14,11 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Serviço responsável por orquestrar os casos de uso de conteúdo:
+ * 1. Classificação de textos via Machine Learning e persistência em banco.
+ * 2. Consulta de conteúdos por palavras-chave.
+ */
 @Service
 public class ConteudoService {
     private static final Logger log = LoggerFactory.getLogger(ConteudoService.class);
@@ -26,14 +30,18 @@ public class ConteudoService {
 
     public ConteudoService(ConteudoRepository conteudoRepository,
                            ClassificadorService classificadorService,
-                           ConteudoMapper conteudoMapper, TagsRepository tagsRepository) {
+                           ConteudoMapper conteudoMapper, 
+                           TagsRepository tagsRepository) {
         this.conteudoRepository = conteudoRepository;
         this.classificadorService = classificadorService;
         this.conteudoMapper = conteudoMapper;
-        this.tagsRepository = tagsRepository; //acrescentei o tagsRepository
+        this.tagsRepository = tagsRepository;
     }
 
-    //persistência das Tags para saber se existem e depois salvar
+    /**
+     * Garante a reutilização ou criação das tags sugeridas no banco de dados.
+     * Se a tag já existir pelo nome, ela é reutilizada; caso contrário, é persistida.
+     */
     private List<Tags> obterOuCriarTags(List<Tags> tags) {
         List<Tags> resultado = new ArrayList<>();
 
@@ -46,13 +54,18 @@ public class ConteudoService {
     }
 
     /**
-     * Coordena o caso de uso completo: classifica o texto e responde ao cliente.
-     * A persistência é melhor-esforço (seção 3.5 do doc): uma falha ao salvar não
-     * pode impedir a resposta da classificação, que já foi calculada com sucesso.
+     * Coordena o caso de uso completo de classificação:
+     * - Envia o texto para a IA via `classificadorService`.
+     * - Tenta persistir o resultado no banco de dados em regime de "melhor esforço" (best-effort).
+     * 
+     * @param request DTO com título e texto a ser processado
+     * @return DTO com os resultados fornecidos pelo classificador
      */
     public ConteudoResponseDTO classificar(ConteudoRequestDTO request) {
+        // Solcita a classificação ao serviço de ML
         ConteudoResponseDTO resposta = classificadorService.classificar(request);
 
+        // Tenta salvar no banco de dados; se falhar, loga o erro mas NÃO trava o retorno ao cliente
         try {
             Conteudo conteudo = conteudoMapper.toEntity(request, resposta);
             conteudo.setTagsSugeridas(
@@ -67,8 +80,11 @@ public class ConteudoService {
     }
 
     /**
-     * Busca conteúdos já processados que contenham a palavra-chave informada
-     * no título, texto, categoria ou informações adicionais.
+     * Busca conteúdos cadastrados que contenham a palavra-chave informada
+     * no título, texto, categoria, informações adicionais ou tags.
+     * 
+     * @param termo Termo/palavra-chave a ser pesquisado
+     * @return Lista de conteúdos formatados como ConteudoResponseDTO
      */
     public List<ConteudoResponseDTO> buscarPorPalavraChave(String termo) {
         List<Conteudo> resultados = conteudoRepository.buscarPorPalavraChave(termo);
@@ -77,3 +93,4 @@ public class ConteudoService {
                 .toList();
     }
 }
+

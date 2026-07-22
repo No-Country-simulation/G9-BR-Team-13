@@ -6,6 +6,12 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Entidade JPA referente à tabela "conteudos".
+ * 
+ * Representa um artigo ou postagem cadastrado no sistema juntamente com
+ * o resultado do seu processamento pela IA (categoria, probabilidade e tags).
+ */
 @Entity
 @Table(name = "conteudos")
 @Getter
@@ -37,12 +43,16 @@ public class Conteudo {
     @Column(name = "criado_em", nullable = false)
     private LocalDateTime criadoEm;
 
+    /**
+     * Callback executado automaticamente pelo JPA antes de inserir o registro no banco.
+     * Define a data e hora de criação do registro.
+     */
     @PrePersist
     public void prePersist() {
         this.criadoEm = LocalDateTime.now();
     }
 
-    // Relacionamento muitos-para-muitos entre Conteúdo e Tags
+    // Relacionamento muitos-para-muitos (N:N) entre Conteúdo e Tags através da tabela "conteudo_tags"
     @ManyToMany
     @JoinTable(
             name = "conteudo_tags",
@@ -61,4 +71,4 @@ public class Conteudo {
         this.informacoesAdicionais = informacoesAdicionais;
         this.tagsSugeridas = tagsSugeridas;
     }
-}
+}
