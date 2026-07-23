@@ -6,6 +6,7 @@ import RelatedContent from "../../components/RelatedContent/RelatedContent";
 import ResultCard from "../../components/ResultCard/ResultCard";
 import StatusCards from "../../components/StatusCards/StatusCards";
 import { analyzeContent } from "../../services/api";
+import { saveAnalysis } from "../../services/history";
 
 function Home() {
   const [result, setResult] = useState(null);
@@ -21,6 +22,7 @@ function Home() {
       const response = await analyzeContent(payload);
 
       setResult(response);
+      saveAnalysis(response);
       setRelatedContents([]);
     } catch (requestError) {
       console.error(requestError);
