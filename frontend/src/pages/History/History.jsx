@@ -1,7 +1,9 @@
 import { useState } from "react";
 import {
   Calendar,
+  Check,
   Clock3,
+  Copy,
   History as HistoryIcon,
   Tag,
   X,
@@ -12,9 +14,31 @@ import { getHistory } from "../../services/history";
 function History() {
   const [history] = useState(() => getHistory());
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
+  const [copiedAnalysisId, setCopiedAnalysisId] = useState(null);
+  const [copyError, setCopyError] = useState("");
 
   function closeModal() {
     setSelectedAnalysis(null);
+  }
+
+  async function copyAnalysisJson(item) {
+    setCopyError("");
+
+    try {
+      const formattedJson = JSON.stringify(item.response, null, 2);
+
+      await navigator.clipboard.writeText(formattedJson);
+
+      setCopiedAnalysisId(item.id);
+
+      window.setTimeout(() => {
+        setCopiedAnalysisId(null);
+      }, 2000);
+    } catch {
+      setCopyError(
+        "Não foi possível copiar o JSON. Tente novamente.",
+      );
+    }
   }
 
   return (
@@ -28,6 +52,15 @@ function History() {
           Consulte os conteúdos analisados anteriormente.
         </p>
       </div>
+
+      {copyError && (
+        <div
+          className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+          role="alert"
+        >
+          {copyError}
+        </div>
+      )}
 
       {history.length === 0 ? (
         <div className="flex min-h-72 flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-slate-900 p-8 text-center">
@@ -56,6 +89,8 @@ function History() {
             const keywords =
               item.response?.informacoesAdicionais ?? [];
 
+            const wasCopied = copiedAnalysisId === item.id;
+
             return (
               <article
                 key={item.id}
@@ -76,7 +111,9 @@ function History() {
                     <Calendar size={16} />
 
                     <span>
-                      {new Date(item.createdAt).toLocaleString("pt-BR")}
+                      {new Date(item.createdAt).toLocaleString(
+                        "pt-BR",
+                      )}
                     </span>
                   </div>
                 </div>
@@ -108,7 +145,9 @@ function History() {
                   <div className="mb-3 flex items-center gap-2 text-slate-300">
                     <Tag size={18} />
 
-                    <span className="font-medium">Palavras-chave</span>
+                    <span className="font-medium">
+                      Palavras-chave
+                    </span>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
@@ -133,17 +172,29 @@ function History() {
                   <button
                     type="button"
                     className="rounded-xl border border-cyan-500 px-4 py-2 text-sm font-medium text-cyan-300 transition hover:bg-cyan-500/10"
-                    onClick={() => setSelectedAnalysis(item.response)}
+                    onClick={() =>
+                      setSelectedAnalysis(item.response)
+                    }
                   >
                     Ver JSON
                   </button>
 
                   <button
                     type="button"
-                    className="cursor-not-allowed rounded-xl border border-slate-600 px-4 py-2 text-sm font-medium text-slate-500"
-                    disabled
+                    className="flex items-center gap-2 rounded-xl border border-slate-600 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-cyan-500 hover:bg-cyan-500/10 hover:text-cyan-300"
+                    onClick={() => copyAnalysisJson(item)}
                   >
-                    Copiar JSON
+                    {wasCopied ? (
+                      <>
+                        <Check size={16} />
+                        Copiado
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={16} />
+                        Copiar JSON
+                      </>
+                    )}
                   </button>
 
                   <button
