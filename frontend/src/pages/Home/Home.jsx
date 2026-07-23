@@ -41,7 +41,7 @@ function Home() {
     <>
       <StatusCards />
 
-      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+      <section className="grid gap-5 lg:gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <AnalysisForm
           onSubmit={handleAnalyze}
           isLoading={isLoading}

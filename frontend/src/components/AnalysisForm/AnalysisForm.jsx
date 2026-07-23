@@ -30,28 +30,28 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
   }
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40">
-      <div className="mb-6 flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
-          <FileText size={24} />
+    <section className="rounded-3xl border border-white/10 bg-slate-900 p-4 shadow-2xl shadow-slate-950/40 sm:p-6">
+      <div className="mb-5 flex items-center gap-3 sm:mb-6">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300 sm:h-12 sm:w-12">
+          <FileText size={22} />
         </div>
 
-        <div>
-          <h3 className="text-xl font-bold text-white">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-lg font-bold text-white sm:text-xl">
             Analisar conteúdo
           </h3>
 
-          <p className="text-sm text-slate-400">
+          <p className="text-xs text-slate-400 sm:text-sm">
             Envie um conteúdo técnico para classificação inteligente.
           </p>
         </div>
       </div>
 
-      <form className="space-y-5" onSubmit={handleSubmit}>
+      <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit}>
         <div>
           <label
             htmlFor="title"
-            className="mb-2 block text-sm font-medium text-slate-300"
+            className="mb-1.5 block text-sm font-medium text-slate-300 sm:mb-2"
           >
             Título do conteúdo
           </label>
@@ -70,7 +70,7 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
             className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
           />
 
-          <div className="mt-2 flex items-center justify-between gap-4 text-xs">
+          <div className="mt-1.5 flex items-center justify-between gap-4 text-xs sm:mt-2">
             <span
               className={
                 title.length > 0 && !isTitleValid
@@ -90,7 +90,7 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
         <div>
           <label
             htmlFor="content"
-            className="mb-2 block text-sm font-medium text-slate-300"
+            className="mb-1.5 block text-sm font-medium text-slate-300 sm:mb-2"
           >
             Texto técnico
           </label>
@@ -105,10 +105,10 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
             minLength={20}
             maxLength={5000}
             placeholder="Cole aqui documentação, anotação, artigo ou material técnico..."
-            className="min-h-52 w-full resize-none rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="min-h-44 w-full resize-none rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-52"
           />
 
-          <div className="mt-2 flex items-center justify-between gap-4 text-xs">
+          <div className="mt-1.5 flex items-center justify-between gap-4 text-xs sm:mt-2">
             <span
               className={
                 content.length > 0 && !isContentValid
@@ -128,7 +128,7 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
         <button
           type="submit"
           disabled={isLoading || !isFormValid}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-cyan-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-cyan-400 px-5 py-3.5 font-bold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60 sm:py-3"
         >
           {isLoading ? (
             <>
@@ -146,7 +146,7 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
         {error && (
           <p
             role="alert"
-            className="rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-300"
+            className="rounded-2xl border border-red-400/20 bg-red-400/10 p-3 text-sm text-red-300 sm:p-4"
           >
             {error}
           </p>

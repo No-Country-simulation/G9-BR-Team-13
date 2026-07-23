@@ -1,1 +1,38 @@
 @import "tailwindcss";
+
+@theme {
+  --breakpoint-xs: 22rem;
+  --breakpoint-3xl: 120rem;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    overscroll-behavior: none;
+  }
+
+  :root {
+    --sat: env(safe-area-inset-top, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+  }
+}
+
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea,
+  button,
+  a {
+    min-height: 44px;
+  }
+}
