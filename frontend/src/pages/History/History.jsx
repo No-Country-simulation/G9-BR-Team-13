@@ -6,19 +6,28 @@ import {
   Copy,
   History as HistoryIcon,
   Tag,
+  Trash2,
   X,
 } from "lucide-react";
 
-import { getHistory } from "../../services/history";
+import {
+  deleteAnalysis,
+  getHistory,
+} from "../../services/history";
 
 function History() {
-  const [history] = useState(() => getHistory());
+  const [history, setHistory] = useState(() => getHistory());
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [copiedAnalysisId, setCopiedAnalysisId] = useState(null);
+  const [analysisToDelete, setAnalysisToDelete] = useState(null);
   const [copyError, setCopyError] = useState("");
 
-  function closeModal() {
+  function closeJsonModal() {
     setSelectedAnalysis(null);
+  }
+
+  function closeDeleteModal() {
+    setAnalysisToDelete(null);
   }
 
   async function copyAnalysisJson(item) {
@@ -39,6 +48,17 @@ function History() {
         "Não foi possível copiar o JSON. Tente novamente.",
       );
     }
+  }
+
+  function confirmDeleteAnalysis() {
+    if (!analysisToDelete) {
+      return;
+    }
+
+    const updatedHistory = deleteAnalysis(analysisToDelete.id);
+
+    setHistory(updatedHistory);
+    setAnalysisToDelete(null);
   }
 
   return (
@@ -75,7 +95,9 @@ function History() {
           <div className="mt-2 flex items-center gap-2 text-sm text-slate-400">
             <Clock3 size={16} />
 
-            <span>As análises realizadas serão exibidas aqui.</span>
+            <span>
+              As análises realizadas serão exibidas aqui.
+            </span>
           </div>
         </div>
       ) : (
@@ -199,9 +221,10 @@ function History() {
 
                   <button
                     type="button"
-                    className="cursor-not-allowed rounded-xl border border-red-500/50 px-4 py-2 text-sm font-medium text-red-400/50"
-                    disabled
+                    className="flex items-center gap-2 rounded-xl border border-red-500/70 px-4 py-2 text-sm font-medium text-red-400 transition hover:bg-red-500/10"
+                    onClick={() => setAnalysisToDelete(item)}
                   >
+                    <Trash2 size={16} />
                     Excluir
                   </button>
                 </div>
@@ -215,7 +238,7 @@ function History() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
           role="presentation"
-          onMouseDown={closeModal}
+          onMouseDown={closeJsonModal}
         >
           <div
             className="w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl"
@@ -241,7 +264,7 @@ function History() {
               <button
                 type="button"
                 className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 transition hover:bg-white/10 hover:text-white"
-                onClick={closeModal}
+                onClick={closeJsonModal}
                 aria-label="Fechar modal"
               >
                 <X size={22} />
@@ -260,9 +283,62 @@ function History() {
               <button
                 type="button"
                 className="rounded-xl bg-cyan-500 px-5 py-2 text-sm font-bold text-slate-950 transition hover:bg-cyan-400"
-                onClick={closeModal}
+                onClick={closeJsonModal}
               >
                 Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {analysisToDelete !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
+          role="presentation"
+          onMouseDown={closeDeleteModal}
+        >
+          <div
+            className="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-modal-title"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-400">
+              <Trash2 size={24} />
+            </div>
+
+            <h3
+              id="delete-modal-title"
+              className="mt-5 text-xl font-bold text-white"
+            >
+              Excluir análise?
+            </h3>
+
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              A análise da categoria{" "}
+              <strong className="text-slate-200">
+                {analysisToDelete.summary.categoria}
+              </strong>{" "}
+              será removida permanentemente do histórico local.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                className="rounded-xl border border-slate-600 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-800"
+                onClick={closeDeleteModal}
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                className="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-red-400"
+                onClick={confirmDeleteAnalysis}
+              >
+                Excluir
               </button>
             </div>
           </div>

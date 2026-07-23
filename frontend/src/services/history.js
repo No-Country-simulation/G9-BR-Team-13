@@ -4,7 +4,6 @@ function createHistoryItem(result) {
   return {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
-
     summary: {
       categoria: result.categoria ?? "Não informada",
       probabilidade:
@@ -12,42 +11,52 @@ function createHistoryItem(result) {
           ? result.probabilidade
           : null,
     },
-
     response: result,
   };
 }
 
 export function getHistory() {
-  const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
-
-  if (!storedHistory) {
-    return [];
-  }
-
   try {
+    const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
+
+    if (!storedHistory) {
+      return [];
+    }
+
     const parsedHistory = JSON.parse(storedHistory);
 
-    return Array.isArray(parsedHistory)
-      ? parsedHistory
-      : [];
+    return Array.isArray(parsedHistory) ? parsedHistory : [];
   } catch {
     return [];
   }
 }
 
 export function saveAnalysis(result) {
-  if (!result || typeof result !== "object") {
-    return;
-  }
-
   const history = getHistory();
-
-  const newHistoryItem = createHistoryItem(result);
+  const historyItem = createHistoryItem(result);
+  const updatedHistory = [historyItem, ...history];
 
   localStorage.setItem(
     HISTORY_STORAGE_KEY,
-    JSON.stringify([newHistoryItem, ...history]),
+    JSON.stringify(updatedHistory),
   );
+
+  return historyItem;
+}
+
+export function deleteAnalysis(id) {
+  const history = getHistory();
+
+  const updatedHistory = history.filter(
+    (historyItem) => historyItem.id !== id,
+  );
+
+  localStorage.setItem(
+    HISTORY_STORAGE_KEY,
+    JSON.stringify(updatedHistory),
+  );
+
+  return updatedHistory;
 }
 
 export function clearHistory() {
