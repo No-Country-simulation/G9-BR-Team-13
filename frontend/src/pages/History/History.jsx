@@ -4,12 +4,18 @@ import {
   Clock3,
   History as HistoryIcon,
   Tag,
+  X,
 } from "lucide-react";
 
 import { getHistory } from "../../services/history";
 
 function History() {
   const [history] = useState(() => getHistory());
+  const [selectedAnalysis, setSelectedAnalysis] = useState(null);
+
+  function closeModal() {
+    setSelectedAnalysis(null);
+  }
 
   return (
     <section>
@@ -35,6 +41,7 @@ function History() {
 
           <div className="mt-2 flex items-center gap-2 text-sm text-slate-400">
             <Clock3 size={16} />
+
             <span>As análises realizadas serão exibidas aqui.</span>
           </div>
         </div>
@@ -54,7 +61,7 @@ function History() {
                 key={item.id}
                 className="rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-lg"
               >
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <h3 className="text-2xl font-bold text-cyan-300">
                       {item.summary.categoria}
@@ -81,7 +88,9 @@ function History() {
                     </span>
 
                     <span className="font-bold text-cyan-300">
-                      {percentage}%
+                      {item.summary.probabilidade !== null
+                        ? `${percentage}%`
+                        : "Não informada"}
                     </span>
                   </div>
 
@@ -98,14 +107,15 @@ function History() {
                 <div className="mt-6">
                   <div className="mb-3 flex items-center gap-2 text-slate-300">
                     <Tag size={18} />
+
                     <span className="font-medium">Palavras-chave</span>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
                     {keywords.length > 0 ? (
-                      keywords.map((keyword) => (
+                      keywords.map((keyword, index) => (
                         <span
-                          key={keyword}
+                          key={`${keyword}-${index}`}
                           className="rounded-full bg-cyan-500/10 px-3 py-1 text-sm text-cyan-300"
                         >
                           {keyword}
@@ -121,21 +131,24 @@ function History() {
 
                 <div className="mt-8 flex flex-wrap gap-3">
                   <button
+                    type="button"
                     className="rounded-xl border border-cyan-500 px-4 py-2 text-sm font-medium text-cyan-300 transition hover:bg-cyan-500/10"
-                    disabled
+                    onClick={() => setSelectedAnalysis(item.response)}
                   >
                     Ver JSON
                   </button>
 
                   <button
-                    className="rounded-xl border border-slate-600 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-700"
+                    type="button"
+                    className="cursor-not-allowed rounded-xl border border-slate-600 px-4 py-2 text-sm font-medium text-slate-500"
                     disabled
                   >
                     Copiar JSON
                   </button>
 
                   <button
-                    className="rounded-xl border border-red-500 px-4 py-2 text-sm font-medium text-red-400 transition hover:bg-red-500/10"
+                    type="button"
+                    className="cursor-not-allowed rounded-xl border border-red-500/50 px-4 py-2 text-sm font-medium text-red-400/50"
                     disabled
                   >
                     Excluir
@@ -144,6 +157,64 @@ function History() {
               </article>
             );
           })}
+        </div>
+      )}
+
+      {selectedAnalysis !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
+          role="presentation"
+          onMouseDown={closeModal}
+        >
+          <div
+            className="w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="json-modal-title"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
+              <div>
+                <h3
+                  id="json-modal-title"
+                  className="text-xl font-bold text-white"
+                >
+                  Resposta completa da API
+                </h3>
+
+                <p className="mt-1 text-sm text-slate-400">
+                  JSON armazenado no histórico desta análise.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 transition hover:bg-white/10 hover:text-white"
+                onClick={closeModal}
+                aria-label="Fechar modal"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="max-h-[65vh] overflow-auto p-6">
+              <pre className="overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-5 text-sm leading-6 text-cyan-200">
+                <code>
+                  {JSON.stringify(selectedAnalysis, null, 2)}
+                </code>
+              </pre>
+            </div>
+
+            <div className="flex justify-end border-t border-white/10 px-6 py-4">
+              <button
+                type="button"
+                className="rounded-xl bg-cyan-500 px-5 py-2 text-sm font-bold text-slate-950 transition hover:bg-cyan-400"
+                onClick={closeModal}
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </section>
