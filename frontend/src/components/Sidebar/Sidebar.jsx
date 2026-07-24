@@ -117,34 +117,43 @@ function Sidebar({ isMobileOpen, onClose }) {
         {content}
       </aside>
 
-      {isMobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
-            onClick={onClose}
-            aria-hidden="true"
-          />
+      <div
+        className={`fixed inset-0 z-50 transition-visibility lg:hidden ${
+          isMobileOpen
+            ? "visible pointer-events-auto"
+            : "invisible pointer-events-none"
+        }`}
+        aria-hidden={!isMobileOpen}
+      >
+        <div
+          className={`fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300 ${
+            isMobileOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={onClose}
+          aria-hidden="true"
+        />
 
-          <aside className="fixed inset-y-0 left-0 z-50 flex w-72 max-w-[calc(100vw-3rem)] flex-col bg-slate-950 shadow-2xl shadow-slate-950/80 animate-slide-in-left">
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-4 sm:px-6">
-              <span className="text-sm font-semibold text-slate-400">
-                Menu
-              </span>
+        <aside
+          className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[calc(100vw-3rem)] flex-col bg-slate-950 shadow-2xl shadow-slate-950/80 transition-transform duration-300 ease-out ${
+            isMobileOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-4 sm:px-6">
+            <span className="text-sm font-semibold text-slate-400">Menu</span>
 
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 transition hover:bg-white/10 hover:text-white"
-                aria-label="Fechar menu"
-              >
-                <X size={22} />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 transition hover:bg-white/10 hover:text-white"
+              aria-label="Fechar menu"
+            >
+              <X size={22} />
+            </button>
+          </div>
 
-            {content}
-          </aside>
-        </div>
-      )}
+          {content}
+        </aside>
+      </div>
     </>
   );
 }
