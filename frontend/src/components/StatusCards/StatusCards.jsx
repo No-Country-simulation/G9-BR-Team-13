@@ -37,30 +37,30 @@ function StatusCards() {
   ];
 
   return (
-    <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <section className="mb-5 grid gap-3 sm:mb-6 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon;
 
         return (
           <div
             key={card.title}
-            className="rounded-3xl border border-white/10 bg-slate-900 p-5 shadow-xl shadow-slate-950/30"
+            className="rounded-3xl border border-white/10 bg-slate-900 p-4 shadow-xl shadow-slate-950/30 sm:p-5"
           >
-            <div className="mb-4 flex items-center">
+            <div className="mb-3 flex items-center sm:mb-4">
               <div
-                className={`flex h-11 w-11 items-center justify-center rounded-2xl ${card.bg} ${card.color}`}
+                className={`flex h-10 w-10 items-center justify-center rounded-2xl sm:h-11 sm:w-11 ${card.bg} ${card.color}`}
               >
-                <Icon size={22} />
+                <Icon size={20} />
               </div>
             </div>
 
-            <p className="text-sm text-slate-400">{card.title}</p>
+            <p className="text-xs text-slate-400 sm:text-sm">{card.title}</p>
 
-            <h3 className={`mt-1 text-xl font-bold ${card.color}`}>
+            <h3 className={`mt-1 text-lg font-bold sm:text-xl ${card.color}`}>
               {card.value}
             </h3>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
               {card.description}
             </p>
           </div>

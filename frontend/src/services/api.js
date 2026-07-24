@@ -26,16 +26,24 @@ function getErrorMessage(errorData) {
 }
 
 function normalizeResponse(data) {
-  return {
-    categoria: data.categoria,
-    probabilidade: data.probabilidade,
+  const additionalInformation =
+    data?.informacoesAdicionais ??
+    data?.informacoes_adicionais;
 
-    // Ele aceita tanto o contrato atual em camelCase quanto
-    // o formato com underscore presente na documentação.
-    informacoesAdicionais:
-      data.informacoesAdicionais ??
-      data.informacoes_adicionais ??
-      [],
+  return {
+    categoria:
+      typeof data?.categoria === "string" && data.categoria.trim()
+        ? data.categoria
+        : "Não informada",
+
+    probabilidade:
+      typeof data?.probabilidade === "number"
+        ? data.probabilidade
+        : null,
+
+    informacoesAdicionais: Array.isArray(additionalInformation)
+      ? additionalInformation
+      : [],
   };
 }
 
