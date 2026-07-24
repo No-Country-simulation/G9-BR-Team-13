@@ -5,9 +5,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Instala dependências aproveitando cache de camadas Docker
+# Instala dependências do frontend
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # Copia código-fonte e gera o build estático de produção em /app/dist
 COPY . .

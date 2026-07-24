@@ -3,6 +3,7 @@
 # SCRIPT DE EXECUÇÃO DE SUÍTE DE TESTES EM CONTAINERS ISOLADOS
 # ==============================================================================
 set -e
+cd "$(dirname "$0")/.."
 
 echo "🧪 Executando testes nos contêineres..."
 

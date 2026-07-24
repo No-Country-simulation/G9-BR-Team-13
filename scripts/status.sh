@@ -2,6 +2,7 @@
 # ==============================================================================
 # SCRIPT DE DIAGNÓSTICO E STATUS DOS CONTÊINERES
 # ==============================================================================
+cd "$(dirname "$0")/.."
 echo "=== Status dos Contêineres Docker Compose ==="
 docker compose ps
 

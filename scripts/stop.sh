@@ -2,6 +2,7 @@
 # ==============================================================================
 # SCRIPT DE PARADA E LIMPEZA DE TODOS OS AMBIENTES DOCKER
 # ==============================================================================
+cd "$(dirname "$0")/.."
 echo "🛑 Parando todos os contêineres e limpando recursos..."
 
 # Encerra os contêineres e remove volumes de desenvolvimento e produção

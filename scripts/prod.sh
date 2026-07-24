@@ -3,6 +3,7 @@
 # SCRIPT DE INICIALIZAÇÃO DO AMBIENTE DE PRODUÇÃO (PROD)
 # ==============================================================================
 set -e
+cd "$(dirname "$0")/.."
 
 echo "🏭 Iniciando ambiente de PRODUÇÃO..."
 

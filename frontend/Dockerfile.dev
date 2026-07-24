@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Instala pacotes do Node.js
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # Copia arquivos do projeto
 COPY . .

@@ -6,6 +6,7 @@
 #   ./scripts/logs.sh [postgres|backend|ia-service|frontend] -> Logs de um serviço
 #   ./scripts/logs.sh                                         -> Logs de todos os serviços
 # ==============================================================================
+cd "$(dirname "$0")/.."
 
 SERVICE=${1:-}
 

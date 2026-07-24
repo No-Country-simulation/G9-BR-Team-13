@@ -5,6 +5,9 @@
 # Interrompe o script se qualquer comando falhar
 set -e
 
+# Navega automaticamente para o diretório raiz do projeto independente de onde o script foi chamado
+cd "$(dirname "$0")/.."
+
 echo "🚀 Iniciando ambiente de DESENVOLVIMENTO..."
 
 # Carrega variáveis de ambiente do arquivo .env.dev (se existir)
