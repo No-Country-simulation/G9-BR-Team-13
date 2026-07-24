@@ -1,0 +1,19 @@
+# ==============================================================================
+# AMBIENTE DE DESENVOLVIMENTO: Frontend React/Vite
+# ==============================================================================
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Instala pacotes do Node.js
+COPY package*.json ./
+RUN npm ci
+
+# Copia arquivos do projeto
+COPY . .
+
+EXPOSE 5173
+
+# Inicia servidor Vite vinculando em 0.0.0.0 para acesso externo ao container
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+

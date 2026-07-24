@@ -1,0 +1,81 @@
+# ==============================================================================
+# CONFIGURAÇÃO DE DESENVOLVIMENTO (OVERRIDE)
+# ==============================================================================
+# Este arquivo é aplicado JUNTO com o docker-compose.yml principal via:
+# docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Ele adiciona recursos focados na experiência do desenvolvedor:
+# - Hot Reload (recarregamento automático de código sem rebuilt)
+# - Montagem de volumes locais para edição em tempo real (bind mounts)
+# - Portas de depuração (Debug Java JDWP na porta 5005)
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # BACKEND EM MODO DEV
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      # Sincroniza o código-fonte da máquina local com o container (Hot Reload)
+      - ./backend:/app
+      # Mantém o cache de dependências Maven persistente entre reinicializações
+      - maven_cache:/root/.m2
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DEVTOOLS_RESTART_ENABLED=true
+    # Executa via Spring Boot Maven plugin permitindo conexão de debugger remoto
+    command: ./mvnw spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    ports:
+      - "8080:8080"
+      - "5005:5005"  # Porta do depurador Java (JDWP)
+
+  # ----------------------------------------------------------------------------
+  # FRONTEND EM MODO DEV
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      # Sincroniza arquivos do frontend em tempo real
+      - ./frontend:/app
+      # Evita que o node_modules local da máquina sobrescreva os pacotes do container
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8080
+    ports:
+      - "5173:5173"
+    # Inicia o servidor de dev do Vite escutando em 0.0.0.0 (acessível de fora do container)
+    command: npm run dev -- --host 0.0.0.0
+
+  # ----------------------------------------------------------------------------
+  # IA & MACHINE LEARNING EM MODO DEV
+  # ----------------------------------------------------------------------------
+  ia-service:
+    build:
+      context: ./ia
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./ia:/app
+      - ./ia/models:/app/models:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - UVICORN_RELOAD=true
+    # Executa o Uvicorn com opção --reload para atualizar a API Python ao alterar o código
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+
+  # ----------------------------------------------------------------------------
+  # BANCO DE DADOS EM MODO DEV
+  # ----------------------------------------------------------------------------
+  postgres:
+    ports:
+      - "5432:5432"
+
+# Cache persistente do Maven para aceleração de builds
+volumes:
+  maven_cache:
+
