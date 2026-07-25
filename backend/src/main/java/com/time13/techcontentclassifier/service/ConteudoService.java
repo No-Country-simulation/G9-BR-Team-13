@@ -62,7 +62,7 @@ public class ConteudoService {
      * @return DTO com os resultados fornecidos pelo classificador
      */
     public ConteudoResponseDTO classificar(ConteudoRequestDTO request) {
-        // Solcita a classificação ao serviço de ML
+        // Solicita a classificação ao serviço de ML
         ConteudoResponseDTO resposta = classificadorService.classificar(request);
 
         // Tenta salvar no banco de dados; se falhar, loga o erro mas NÃO trava o retorno ao cliente
