@@ -12,9 +12,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.schemas import TextInput, PredictionOutput
 from app import model_loader
 from app.keywords import extract_keywords
+from app.logging_config import setup_json_logging
 
-# Configuração de Logs da aplicação
-logging.basicConfig(level=logging.INFO)
+# Configuração de logs estruturados em JSON para produção
+setup_json_logging()
 logger = logging.getLogger(__name__)
 
 
