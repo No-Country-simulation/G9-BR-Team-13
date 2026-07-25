@@ -8,6 +8,7 @@ carregando os artefatos de IA durante a inicialização (lifespan).
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from app.schemas import TextInput, PredictionOutput
 from app import model_loader
 from app.keywords import extract_keywords
@@ -29,6 +30,14 @@ async def lifespan(app: FastAPI):
 
 # Inicialização da instância FastAPI com título e manipulador do ciclo de vida
 app = FastAPI(title="TechKnowledge ML Service", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")
