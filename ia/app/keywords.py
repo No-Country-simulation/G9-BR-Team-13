@@ -18,16 +18,19 @@ def extract_keywords(text, vectorizer, modelo, top_n=5):
     Returns:
         List[str]: Lista com os termos de maior relevância/contribuição para a classe predita.
     """
-    # Transforma o texto de entrada na representação vetorial TF-IDF
     X_vec = vectorizer.transform([text])
-
-    # Calcula as pontuações de decisão e identifica o índice da classe predita
-    decision_scores = modelo.decision_function(X_vec)
-    predicted_class_idx = np.argmax(decision_scores)
-
-    # Obtém os coeficientes do modelo para a classe predita e os nomes dos termos
-    coef = modelo.coef_[predicted_class_idx]
     feature_names = vectorizer.get_feature_names_out()
+
+    if hasattr(modelo, "decision_function"):
+        decision_scores = modelo.decision_function(X_vec)
+        predicted_class_idx = np.argmax(decision_scores)
+    elif hasattr(modelo, "predict_proba"):
+        probs = modelo.predict_proba(X_vec)[0]
+        predicted_class_idx = np.argmax(probs)
+    else:
+        return []
+
+    coef = modelo.coef_[predicted_class_idx]
 
     word_contributions = {}
 
