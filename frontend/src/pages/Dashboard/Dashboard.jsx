@@ -56,7 +56,7 @@ function Dashboard() {
     },
     {
       title: "Base de conhecimento",
-      value: "0",
+      value: history.length.toString(),
       description: "Conteúdos armazenados",
       icon: BookOpen,
     },
