@@ -6,24 +6,37 @@ import RelatedContent from "../../components/RelatedContent/RelatedContent";
 import ResultCard from "../../components/ResultCard/ResultCard";
 import StatusCards from "../../components/StatusCards/StatusCards";
 import { analyzeContent } from "../../services/api";
-import { saveAnalysis } from "../../services/history";
+import {
+  getRelatedAnalyses,
+  saveAnalysis,
+} from "../../services/history";
 
 function Home() {
   const [result, setResult] = useState(null);
-  const [relatedContents, setRelatedContents] = useState([]);
+  const [relatedContents, setRelatedContents] =
+    useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   async function handleAnalyze(payload) {
     setIsLoading(true);
     setError(null);
+    setRelatedContents([]);
 
     try {
       const response = await analyzeContent(payload);
 
       setResult(response);
-      saveAnalysis(response);
-      setRelatedContents([]);
+
+      const savedAnalysis = saveAnalysis(
+        response,
+        payload,
+      );
+
+      const relatedAnalyses =
+        getRelatedAnalyses(savedAnalysis);
+
+      setRelatedContents(relatedAnalyses);
     } catch (requestError) {
       console.error(requestError);
 
