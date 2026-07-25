@@ -7,6 +7,7 @@ Serviço de Ciência de Dados / Machine Learning: treina o modelo de classifica�
 - Python 3.11, FastAPI, Scikit-Learn, `joblib`, Pydantic (validação)
 - Algoritmo: TF-IDF + **LogisticRegression** (multinomial, `predict_proba` nativo)
 - Testes: **pytest** (8 testes unitários em `tests/`)
+- Logging: **JSON estruturado** (`app/logging_config.py` — formato padronizado para observabilidade)
 - Stopwords: **português** (lista curada inline no `config.yaml`)
 - CORS habilitado (allow_origins=["*"])
 - OCI Object Storage (`app/model_loader.py` baixa os artefatos de lá se `OCI_NAMESPACE` estiver configurado; roda localmente sem OCI se `models/modelo.joblib` e `models/vectorizer.joblib` já existirem)
@@ -20,6 +21,8 @@ Serviço de Ciência de Dados / Machine Learning: treina o modelo de classifica�
 - **Contrato:** campo `informacoes_adicionais` conforme seção 14.2 do doc
 - **Dataset:** 630 exemplos realistas de documentação técnica (150 por categoria + 30 de ruído), 5 categorias (Backend, Dados, DevOps, Frontend, Outros), com variação de comprimento (50-500 caracteres), gerados por `scripts/generate_realistic_dataset.py`
 - **Testes:** 8 testes pytest em `tests/test_predict.py`
+- **Logging:** JSON estruturado com `JsonFormatter` em `app/logging_config.py`
+- **Docker:** HEALTHCHECK configurado via `curl /health` (intervalo 30s, timeout 10s, 3 retries)
 
 ## Como rodar localmente
 
@@ -58,7 +61,8 @@ ia/
 │   ├── main.py                   # FastAPI app, endpoints POST /predict, GET /categorias, GET /health
 │   ├── schemas.py                # Pydantic models com validação (TextInput, PredictionOutput)
 │   ├── model_loader.py           # download do OCI + carga dos artefatos .joblib (paths absolutos, timeout 30s)
-│   └── keywords.py               # extração de palavras-chave com fallback decision_function/predict_proba
+│   ├── keywords.py               # extração de palavras-chave com fallback decision_function/predict_proba
+│   └── logging_config.py         # formatter JSON estruturado para logs de produção
 ├── scripts/
 │   ├── generate_realistic_dataset.py  # gera dataset com 630 exemplos, 5 categorias, variação de comprimento
 │   ├── train.py                   # treina o pipeline (TF-IDF + LogisticRegression) e salva métricas
@@ -76,7 +80,7 @@ ia/
 ├── config.yaml                    # hiperparâmetros do TF-IDF / LogisticRegression + stopwords pt
 ├── requirements.txt
 ├── requirements-dev.txt   # dependências para o notebook (matplotlib, seaborn, jupyter)
-├── Dockerfile
+├── Dockerfile                    # HEALTHCHECK via curl /health, python:3.11-slim, 4 workers
 └── .env.example
 ```
 
