@@ -1,8 +1,16 @@
+"""
+Script de geração de dataset sintético realista para treinamento do modelo de IA.
+
+Gera amostragem sintética para diversas categorias de tecnologia (Backend, Frontend, DevOps, etc.)
+e salva no formato CSV em 'data/dataset.csv'.
+"""
+
 import csv
 import os
 import random
 
 realistic_samples = {
+
     "Backend": [
         "O Spring Boot oferece auto-configuracao que simplifica a criacao de aplicacoes Spring em producao, com embedded Tomcat e dependencias starter que reduzem a configuracao manual ao minimo.",
         "Microsservicos sao uma abordagem arquitetural onde o sistema e dividido em servicos pequenos, independentes e cada um com seu proprio banco de dados, comunicando-se via HTTP ou mensageria assincrona.",
