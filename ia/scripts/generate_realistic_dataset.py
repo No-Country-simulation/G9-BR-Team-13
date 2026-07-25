@@ -1,3 +1,10 @@
+"""
+Script de geração de dataset realista para treinamento do modelo de classificação.
+
+Produz amostras textuais nas categorias Backend, Dados, Frontend, DevOps e Outros
+(ruído), com variações de comprimento para aumentar a robustez do classificador.
+"""
+
 import csv
 import os
 import random
@@ -256,18 +263,45 @@ noise_samples = [
 
 
 def extract_titulo(texto):
+    """
+    Extrai um título curto a partir da primeira frase do texto de exemplo.
+
+    Tenta capturar o termo principal após o artigo inicial usando regex,
+    e faz fallback para as primeiras 6 palavras do texto.
+
+    Args:
+        texto (str): Texto completo do exemplo.
+
+    Returns:
+        str: Título extraído com no máximo 60 caracteres.
+    """
+    # Tenta capturar o termo principal após "O " seguido de vírgula
     match = re.match(r'^O\s+(.+?)(?:\s+(?:e|que|para|com|em|de\s+\w+))?[,]', texto)
     if match:
         return match.group(1)[:60]
+    # Fallback: pega as 6 primeiras palavras como título
     words = texto.split()
     titulo = " ".join(words[:6])
     return titulo[:60]
 
 
 def add_length_variation(texto):
+    """
+    Gera uma variação de comprimento do texto para aumentar a robustez do modelo.
+
+    Retorna aleatoriamente uma versão reduzida (metade do texto), o texto original
+    ou uma versão estendida com uma frase adicional.
+
+    Args:
+        texto (str): Texto base para variação.
+
+    Returns:
+        str: Variação do texto com comprimento diferente do original.
+    """
     words = texto.split()
     half = len(words) // 2
     short = " ".join(words[:max(15, half//2)])
+    # Frases de extensão que contextualizam sem adicionar jargão técnico
     long = texto + " " + random.choice([
         "Este conceito e amplamente utilizado em projetos modernos e essencial para profissionais da area.",
         "Dominar este tema e fundamental para quem busca atuar com desenvolvimento de software profissional.",
@@ -278,8 +312,24 @@ def add_length_variation(texto):
 
 
 def gerar_dataset_realistico(qtd_por_classe=50, qtd_noise=30):
+    """
+    Gera o dataset completo balanceado com exemplos realistas por categoria.
+
+    Para cada amostra selecionada, cria 3 variações (curta, média, longa)
+    para melhorar a generalização do modelo. Amostras de ruído são incluídas
+    na categoria "Outros".
+
+    Args:
+        qtd_por_classe (int, optional): Quantidade de amostras por categoria. Padrão é 50.
+        qtd_noise (int, optional): Quantidade de amostras de ruído. Padrão é 30.
+
+    Returns:
+        List[Dict[str, str]]: Lista de dicionários com titulo, texto e categoria.
+    """
+    # Seed fixa para reprodutibilidade do dataset gerado
     random.seed(42)
     linhas = []
+    # Para cada categoria técnica, seleciona as amostras e cria as variações
     for cat, samples in realistic_samples.items():
         selecionados = random.sample(samples, min(qtd_por_classe, len(samples)))
         for texto in selecionados:
@@ -290,15 +340,28 @@ def gerar_dataset_realistico(qtd_por_classe=50, qtd_noise=30):
             texto_var2 = add_length_variation(texto)
             linhas.append({"titulo": titulo, "texto": texto_var2, "categoria": cat})
 
+    # Adiciona as amostras de ruído na categoria "Outros"
     for texto in noise_samples:
         titulo = extract_titulo(texto)
         linhas.append({"titulo": titulo, "texto": texto, "categoria": "Outros"})
 
+    # Embaralha as linhas para evitar viés de ordem no treinamento
     random.shuffle(linhas)
     return linhas
 
 
 def gerar_para_csv(qtd_por_classe, qtd_noise, nome_arquivo):
+    """
+    Gera o dataset realista e persiste em arquivo CSV no diretório data/.
+
+    Args:
+        qtd_por_classe (int): Quantidade de amostras por categoria técnica.
+        qtd_noise (int): Quantidade de amostras de ruído (categoria "Outros").
+        nome_arquivo (str): Nome do arquivo CSV a ser gerado.
+
+    Returns:
+        str: Caminho completo do arquivo CSV gerado.
+    """
     dataset = gerar_dataset_realistico(qtd_por_classe, qtd_noise)
     os.makedirs("data", exist_ok=True)
     caminho = f"data/{nome_arquivo}"
@@ -310,5 +373,6 @@ def gerar_para_csv(qtd_por_classe, qtd_noise, nome_arquivo):
     return caminho
 
 
+# Execução direta com parâmetros default: 50 amostras/classe, 30 de ruído
 if __name__ == "__main__":
     gerar_para_csv(50, 30, "dataset.csv")
