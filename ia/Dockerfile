@@ -24,5 +24,9 @@ USER appuser
 
 EXPOSE 8000
 
+# Healthcheck periódico para o orquestrador (Kubernetes, ECS, etc.)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl --fail http://localhost:8000/health || exit 1
+
 # Executa API FastAPI com servidor ASGI Uvicorn em modo multi-worker (4 workers)
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
