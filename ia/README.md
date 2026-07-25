@@ -126,9 +126,8 @@ Verificação de saúde do serviço:
 
 ```json
 {
-  "status": "ok",
-  "modelo_carregado": true,
-  "categorias": ["Backend", "Dados", "DevOps", "Frontend", "Outros"]
+  "status": "healthy",
+  "model_loaded": true
 }
 ```
 
