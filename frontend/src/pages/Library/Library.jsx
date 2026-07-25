@@ -6,59 +6,67 @@ import {
   Search,
   Tag,
 } from "lucide-react";
+
 import { getHistory } from "../../services/history";
 
+function normalizeText(value, fallback = "") {
+  return typeof value === "string" && value.trim()
+    ? value.trim()
+    : fallback;
+}
+
 function getContentTitle(item) {
-  return (
-    item?.title ||
-    item?.input?.title ||
-    item?.contentTitle ||
-    "Conteúdo sem título"
+  return normalizeText(
+    item?.input?.titulo,
+    "Conteúdo sem título",
   );
 }
 
 function getContentCategory(item) {
-  return (
-    item?.category ||
-    item?.result?.category ||
-    item?.analysis?.category ||
-    "Sem categoria"
+  return normalizeText(
+    item?.summary?.categoria ??
+      item?.response?.categoria,
+    "Não informada",
   );
-}
-
-function getContentKeywords(item) {
-  const keywords =
-    item?.keywords ||
-    item?.result?.keywords ||
-    item?.analysis?.keywords ||
-    [];
-
-  if (Array.isArray(keywords)) {
-    return keywords;
-  }
-
-  if (typeof keywords === "string") {
-    return keywords
-      .split(",")
-      .map((keyword) => keyword.trim())
-      .filter(Boolean);
-  }
-
-  return [];
 }
 
 function getContentText(item) {
-  return (
-    item?.text ||
-    item?.content ||
-    item?.input?.text ||
-    item?.description ||
-    ""
-  );
+  return normalizeText(item?.input?.texto);
+}
+
+function getAdditionalInformation(item) {
+  const additionalInformation =
+    item?.response?.informacoesAdicionais;
+
+  if (!Array.isArray(additionalInformation)) {
+    return [];
+  }
+
+  return additionalInformation
+    .map((information) => {
+      if (typeof information === "string") {
+        return information.trim();
+      }
+
+      if (
+        information &&
+        typeof information === "object"
+      ) {
+        return normalizeText(
+          information.titulo ??
+            information.nome ??
+            information.descricao ??
+            information.valor,
+        );
+      }
+
+      return "";
+    })
+    .filter(Boolean);
 }
 
 function getContentDate(item) {
-  return item?.createdAt || item?.date || item?.timestamp || null;
+  return item?.createdAt ?? null;
 }
 
 function formatDate(dateValue) {
@@ -80,48 +88,75 @@ function formatDate(dateValue) {
 
 function Library() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Todas");
+  const [selectedCategory, setSelectedCategory] =
+    useState("Todas");
 
   const history = getHistory();
 
   const categories = useMemo(() => {
-    const availableCategories = history.map(getContentCategory);
+    const availableCategories = history
+      .map(getContentCategory)
+      .filter(Boolean);
 
-    return ["Todas", ...new Set(availableCategories)];
+    return [
+      "Todas",
+      ...new Set(availableCategories),
+    ];
   }, [history]);
 
   const filteredContents = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const normalizedSearch = searchTerm
+      .trim()
+      .toLowerCase();
 
     return [...history]
       .filter((item) => {
-        const title = getContentTitle(item).toLowerCase();
-        const category = getContentCategory(item).toLowerCase();
-        const keywords = getContentKeywords(item)
-          .join(" ")
-          .toLowerCase();
-        const text = getContentText(item).toLowerCase();
+        const title =
+          getContentTitle(item).toLowerCase();
+
+        const category =
+          getContentCategory(item).toLowerCase();
+
+        const text =
+          getContentText(item).toLowerCase();
+
+        const additionalInformation =
+          getAdditionalInformation(item)
+            .join(" ")
+            .toLowerCase();
 
         const matchesSearch =
           normalizedSearch.length === 0 ||
           title.includes(normalizedSearch) ||
           category.includes(normalizedSearch) ||
-          keywords.includes(normalizedSearch) ||
-          text.includes(normalizedSearch);
+          text.includes(normalizedSearch) ||
+          additionalInformation.includes(
+            normalizedSearch,
+          );
 
         const matchesCategory =
           selectedCategory === "Todas" ||
-          getContentCategory(item) === selectedCategory;
+          getContentCategory(item) ===
+            selectedCategory;
 
         return matchesSearch && matchesCategory;
       })
       .sort((firstItem, secondItem) => {
-        const firstDate = new Date(getContentDate(firstItem) || 0).getTime();
-        const secondDate = new Date(getContentDate(secondItem) || 0).getTime();
+        const firstDate = new Date(
+          getContentDate(firstItem) ?? 0,
+        ).getTime();
+
+        const secondDate = new Date(
+          getContentDate(secondItem) ?? 0,
+        ).getTime();
 
         return secondDate - firstDate;
       });
-  }, [history, searchTerm, selectedCategory]);
+  }, [
+    history,
+    searchTerm,
+    selectedCategory,
+  ]);
 
   return (
     <section>
@@ -131,7 +166,8 @@ function Library() {
         </h2>
 
         <p className="mt-1.5 text-sm text-slate-400 sm:mt-2">
-          Pesquise e organize conteúdos técnicos classificados pela plataforma.
+          Pesquise e organize conteúdos técnicos
+          classificados pela plataforma.
         </p>
       </div>
 
@@ -146,19 +182,28 @@ function Library() {
             <input
               type="search"
               value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="Pesquisar conteúdo, categoria ou palavra-chave..."
+              onChange={(event) =>
+                setSearchTerm(event.target.value)
+              }
+              placeholder="Pesquisar conteúdo, categoria ou informação..."
               className="w-full rounded-2xl border border-white/10 bg-slate-950 py-3 pl-11 pr-4 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-400 sm:pl-12"
             />
           </div>
 
           <select
             value={selectedCategory}
-            onChange={(event) => setSelectedCategory(event.target.value)}
+            onChange={(event) =>
+              setSelectedCategory(
+                event.target.value,
+              )
+            }
             className="rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400"
           >
             {categories.map((category) => (
-              <option key={category} value={category}>
+              <option
+                key={category}
+                value={category}
+              >
                 {category}
               </option>
             ))}
@@ -166,7 +211,10 @@ function Library() {
         </div>
 
         <div className="mt-4 flex items-center gap-2 text-xs text-slate-400 sm:text-sm">
-          <Database size={16} className="text-cyan-300" />
+          <Database
+            size={16}
+            className="text-cyan-300"
+          />
 
           <span>
             {filteredContents.length}{" "}
@@ -196,16 +244,25 @@ function Library() {
           </div>
         ) : (
           <div className="mt-5 grid gap-4 sm:mt-6 lg:grid-cols-2">
-            {filteredContents.map((item, index) => {
-              const title = getContentTitle(item);
-              const category = getContentCategory(item);
-              const keywords = getContentKeywords(item);
-              const text = getContentText(item);
-              const date = getContentDate(item);
+            {filteredContents.map((item) => {
+              const title =
+                getContentTitle(item);
+
+              const category =
+                getContentCategory(item);
+
+              const text =
+                getContentText(item);
+
+              const additionalInformation =
+                getAdditionalInformation(item);
+
+              const date =
+                getContentDate(item);
 
               return (
                 <article
-                  key={item?.id || `${date || "content"}-${index}`}
+                  key={item.id}
                   className="rounded-3xl border border-white/10 bg-slate-950/60 p-5 transition hover:border-cyan-400/40"
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -215,14 +272,18 @@ function Library() {
                       </div>
 
                       <div className="min-w-0">
-                        <h3 className="truncate text-base font-bold text-white">
+                        <h3 className="break-words text-base font-bold text-white">
                           {title}
                         </h3>
 
                         <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
-                          <CalendarDays size={14} />
+                          <CalendarDays
+                            size={14}
+                          />
 
-                          <span>{formatDate(date)}</span>
+                          <span>
+                            {formatDate(date)}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -238,22 +299,33 @@ function Library() {
                     </p>
                   )}
 
-                  {keywords.length > 0 && (
+                  {additionalInformation.length >
+                    0 && (
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {keywords.slice(0, 5).map((keyword) => (
-                        <span
-                          key={keyword}
-                          className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300"
-                        >
-                          <Tag size={12} />
+                      {additionalInformation
+                        .slice(0, 5)
+                        .map(
+                          (
+                            information,
+                            index,
+                          ) => (
+                            <span
+                              key={`${information}-${index}`}
+                              className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300"
+                            >
+                              <Tag size={12} />
 
-                          {keyword}
-                        </span>
-                      ))}
+                              {information}
+                            </span>
+                          ),
+                        )}
 
-                      {keywords.length > 5 && (
+                      {additionalInformation.length >
+                        5 && (
                         <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-400">
-                          +{keywords.length - 5}
+                          +
+                          {additionalInformation.length -
+                            5}
                         </span>
                       )}
                     </div>
