@@ -1,0 +1,79 @@
+# ==============================================================================
+# CONFIGURAÇÃO DE PRODUÇÃO (OVERRIDE)
+# ==============================================================================
+# Este arquivo é aplicado JUNTO com o docker-compose.yml principal via:
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# Ele configura o ambiente para alta performance, alta disponibilidade e segurança:
+# - Limite rígido de memória RAM e CPU por container (evita indisponibilidade total)
+# - Política de reinicialização automática (restart: unless-stopped)
+# - Desabilita ferramentas de desenvolvimento e compilação em tempo real
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # BACKEND EM MODO PRODUÇÃO
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # ----------------------------------------------------------------------------
+  # FRONTEND EM MODO PRODUÇÃO (NGINX ESTÁTICO)
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  # ----------------------------------------------------------------------------
+  # IA & MACHINE LEARNING EM MODO PRODUÇÃO
+  # ----------------------------------------------------------------------------
+  ia-service:
+    build:
+      context: ./ia
+      dockerfile: Dockerfile
+    environment:
+      - WORKERS=4
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+  # ----------------------------------------------------------------------------
+  # BANCO DE DADOS EM MODO PRODUÇÃO
+  # ----------------------------------------------------------------------------
+  postgres:
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+volumes:
+  postgres_data:
+

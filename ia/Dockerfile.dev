@@ -1,0 +1,22 @@
+# ==============================================================================
+# AMBIENTE DE DESENVOLVIMENTO: Python FastAPI IA Service
+# ==============================================================================
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Instala ferramentas do sistema para compilação e suporte a healthchecks
+RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala pacotes de produção e desenvolvimento (ex: pytest)
+COPY requirements.txt requirements-dev.txt ./
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-dev.txt
+
+COPY . .
+
+EXPOSE 8000
+
+# Executa Uvicorn com suporte a live-reloading de arquivos
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+

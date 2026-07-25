@@ -1,0 +1,106 @@
+# ==============================================================================
+# CONFIGURAÇÃO BASE DO DOCKER COMPOSE
+# ==============================================================================
+# Este arquivo define a arquitetura principal dos microsserviços da aplicação:
+# 1. postgres: Banco de dados relacional PostgreSQL.
+# 2. backend: Aplicação Spring Boot (Java).
+# 3. ia-service: Serviço de Inteligência Artificial / Machine Learning (Python FastAPI/Uvicorn).
+# 4. frontend: Aplicação Web em React/Vite servida via Nginx.
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # BANCO DE DADOS: PostgreSQL 16
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: techcontent-postgres
+    environment:
+      # Variáveis de ambiente com valores padrão de fallback caso não estejam no .env
+      POSTGRES_DB: ${DB_NAME:-techcontent}
+      POSTGRES_USER: ${DB_USER:-techuser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-techpass}
+    ports:
+      # Mapeamento de porta: <Porta_Hospedeiro>:<Porta_Container>
+      - "5432:5432"
+    volumes:
+      # Volume persistente para salvar os dados do banco além do ciclo de vida do container
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # Verifica se o PostgreSQL está pronto para aceitar conexões antes que outros serviços dependentes iniciem
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-techuser} -d ${DB_NAME:-techcontent}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # BACKEND: Java Spring Boot API
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: techcontent-backend
+    environment:
+      DB_HOST: postgres
+      DB_NAME: ${DB_NAME:-techcontent}
+      DB_USER: ${DB_USER:-techuser}
+      DB_PASSWORD: ${DB_PASSWORD:-techpass}
+      # URL do serviço de IA utilizando o nome do serviço no Compose para resolução DNS interna
+      ML_SERVICE_URL: http://ia-service:8000
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      # Aguarda o banco e a IA estarem completamente saudáveis antes de subir a API backend
+      postgres:
+        condition: service_healthy
+      ia-service:
+        condition: service_healthy
+    restart: on-failure
+
+  # ----------------------------------------------------------------------------
+  # IA & MACHINE LEARNING: Python FastAPI Service
+  # ----------------------------------------------------------------------------
+  ia-service:
+    build:
+      context: ./ia
+      dockerfile: Dockerfile
+    container_name: techcontent-ml
+    environment:
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    volumes:
+      # Monta pastas de modelos e dados como somente leitura (:ro)
+      - ./ia/models:/app/models:ro
+      - ./ia/data:/app/data:ro
+    healthcheck:
+      # Testa o endpoint /health da API Python
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: on-failure
+
+  # ----------------------------------------------------------------------------
+  # FRONTEND: React / Vite App
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: techcontent-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    restart: on-failure
+
+# ------------------------------------------------------------------------------
+# VOLUMES PERSISTENTES NOMEADOS
+# ------------------------------------------------------------------------------
+volumes:
+  postgres_data:
+

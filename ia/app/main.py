@@ -31,6 +31,11 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="TechKnowledge ML Service", lifespan=lifespan)
 
 
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "model_loaded": model_loader.modelo is not None}
+
+
 @app.post("/predict", response_model=PredictionOutput)
 async def predict(input_data: TextInput):
     """

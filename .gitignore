@@ -47,8 +47,10 @@ __pycache__/
 venv/
 *.joblib
 
-### Segredos e infra ###
+### Segredos e Arquivos de Ambiente (.env) ###
 .env
+.env.*
+!.env.example
 *.pem
 *-local.properties
 *local.properties

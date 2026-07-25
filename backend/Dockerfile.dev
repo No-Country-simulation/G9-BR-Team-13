@@ -1,0 +1,22 @@
+# ==============================================================================
+# AMBIENTE DE DESENVOLVIMENTO: Java Spring Boot
+# ==============================================================================
+FROM maven:3.9-eclipse-temurin-17
+
+WORKDIR /app
+
+# Copia arquivos de gerenciamento do Maven para preparar dependências offline
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
+RUN ./mvnw dependency:go-offline -B
+
+# Copia código-fonte
+COPY src ./src
+
+# Expõe porta da API (8080) e porta do debugger Java remoto (5005)
+EXPOSE 8080 5005
+
+# Inicia em modo de depuração com hot-reload ativo
+ENTRYPOINT ["./mvnw", "spring-boot:run", "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]
+
