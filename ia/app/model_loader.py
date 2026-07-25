@@ -25,6 +25,7 @@ MODELO_PATH = str(BASE_DIR / "models" / "modelo.joblib")
 
 OCI_BUCKET_NAME = os.getenv("OCI_BUCKET_NAME", "techknowledge-models")
 OCI_NAMESPACE = os.getenv("OCI_NAMESPACE")
+OCI_REGION = os.getenv("OCI_REGION", "us-ashburn-1")
 
 # Variáveis globais contendo as instâncias carregadas na memória
 vectorizer = None
@@ -72,7 +73,7 @@ def download_from_oci(local_path, object_name):
         )
 
         with open(local_path, 'wb') as f:
-            for chunk in get_obj.data.raw.stream(1024 * 1024):
+            for chunk in get_obj.data.raw.stream(1024 * 1024, timeout=30):
                 f.write(chunk)
 
         logger.info(f"{object_name} baixado do OCI com sucesso!")
