@@ -36,6 +36,13 @@ async def health():
     return {"status": "healthy", "model_loaded": model_loader.modelo is not None}
 
 
+@app.get("/categorias")
+async def listar_categorias():
+    if model_loader.modelo is not None:
+        return {"categorias": list(model_loader.modelo.classes_)}
+    return {"categorias": ["Backend", "Dados", "DevOps", "Frontend"]}
+
+
 @app.post("/predict", response_model=PredictionOutput)
 async def predict(input_data: TextInput):
     """
