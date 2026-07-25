@@ -1,16 +1,9 @@
-"""
-Script de geração de dataset sintético realista para treinamento do modelo de IA.
-
-Gera amostragem sintética para diversas categorias de tecnologia (Backend, Frontend, DevOps, etc.)
-e salva no formato CSV em 'data/dataset.csv'.
-"""
-
 import csv
 import os
 import random
+import re
 
 realistic_samples = {
-
     "Backend": [
         "O Spring Boot oferece auto-configuracao que simplifica a criacao de aplicacoes Spring em producao, com embedded Tomcat e dependencias starter que reduzem a configuracao manual ao minimo.",
         "Microsservicos sao uma abordagem arquitetural onde o sistema e dividido em servicos pequenos, independentes e cada um com seu proprio banco de dados, comunicando-se via HTTP ou mensageria assincrona.",
@@ -65,7 +58,7 @@ realistic_samples = {
         "O Node.js com Express permite criar servidores HTTP rapidamente com rotas, middlewares e tratamento de requisicoes, sendo uma alternativa leve ao Java Spring para APIs REST.",
         "O MongoDB e um banco NoSQL orientado a documentos que armazena dados em formato JSON flexivel, ideal para prototipos e aplicacoes que exigem schema dinamico sem migrations.",
         "A autenticacao JWT em Node.js utiliza a biblioteca jsonwebtoken para gerar e verificar tokens com payload customizado, expiracao configuravel e assinatura HMAC ou RSA.",
-        "O Prisma ORM para Node.js e TypeScript gera queries SQL automaticamente a partir de schemas declarativos, com migracoes, seed e um cliente tipado que previne erros em tempo de compilacao."
+        "O Prisma ORM para Node.js e TypeScript gera queries SQL automaticamente a partir de schemas declarativos, com migracoes, seed e um cliente tipado que previne erros em tempo de compilacao.",
     ],
     "Dados": [
         "Pandas e a biblioteca fundamental para manipulacao de dados em Python, oferecendo estruturas como DataFrame e Series para limpeza, transformacao e analise exploratoria de dados tabulares.",
@@ -119,7 +112,7 @@ realistic_samples = {
         "O algoritmo de Expectation-Maximization estima parametros de modelos probabilisticos na presenca de variaveis latentes, usado em misturas de Gaussianas para clusterizacao suave.",
         "A matriz de correlacao com heatmap no Seaborn visualiza relacoes entre variaveis numericas com um gradiente de cores, facilitando a identificacao de padroes e dependencias lineares no dataset.",
         "A biblioteca Plotly cria graficos interativos com zoom, pan e tooltips em HTML, exportaveis para PNG ou SVG e incorporaveis em dashboards web e notebooks Jupyter.",
-        "O Framework Dash do Plotly constroi dashboards analiticos com Python puro, combinando graficos interativos com componentes de UI como dropdowns, sliders e tabelas sem escrever JavaScript."
+        "O Framework Dash do Plotly constroi dashboards analiticos com Python puro, combinando graficos interativos com componentes de UI como dropdowns, sliders e tabelas sem escrever JavaScript.",
     ],
     "Frontend": [
         "React e uma biblioteca JavaScript para construir interfaces de usuario com componentes reutilizaveis, estado unidirecional e virtual DOM que otimiza a renderizacao ao minimizar manipulacoes no DOM real.",
@@ -172,7 +165,7 @@ realistic_samples = {
         "O Three.js e uma biblioteca JavaScript para renderizacao 3D no navegador usando WebGL, permitindo criar cenas com camaras, luzes, texturas e animacoes para visualizacao de dados imersiva.",
         "O Vite substitui o Webpack como bundler de desenvolvimento com HMR instantaneo usando ESM nativo do navegador, resultando em inicializacao e recarregamento muito mais rapidos.",
         "O Vitest e um framework de testes unitarios compativel com Jest que roda nativamente no Vite, compartilhando a mesma configuracao de transformacao e plugins para desenvolvimento unificado.",
-        "O deploy de aplicacoes React estaticas na Vercel ou Netlify conecta o repositorio Git, faz build automatico e publica em CDN global com HTTPS, preview deployments por branch e rollback com um clique."
+        "O deploy de aplicacoes React estaticas na Vercel ou Netlify conecta o repositorio Git, faz build automatico e publica em CDN global com HTTPS, preview deployments por branch e rollback com um clique.",
     ],
     "DevOps": [
         "Docker utiliza containers que empacotam aplicacoes com todas as suas dependencias, garantindo que o software execute da mesma forma em qualquer ambiente, do notebook do desenvolvedor ao servidor de producao.",
@@ -218,42 +211,104 @@ realistic_samples = {
         "O helm upgrade --install gerencia releases no Kubernetes com upgrade atomico e rollback automatico em caso de falha, mantendo o historico de revisoes para recovery rapido.",
         "O sistema de arquivos OverlayFS usado pelo Docker empilha camadas de imagem em uma unica montagem, compartilhando camadas base entre containers para economizar espaco em disco.",
         "A ferramenta Packer cria imagens de maquina virtual identicas para diferentes provedores de nuvem como AWS AMI, GCP Image e Azure VHD a partir de um unico template JSON ou HCL.",
-        "O monitoramento de logs centralizados com Loki agrega logs de todos os containers e servicos em um unico storage, indexado por labels do Prometheus para consultas rapidas sem全文搜索 completo.",
+        "O monitoramento de logs centralizados com Loki agrega logs de todos os containers e servicos em um unico storage, indexado por labels do Prometheus para consultas rapidas sem full search.",
         "A assinatura de commits com GPG no GitHub verifica a autenticidade do autor, exibindo um selo Verified no historico que garante que o commit veio realmente de quem diz ser.",
         "A ferramenta k9s oferece uma interface terminal interativa para gerenciar clusters Kubernetes, com navegacao por pods, logs em tempo real, port-forward e execucao remota em containers.",
         "A migracao de maquinas virtuais para containers envolve reempacotar aplicacoes em imagens Docker, ajustar configuracoes de rede e armazenamento persistente com volumes Kubernetes.",
         "O VPC peering na AWS conecta duas Virtual Private Clouds em redes diferentes usando rotas privadas, permitindo comunicacao segura entre recursos sem passar pela internet publica.",
         "A configuracao de health checks no Kubernetes com probes liveness e readiness determina quando um pod esta vivo e pronto para receber trafego, reiniciando automaticamente containers com falha.",
-        "O SonarQube analisa a qualidade do codigo fonte detectando bugs, vulnerabilidades de seguranca e code smells, integrado ao pipeline de CI para bloquear deploys com qualidade abaixo do threshold."
-    ]
+        "O SonarQube analisa a qualidade do codigo fonte detectando bugs, vulnerabilidades de seguranca e code smells, integrado ao pipeline de CI para bloquear deploys com qualidade abaixo do threshold.",
+    ],
 }
 
-def gerar_dataset_realistico(qtd_por_classe=25):
+noise_samples = [
+    "Nesta reuniao discutimos os prazos de entrega e alinhamento sobre as tarefas da sprint atual com o cliente.",
+    "O cafe da manha esta servido no refeitorio a partir das 8h, com pao, cafe, leite e frutas da estacao.",
+    "A previsao do tempo para hoje indica sol com algumas nuvens e temperatura maxima de 28 graus Celsius.",
+    "O expediente do dia 24 de dezembro sera ate as 14h, conforme comunicado interno da gestao de pessoas.",
+    "Favor preencher o formulario de ferias ate o dia 15 de cada mes para programacao do proximo periodo.",
+    "A empresa oferece plano de saude, vale alimentacao, vale transporte e seguro de vida como beneficios.",
+    "O estacionamento do predio esta passando por reformas e as vagas serao remanejadas para o subsolo.",
+    "A ata da reuniao de retrospectiva sera enviada por email com os acordos e pontos de acao definidos.",
+    "O sistema de ponto eletronico registra entrada, saida e almoco, com tolerancia de 10 minutos no horario.",
+    "A festa de confraternizacao sera no dia 20 de dezembro no espaco de eventos do 15o andar.",
+    "O condominio esta com obras na fachada e o acesso de veiculos pela portaria principal estara bloqueado.",
+    "O alarme de incendio sera testado nesta sexta as 10h, nao sendo necessaria evacuacao durante o teste.",
+    "A central de atendimento funciona 24 horas por dia, 7 dias por semana, inclusive feriados.",
+    "O processo de avaliacao de desempenho e feito semestralmente com feedback do gestor direto.",
+    "A intranet corporativa possui politicas de compras, viagens e beneficios disponiveis para consulta.",
+    "O treinamento de seguranca do trabalho e obrigatorio para todos os novos colaboradores da empresa.",
+    "A reserva de salas de reuniao deve ser feita pelo sistema online com no minimo 2 horas de antecedencia.",
+    "O codigo de conduta da empresa proibe discriminacao, assedio e qualquer forma de violencia no ambiente de trabalho.",
+    "A assembleia geral ordinaria sera realizada no dia 30 de marco para aprovacao do balanco anual.",
+    "As inscricoes para o programa de estagio estao abertas ate o dia 15 de fevereiro pelo site de carreiras.",
+    "A entrega dos equipamentos de informatica deve ser solicitada ao departamento de TI com 48 horas de antecedencia.",
+    "O manual do colaborador contem informacoes sobre politicas internas, beneficios e procedimentos administrativos.",
+    "A pesquisa de clima organizacional e anonima e ajuda a identificar oportunidades de melhoria no ambiente de trabalho.",
+    "As normas da ABNT devem ser seguidas para formatacao de documentos oficiais e relatorios tecnicos.",
+    "O calendario de feriados municipais e estaduais esta disponivel no portal do colaborador para consulta.",
+    "A politica de vestimenta recomenda trajes formais de segunda a quinta e casual na sexta-feira.",
+    "O programa de indicacao de novos talentos premia colaboradores que recomendam candidatos aprovados no processo seletivo.",
+    "A central de servicos compartilhados atende solicitacoes de RH, financeiro e infraestrutura em um unico canal.",
+    "O procedimento de devolucao de mercadorias exige nota fiscal original e prazo maximo de 7 dias uteis.",
+    "A convencao coletiva de trabalho define pisos salariais, jornada, adicionais e demais direitos da categoria.",
+]
+
+
+def extract_titulo(texto):
+    match = re.match(r'^O\s+(.+?)(?:\s+(?:e|que|para|com|em|de\s+\w+))?[,]', texto)
+    if match:
+        return match.group(1)[:60]
+    words = texto.split()
+    titulo = " ".join(words[:6])
+    return titulo[:60]
+
+
+def add_length_variation(texto):
+    words = texto.split()
+    half = len(words) // 2
+    short = " ".join(words[:max(15, half//2)])
+    long = texto + " " + random.choice([
+        "Este conceito e amplamente utilizado em projetos modernos e essencial para profissionais da area.",
+        "Dominar este tema e fundamental para quem busca atuar com desenvolvimento de software profissional.",
+        "Compreender bem este assunto diferencia profissionais juniores dos seniors no mercado de tecnologia.",
+        "Esta tecnologia continua evoluindo e se mantem relevante no cenario atual de desenvolvimento.",
+    ])
+    return random.choice([short, texto, long])
+
+
+def gerar_dataset_realistico(qtd_por_classe=50, qtd_noise=30):
     random.seed(42)
     linhas = []
     for cat, samples in realistic_samples.items():
         selecionados = random.sample(samples, min(qtd_por_classe, len(samples)))
         for texto in selecionados:
-            linhas.append({"texto": texto, "categoria": cat})
+            titulo = extract_titulo(texto)
+            linhas.append({"titulo": titulo, "texto": texto, "categoria": cat})
+            texto_var1 = add_length_variation(texto)
+            linhas.append({"titulo": titulo, "texto": texto_var1, "categoria": cat})
+            texto_var2 = add_length_variation(texto)
+            linhas.append({"titulo": titulo, "texto": texto_var2, "categoria": cat})
+
+    for texto in noise_samples:
+        titulo = extract_titulo(texto)
+        linhas.append({"titulo": titulo, "texto": texto, "categoria": "Outros"})
+
     random.shuffle(linhas)
     return linhas
 
-def gerar_para_csv(qtd_por_classe, nome_arquivo):
-    dataset = gerar_dataset_realistico(qtd_por_classe)
+
+def gerar_para_csv(qtd_por_classe, qtd_noise, nome_arquivo):
+    dataset = gerar_dataset_realistico(qtd_por_classe, qtd_noise)
     os.makedirs("data", exist_ok=True)
     caminho = f"data/{nome_arquivo}"
     with open(caminho, "w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["texto", "categoria"])
+        writer = csv.DictWriter(f, fieldnames=["titulo", "texto", "categoria"])
         writer.writeheader()
         writer.writerows(dataset)
     print(f"[OK] {nome_arquivo} gerado com {len(dataset)} exemplos realistas!")
     return caminho
 
+
 if __name__ == "__main__":
-    gerar_para_csv(50, "dataset_realistico_200.csv")  # 4x50 = 200 exemplos
-    dataset = gerar_dataset_realistico(50)
-    with open("data/dataset.csv", "w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["texto", "categoria"])
-        writer.writeheader()
-        writer.writerows(dataset)
-    print(f"[OK] dataset.csv substituido por {len(dataset)} exemplos realistas!")
+    gerar_para_csv(50, 30, "dataset.csv")
