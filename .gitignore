@@ -48,7 +48,6 @@ venv/
 *.joblib
 
 ### Documentos de análise interna ###
-IA-ANALYSIS.md
 
 ### Segredos e Arquivos de Ambiente (.env) ###
 .env
