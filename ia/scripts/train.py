@@ -23,7 +23,7 @@ with open("config.yaml", "r") as f:
 
 # 1. Carregar dataset e preparar variáveis X (features textuais) e y (rótulo/categoria)
 df = pd.read_csv("data/dataset.csv")
-X = (df["titulo"].astype(str).fillna("") + " " + df["texto"].astype(str).fillna(""))
+X = df["texto"].astype(str).fillna("")
 y = df["categoria"]
 
 # Verificar distribuição das classes no dataset

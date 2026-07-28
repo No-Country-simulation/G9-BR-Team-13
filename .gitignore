@@ -47,8 +47,6 @@ __pycache__/
 venv/
 *.joblib
 
-### Documentos de análise interna ###
-
 ### Segredos e Arquivos de Ambiente (.env) ###
 .env
 .env.*

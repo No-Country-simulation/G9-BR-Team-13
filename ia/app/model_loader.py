@@ -8,24 +8,21 @@ usando autenticação por Resource Principal ou arquivo de configuração ~/.oci
 import os
 import joblib
 import logging
-from pathlib import Path
+import oci
+from dotenv import load_dotenv
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
+# Carrega variáveis de ambiente do arquivo .env
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+# Caminhos locais para os arquivos salvos do modelo e vetorizador
+VECTORIZER_PATH = "models/vectorizer.joblib"
+MODELO_PATH = "models/modelo.joblib"
 
-VECTORIZER_PATH = str(BASE_DIR / "models" / "vectorizer.joblib")
-MODELO_PATH = str(BASE_DIR / "models" / "modelo.joblib")
-
+# Configurações do OCI Object Storage
 OCI_BUCKET_NAME = os.getenv("OCI_BUCKET_NAME", "techknowledge-models")
 OCI_NAMESPACE = os.getenv("OCI_NAMESPACE")
-OCI_REGION = os.getenv("OCI_REGION", "us-ashburn-1")
 
 # Variáveis globais contendo as instâncias carregadas na memória
 vectorizer = None
@@ -50,11 +47,10 @@ def download_from_oci(local_path, object_name):
     logger.info(f"Baixando {object_name} do OCI Object Storage...")
 
     try:
-        import oci
-
         if not OCI_NAMESPACE:
             raise ValueError("OCI_NAMESPACE nao configurado.")
 
+        # Tenta autenticação nativa de ambiente OCI (Resource Principal Signer)
         try:
             signer = oci.auth.signers.get_resource_principals_signer()
             object_storage = oci.object_storage.ObjectStorageClient(config={}, signer=signer)
@@ -73,7 +69,7 @@ def download_from_oci(local_path, object_name):
         )
 
         with open(local_path, 'wb') as f:
-            for chunk in get_obj.data.raw.stream(1024 * 1024, timeout=30):
+            for chunk in get_obj.data.raw.stream(1024 * 1024):
                 f.write(chunk)
 
         logger.info(f"{object_name} baixado do OCI com sucesso!")

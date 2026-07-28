@@ -2,20 +2,20 @@
 Schemas Pydantic para validação e serialização de dados da API FastAPI.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import List
 
 
-CATEGORIAS = [
-    "Backend", "Dados", "DevOps", "Frontend",
-    "Saude", "Direito", "Financas", "Marketing", "Educacao",
-    "Outros",
-]
-
-
 class TextInput(BaseModel):
-    titulo: str = Field(min_length=3, max_length=200)
-    texto: str = Field(min_length=20, max_length=5000)
+    """
+    Modelo de entrada de dados para requisição de classificação.
+    
+    Attributes:
+        titulo (str): Título do conteúdo técnico a ser classificado.
+        texto (str): Corpo/conteúdo do texto técnico.
+    """
+    titulo: str
+    texto: str
 
 
 class PredictionOutput(BaseModel):
