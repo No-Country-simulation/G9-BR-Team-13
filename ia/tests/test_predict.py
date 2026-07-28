@@ -18,14 +18,20 @@ from app.keywords import extract_keywords
 import joblib
 
 
-def test_categorias_possui_4():
-    """Verifica se a lista de categorias suportadas contém exatamente as 4 esperadas."""
+def test_categorias_possui_10():
+    """Verifica se a lista de categorias suportadas contém exatamente as 10 esperadas."""
     from app.schemas import CATEGORIAS
-    assert len(CATEGORIAS) == 4
+    assert len(CATEGORIAS) == 10
     assert "Backend" in CATEGORIAS
     assert "Frontend" in CATEGORIAS
     assert "Dados" in CATEGORIAS
     assert "DevOps" in CATEGORIAS
+    assert "Saude" in CATEGORIAS
+    assert "Direito" in CATEGORIAS
+    assert "Financas" in CATEGORIAS
+    assert "Marketing" in CATEGORIAS
+    assert "Educacao" in CATEGORIAS
+    assert "Outros" in CATEGORIAS
 
 
 def test_text_input_valido():
