@@ -51,12 +51,13 @@ public class GlobalExceptionHandler {
      * @return JSON estruturado indicando indisponibilidade do serviço de IA (HTTP 503 Service Unavailable)
      */
     @ExceptionHandler(MlServiceException.class)
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    public Map<String, String> tratarErroServicoIa(MlServiceException ex) {
-        Map<String, String> erro = new HashMap<>();
-        erro.put("erro", "ML_SERVICE_UNAVAILABLE");
-        erro.put("mensagem", ex.getMessage());
-        return erro;
+    public ResponseEntity<RespostaErros> tratarErroServicoIa(MlServiceException ex) {
+        RespostaErros error = new RespostaErros(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Serviço de IA Indisponível",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
     }
 
     /**
