@@ -16,7 +16,7 @@ Serviço de Ciência de Dados / Machine Learning: treina o modelo de classifica�
 
 - **Modelo treinado:** TF-IDF + LogisticRegression (multinomial)
 - **Acurácia atual:** ~93.3% (F1-weighted: ~0.93, validação cruzada com GridSearchCV)
-- **Dataset:** 597 exemplos reais da Wikipedia em português, 10 categorias (Backend, Dados, DevOps, Frontend, Saude, Direito, Financas, Marketing, Educacao, Outros), média de ~1333 caracteres
+- **Dataset:** 1479 exemplos reais da Wikipedia em português, 10 categorias (Backend, Dados, DevOps, Frontend, Saude, Direito, Financas, Marketing, Educacao, Outros), ~147 por categoria, média de ~1189 caracteres
 - **Origem dos dados:** Wikipedia API via `scripts/ingest_wikipedia.py` (dados reais, não sintéticos)
 - **Stopwords:** português (lista curada no `config.yaml`)
 - **Validação de entrada:** Pydantic com `Field(min_length, max_length)` — titulo (3-200), texto (20-5000)
@@ -81,7 +81,7 @@ ia/
 │   ├── __init__.py
 │   └── test_predict.py            # suite de testes pytest (8 testes: validação, schemas, keywords)
 ├── data/
-│   └── dataset.csv                # dataset principal (597 exemplos, 10 categorias, Wikipedia)
+│   └── dataset.csv                # dataset principal (1479 exemplos, 10 categorias, Wikipedia)
 ├── models/
 │   ├── modelo.joblib              # classificador LogisticRegression serializado
 │   ├── vectorizer.joblib           # vetorizador TF-IDF serializado
