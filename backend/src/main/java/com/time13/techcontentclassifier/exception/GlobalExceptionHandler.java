@@ -2,14 +2,12 @@ package com.time13.techcontentclassifier.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Manipulador global de exceções (@RestControllerAdvice).
@@ -40,6 +38,23 @@ public class GlobalExceptionHandler {
                 "Erro de Validação",
                 "Um ou mais campos contêm valores inválidos.",
                 campoErros
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * HTTP 400 - Trata requisições com JSON malformado ou tipos incompatíveis.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<RespostaErros> tratarJsonMalformado(HttpMessageNotReadableException ex) {
+        String detalhe = "O JSON enviado na requisição está malformado, vazio ou possui tipos de dados incompatíveis.";
+        if (ex.getCause() instanceof com.fasterxml.jackson.databind.JsonMappingException) {
+            detalhe = "A estrutura do JSON é incompatível com o objeto esperado.";
+        }
+        RespostaErros error = new RespostaErros(
+                HttpStatus.BAD_REQUEST.value(),
+                "Corpo da Requisição Inválido",
+                detalhe
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
