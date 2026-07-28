@@ -2,13 +2,12 @@
 Script de ingestao de dados reais da Wikipedia para enriquecer o dataset de treinamento.
 
 Utiliza a API de consulta da Wikipedia em portugues (pt.wikipedia.org) para buscar
-artigos de diversas areas do conhecimento (tecnologia, saude, direito, financas, etc.),
-extrair seus resumos e estrutura-los no mesmo formato CSV esperado pelo pipeline
-de treinamento (titulo, texto, categoria).
+artigos de temas exclusivamente de tecnologia, extrair seus resumos e estrutura-los
+no formato CSV esperado pelo pipeline de treinamento (titulo, texto, categoria).
 
 Diferente do script generate_realistic_dataset.py que cria dados sinteticos,
 este script obtem dados reais e variados, melhorando a capacidade de generalizacao
-do modelo para diferentes dominios.
+do modelo para diferentes dominios tech.
 
 Estrategia de API:
     1. Para cada termo de busca em cada categoria, usa action=query + list=search
@@ -32,7 +31,7 @@ import urllib.request
 import json
 
 
-# Mapeamento de categorias para termos de busca na Wikipedia em portugues.
+# Mapeamento de categorias tech para termos de busca na Wikipedia em portugues.
 # Cada categoria possui uma lista de palavras-chave que serao usadas para
 # encontrar artigos relevantes na enciclopedia.
 # Foram selecionados termos amplos e bem estabelecidos em cada area.
@@ -76,59 +75,45 @@ CATEGORY_SEARCH_TERMS = {
         "Framewok CSS", "JavaScript assincrono", "DOM",
         "Evento", "Formulario web", "SVG", "Canvas",
     ],
-    "Saude": [
-        "Medicina", "Cardiologia", "Pediatria", "Enfermagem",
-        "Farmacologia", "Anatomia", "Fisiologia", "Vacina",
-        "Cirurgia", "Epidemiologia", "Biologia", "Genetica",
-        "Neurologia", "Psiquiatria", "Nutricao",
-        "Oftalmologia", "Ginecologia", "Urologia", "Endocrinologia",
-        "Reumatologia", "Infectologia", "Pneumologia", "Hematologia",
-        "Radiologia", "Patologia", "Imunologia", "Embriologia",
+    "Mobile": [
+        "Desenvolvimento mobile", "Android", "iOS", "Flutter",
+        "React Native", "Aplicativo movel", "Swift", "Kotlin",
+        "Aplicativo", "Smartphone", "Mobile", "Desenvolvimento de aplicativos",
+        "Interface movel", "UX mobile", "Xamarin", "App", "Framework mobile",
     ],
-    "Direito": [
-        "Direito", "Legislacao", "Constituicao",
-        "Direito civil", "Direito penal", "Direito trabalhista",
-        "Direito tributario", "Tribunal", "Advocacia", "Lei",
-        "Direitos humanos", "Contrato", "Regulamentacao",
-        "Sindicato", "Seguridade social", "Previdencia",
-        "Notario", "Registro publico", "Procuradoria",
-        "Propriedade intelectual", "Direito autoral", "Patente",
+    "Ciberseguranca": [
+        "Seguranca da informacao", "Criptografia", "Firewall", "Hacker",
+        "LGPD", "Ciberseguranca", "Seguranca digital", "Malware",
+        "Phishing", "Criptografia", "Seguranca de rede", "Criptografia",
+        "Engenharia social", "Ransomware", "Teste de penetracao",
+        "Autenticacao", "Biometria", "Seguranca computacional",
     ],
-    "Financas": [
-        "Economia", "Contabilidade", "Mercado financeiro",
-        "Investimento", "Banco", "Microeconomia", "Macroeconomia",
-        "Bolsa de valores", "Inflacao", "Juros", "Credito",
-        "Orcamento", "Capital", "Gestao financeira",
-        "Ativo financeiro", "Dividendo", " Hedge",
-        "Selic", "CDI", "Debenture", "Acao",
-        "Risco", "Liquidez", "Rentabilidade", "Depreciacao",
+    "Cloud/Infra": [
+        "Computacao em nuvem", "Servidor", "Datacenter",
+        "AWS", "Azure", "Google Cloud", "Infraestrutura",
+        "Virtualizacao", "Cloud computing", "IaaS",
+        "PaaS", "SaaS", "Edge computing", "Computacao em nuvem",
+        "Infraestrutura como codigo", "Terraform", "Escalabilidade",
     ],
-    "Marketing": [
-        "Marketing", "Publicidade", "Vendas", "Marca",
-        "Midia digital", "Comportamento do consumidor", "Propaganda",
-        "SEO", "Midias sociais", "Branding", "E-commerce",
-        "Comunicacao social", "Marketing digital",
-        "Merchandising", "Promocao", "Patrocinio",
-        "CRM", "Fidelizacao", "Pesquisa de mercado",
-        "Segmentacao", "Precificacao", "Distribuicao",
+    "QA": [
+        "Teste de software", "Qualidade de software", "TDD",
+        "Automacao de testes", "Teste unitario", "Teste de integracao",
+        "Selenium", "Cypress", "Playwright",
+        "Teste de regressao", "Teste de aceitacao",
+        "BDD", "Teste de desempenho", "Teste funcional",
     ],
-    "Educacao": [
-        "Educacao", "Pedagogia", "Ensino", "Aprendizagem",
-        "Didatica", "Curriculo escolar", "Educacao infantil",
-        "Ensino superior", "Educacao a distancia",
-        "Tecnologia educacional", "Alfabetizacao", "Avaliacao educacional",
-        "Escola", "Docencia", "Monitoria", "Estagio",
-        "Material didatico", "Prova", "Bolsa de estudos",
-        "EJA", "Educacao especial", "Inclusao escolar",
+    "Blockchain": [
+        "Blockchain", "Criptomoeda", "Bitcoin", "Ethereum",
+        "Smart contract", "Web3", "DeFi", "Cadeia de blocos",
+        "Token", "NFT", "Mineração", "Contrato inteligente",
+        "Criptografia", "Livro razao", "Consenso distribuido",
     ],
-    "Outros": [
-        "Geografia", "Historia", "Filosofia", "Sociologia",
-        "Antropologia", "Politica", "Arte", "Musica", "Cinema",
-        "Literatura", "Esporte", "Meio ambiente", "Astronomia",
-        "Fisica", "Quimica", "Engenharia", "Psicologia",
-        "Arqueologia", "Teologia", "Economia domestica",
-        "Moda", "Gastronomia", "Turismo", "Jornalismo",
-        "Arquitetura", "Urbanismo", "Design", "Fotografia",
+    "UX/UI": [
+        "Design de interface", "Experiencia do usuario", "Figma",
+        "Usabilidade", "Design thinking", "Interface",
+        "UX", "UI design", "Prototipacao",
+        "Design centrado no usuario", "Arquitetura da informacao",
+        "Design system", "Teste de usabilidade", "Wireframe",
     ],
 }
 

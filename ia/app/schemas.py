@@ -8,8 +8,8 @@ from typing import List
 
 CATEGORIAS = [
     "Backend", "Dados", "DevOps", "Frontend",
-    "Saude", "Direito", "Financas", "Marketing", "Educacao",
-    "Outros",
+    "Mobile", "Ciberseguranca", "Cloud/Infra", "QA", "Blockchain",
+    "UX/UI",
 ]
 
 

@@ -50,7 +50,7 @@ async def health():
 async def listar_categorias():
     if model_loader.modelo is not None:
         return {"categorias": list(model_loader.modelo.classes_)}
-    return {"categorias": ["Backend", "Dados", "DevOps", "Frontend", "Saude", "Direito", "Financas", "Marketing", "Educacao", "Outros"]}
+    return {"categorias": ["Backend", "Dados", "DevOps", "Frontend", "Mobile", "Ciberseguranca", "Cloud/Infra", "QA", "Blockchain", "UX/UI"]}
 
 
 @app.post("/predict", response_model=PredictionOutput)

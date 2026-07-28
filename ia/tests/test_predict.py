@@ -19,19 +19,19 @@ import joblib
 
 
 def test_categorias_possui_10():
-    """Verifica se a lista de categorias suportadas contém exatamente as 10 esperadas."""
+    """Verifica se a lista de categorias suportadas contém exatamente as 10 tech esperadas."""
     from app.schemas import CATEGORIAS
     assert len(CATEGORIAS) == 10
     assert "Backend" in CATEGORIAS
     assert "Frontend" in CATEGORIAS
     assert "Dados" in CATEGORIAS
     assert "DevOps" in CATEGORIAS
-    assert "Saude" in CATEGORIAS
-    assert "Direito" in CATEGORIAS
-    assert "Financas" in CATEGORIAS
-    assert "Marketing" in CATEGORIAS
-    assert "Educacao" in CATEGORIAS
-    assert "Outros" in CATEGORIAS
+    assert "Mobile" in CATEGORIAS
+    assert "Ciberseguranca" in CATEGORIAS
+    assert "Cloud/Infra" in CATEGORIAS
+    assert "QA" in CATEGORIAS
+    assert "Blockchain" in CATEGORIAS
+    assert "UX/UI" in CATEGORIAS
 
 
 def test_text_input_valido():
