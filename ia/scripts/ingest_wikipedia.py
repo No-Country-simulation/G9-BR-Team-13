@@ -42,6 +42,10 @@ CATEGORY_SEARCH_TERMS = {
         "API", "Linguagem de programacao", "Java", "Python",
         "Banco de dados", "Arquitetura de software", "Orientacao a objetos",
         "Microsservicos", "REST", "Mensageria", "Autenticacao", "Criptografia",
+        "Compilador", "Software livre", "Teste de software", "DevOps",
+        "Interface de programacao", "Protocolo de rede", "Thread",
+        "Maquina virtual", "Container", "Algoritmo", "Estrutura de dados",
+        "Depuracao", "Log", "ORM", "API REST",
     ],
     "Dados": [
         "Ciencia de dados", "Banco de dados", "SQL",
@@ -49,54 +53,82 @@ CATEGORY_SEARCH_TERMS = {
         "Big data", "Mineracao de dados", "Visualizacao de dados",
         "Redes neurais", "Processamento de linguagem natural",
         "Analise de dados", "Probabilidade",
+        "Regressao linear", "Classificacao", "Clusterizacao",
+        "Serie temporal", "Amostragem", "Correlacao",
+        "Banco de dados relacional", "Banco NoSQL", "Dado estruturado",
+        "GraphQL", "Pipeline de dados", "ETL",
     ],
     "DevOps": [
         "DevOps", "Computacao em nuvem", "Docker", "Kubernetes",
         "Infraestrutura", "Linux", "Rede de computadores",
         "Seguranca da informacao", "AWS", "Automacao",
         "Virtualizacao", "Monitoramento", "Git", "Container", "Sistema operacional",
+        "Servidor", "Proxy", "Firewall", "DNS",
+        "CLI", "Script", "Pipeline", "LAN",
+        "Criptografia", "Certificado digital", "Backup", "LDAP",
     ],
     "Frontend": [
         "Front-end", "HTML", "CSS", "JavaScript",
         "TypeScript", "React", "Design web",
         "Interface do usuario", "Acessibilidade web",
         "Navegador web", "SPA", "Web design responsivo",
+        "UX", "Tipografia", "Animacao web",
+        "Framewok CSS", "JavaScript assincrono", "DOM",
+        "Evento", "Formulario web", "SVG", "Canvas",
     ],
     "Saude": [
         "Medicina", "Cardiologia", "Pediatria", "Enfermagem",
         "Farmacologia", "Anatomia", "Fisiologia", "Vacina",
         "Cirurgia", "Epidemiologia", "Biologia", "Genetica",
         "Neurologia", "Psiquiatria", "Nutricao",
+        "Oftalmologia", "Ginecologia", "Urologia", "Endocrinologia",
+        "Reumatologia", "Infectologia", "Pneumologia", "Hematologia",
+        "Radiologia", "Patologia", "Imunologia", "Embriologia",
     ],
     "Direito": [
         "Direito", "Legislacao", "Constituicao",
         "Direito civil", "Direito penal", "Direito trabalhista",
         "Direito tributario", "Tribunal", "Advocacia", "Lei",
         "Direitos humanos", "Contrato", "Regulamentacao",
+        "Sindicato", "Seguridade social", "Previdencia",
+        "Notario", "Registro publico", "Procuradoria",
+        "Propriedade intelectual", "Direito autoral", "Patente",
     ],
     "Financas": [
         "Economia", "Contabilidade", "Mercado financeiro",
         "Investimento", "Banco", "Microeconomia", "Macroeconomia",
         "Bolsa de valores", "Inflacao", "Juros", "Credito",
         "Orcamento", "Capital", "Gestao financeira",
+        "Ativo financeiro", "Dividendo", " Hedge",
+        "Selic", "CDI", "Debenture", "Acao",
+        "Risco", "Liquidez", "Rentabilidade", "Depreciacao",
     ],
     "Marketing": [
         "Marketing", "Publicidade", "Vendas", "Marca",
         "Midia digital", "Comportamento do consumidor", "Propaganda",
         "SEO", "Midias sociais", "Branding", "E-commerce",
         "Comunicacao social", "Marketing digital",
+        "Merchandising", "Promocao", "Patrocinio",
+        "CRM", "Fidelizacao", "Pesquisa de mercado",
+        "Segmentacao", "Precificacao", "Distribuicao",
     ],
     "Educacao": [
         "Educacao", "Pedagogia", "Ensino", "Aprendizagem",
         "Didatica", "Curriculo escolar", "Educacao infantil",
         "Ensino superior", "Educacao a distancia",
         "Tecnologia educacional", "Alfabetizacao", "Avaliacao educacional",
+        "Escola", "Docencia", "Monitoria", "Estagio",
+        "Material didatico", "Prova", "Bolsa de estudos",
+        "EJA", "Educacao especial", "Inclusao escolar",
     ],
     "Outros": [
         "Geografia", "Historia", "Filosofia", "Sociologia",
         "Antropologia", "Politica", "Arte", "Musica", "Cinema",
         "Literatura", "Esporte", "Meio ambiente", "Astronomia",
         "Fisica", "Quimica", "Engenharia", "Psicologia",
+        "Arqueologia", "Teologia", "Economia domestica",
+        "Moda", "Gastronomia", "Turismo", "Jornalismo",
+        "Arquitetura", "Urbanismo", "Design", "Fotografia",
     ],
 }
 
@@ -214,31 +246,7 @@ def extrair_titulo_curto(texto):
     return titulo[:60]
 
 
-def extrair_titulo_curto(texto):
-    """
-    Extrai um titulo curto a partir do inicio do texto do artigo.
-
-    Usa a primeira frase do texto ou as primeiras 6 palavras como titulo,
-    limitado a 60 caracteres. Util para gerar o campo 'titulo' do CSV.
-
-    Args:
-        texto (str): Texto completo do artigo.
-
-    Returns:
-        str: Titulo curto extraido com no maximo 60 caracteres.
-    """
-    match = re.match(r'^["""]?(.+?)[.!?]', texto)
-    if match:
-        titulo_extraido = match.group(1).strip()[:60]
-        if len(titulo_extraido) > 10:
-            return titulo_extraido
-
-    words = texto.split()
-    titulo = " ".join(words[:6])
-    return titulo[:60]
-
-
-def gerar_dataset_wikipedia(artigos_por_categoria=30):
+def gerar_dataset_wikipedia(artigos_por_categoria=50):
     """
     Gera um dataset completo com dados reais obtidos da Wikipedia.
 
@@ -253,7 +261,7 @@ def gerar_dataset_wikipedia(artigos_por_categoria=30):
 
     Args:
         artigos_por_categoria (int, optional): Numero maximo de artigos
-            a coletar por categoria. Padrao e 30.
+            a coletar por categoria. Padrao e 50.
 
     Returns:
         List[Dict[str, str]]: Lista de dicionarios com 'titulo', 'texto' e 'categoria'.
@@ -269,7 +277,7 @@ def gerar_dataset_wikipedia(artigos_por_categoria=30):
         for termo in termos:
             if len(titulos_coletados) >= artigos_por_categoria:
                 break
-            resultados = buscar_titulos_por_termo(termo, limite=8)
+            resultados = buscar_titulos_por_termo(termo, limite=15)
             for titulo in resultados:
                 if len(titulos_coletados) < artigos_por_categoria:
                     titulos_coletados.add(titulo)
@@ -278,10 +286,16 @@ def gerar_dataset_wikipedia(artigos_por_categoria=30):
             print(f"  [AVISO] Nenhum artigo encontrado para {categoria}")
             continue
 
-        # Fase 2: Obter extratos em lote (uma unica requisicao para todos os titulos)
-        print(f"  Buscando extratos de {len(titulos_coletados)} artigos em lote...")
-        extratos = obter_extratos_em_lote(list(titulos_coletados))
-        print(f"  Obtidos extratos de {len(extratos)} artigos com sucesso")
+        # Fase 2: Obter extratos em lotes de 20 (API da Wikipedia limita retorno)
+        print(f"  Buscando extratos de {len(titulos_coletados)} artigos em lotes de 20...")
+        extratos = {}
+        lista_titulos = list(titulos_coletados)
+        for i in range(0, len(lista_titulos), 20):
+            lote = lista_titulos[i:i + 20]
+            resultado_lote = obter_extratos_em_lote(lote)
+            extratos.update(resultado_lote)
+            print(f"    Lote {i // 20 + 1}: +{len(resultado_lote)} extratos")
+        print(f"  Total: {len(extratos)} extratos obtidos")
 
         # Fase 3: Gerar linhas do CSV com variacoes de comprimento
         for titulo_artigo, texto in extratos.items():
@@ -325,7 +339,7 @@ def gerar_dataset_wikipedia(artigos_por_categoria=30):
     return linhas
 
 
-def gerar_para_csv(artigos_por_categoria=30, nome_arquivo="dataset.csv"):
+def gerar_para_csv(artigos_por_categoria=50, nome_arquivo="dataset.csv"):
     """
     Gera o dataset enriquecido com dados da Wikipedia e persiste em CSV.
 
@@ -378,4 +392,4 @@ def gerar_para_csv(artigos_por_categoria=30, nome_arquivo="dataset.csv"):
 
 
 if __name__ == "__main__":
-    gerar_para_csv(artigos_por_categoria=30)
+    gerar_para_csv(artigos_por_categoria=50)

@@ -1,75 +1,75 @@
 {
     "Backend": {
-        "precision": 0.9090909090909091,
-        "recall": 0.8333333333333334,
-        "f1-score": 0.8695652173913043,
-        "support": 12.0
+        "precision": 0.9285714285714286,
+        "recall": 0.8666666666666667,
+        "f1-score": 0.896551724137931,
+        "support": 30.0
     },
     "Dados": {
-        "precision": 0.75,
-        "recall": 0.75,
-        "f1-score": 0.75,
-        "support": 12.0
+        "precision": 0.8235294117647058,
+        "recall": 0.9333333333333333,
+        "f1-score": 0.875,
+        "support": 30.0
     },
     "DevOps": {
-        "precision": 1.0,
-        "recall": 0.9166666666666666,
-        "f1-score": 0.9565217391304348,
-        "support": 12.0
+        "precision": 0.9629629629629629,
+        "recall": 0.896551724137931,
+        "f1-score": 0.9285714285714286,
+        "support": 29.0
     },
     "Direito": {
-        "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
-        "support": 12.0
+        "precision": 0.8787878787878788,
+        "recall": 0.9666666666666667,
+        "f1-score": 0.9206349206349206,
+        "support": 30.0
     },
     "Educacao": {
-        "precision": 0.9090909090909091,
-        "recall": 0.8333333333333334,
-        "f1-score": 0.8695652173913043,
-        "support": 12.0
+        "precision": 0.9354838709677419,
+        "recall": 0.9666666666666667,
+        "f1-score": 0.9508196721311475,
+        "support": 30.0
     },
     "Financas": {
-        "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
-        "support": 12.0
+        "precision": 0.9032258064516129,
+        "recall": 0.9655172413793104,
+        "f1-score": 0.9333333333333333,
+        "support": 29.0
     },
     "Frontend": {
-        "precision": 0.8571428571428571,
-        "recall": 1.0,
-        "f1-score": 0.9230769230769231,
-        "support": 12.0
+        "precision": 1.0,
+        "recall": 0.9655172413793104,
+        "f1-score": 0.9824561403508771,
+        "support": 29.0
     },
     "Marketing": {
         "precision": 1.0,
         "recall": 1.0,
         "f1-score": 1.0,
-        "support": 12.0
+        "support": 29.0
     },
     "Outros": {
+        "precision": 0.92,
+        "recall": 0.7666666666666667,
+        "f1-score": 0.8363636363636363,
+        "support": 30.0
+    },
+    "Saude": {
         "precision": 1.0,
         "recall": 1.0,
         "f1-score": 1.0,
-        "support": 12.0
+        "support": 30.0
     },
-    "Saude": {
-        "precision": 0.9230769230769231,
-        "recall": 1.0,
-        "f1-score": 0.96,
-        "support": 12.0
-    },
-    "accuracy": 0.9333333333333333,
+    "accuracy": 0.9324324324324325,
     "macro avg": {
-        "precision": 0.9348401598401599,
-        "recall": 0.9333333333333333,
-        "f1-score": 0.9328729096989967,
-        "support": 120.0
+        "precision": 0.9352561359506332,
+        "recall": 0.9327586206896553,
+        "f1-score": 0.9323730855523275,
+        "support": 296.0
     },
     "weighted avg": {
-        "precision": 0.9348401598401598,
-        "recall": 0.9333333333333333,
-        "f1-score": 0.9328729096989966,
-        "support": 120.0
+        "precision": 0.9348332838370789,
+        "recall": 0.9324324324324325,
+        "f1-score": 0.9319850160927114,
+        "support": 296.0
     }
 }
