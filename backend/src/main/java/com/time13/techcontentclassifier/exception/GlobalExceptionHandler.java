@@ -95,8 +95,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RespostaErros> tratarErroInternoGenerico(Exception ex) {
-        // Recomenda-se registrar no log com um logger (ex: log.error("Erro interno não esperado", ex);)
-
         RespostaErros error = new RespostaErros(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Erro Interno no Servidor",
