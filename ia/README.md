@@ -15,11 +15,12 @@ Serviço de Ciência de Dados / Machine Learning: treina o modelo de classifica�
 ## Status
 
 - **Modelo treinado:** TF-IDF + LogisticRegression (multinomial)
-- **Acurácia atual:** ~95.89% (F1-weighted: ~0.96, validação cruzada com GridSearchCV)
+- **Acurácia atual:** ~93.3% (F1-weighted: ~0.93, validação cruzada com GridSearchCV)
+- **Dataset:** 597 exemplos reais da Wikipedia em português, 10 categorias (Backend, Dados, DevOps, Frontend, Saude, Direito, Financas, Marketing, Educacao, Outros), média de ~1333 caracteres
+- **Origem dos dados:** Wikipedia API via `scripts/ingest_wikipedia.py` (dados reais, não sintéticos)
 - **Stopwords:** português (lista curada no `config.yaml`)
 - **Validação de entrada:** Pydantic com `Field(min_length, max_length)` — titulo (3-200), texto (20-5000)
 - **Contrato:** campo `informacoes_adicionais` conforme seção 14.2 do doc
-- **Dataset:** 630 exemplos realistas de documentação técnica (150 por categoria + 30 de ruído), 5 categorias (Backend, Dados, DevOps, Frontend, Outros), com variação de comprimento (50-500 caracteres), gerados por `scripts/generate_realistic_dataset.py`
 - **Testes:** 8 testes pytest em `tests/test_predict.py`
 - **Logging:** JSON estruturado com `JsonFormatter` em `app/logging_config.py`
 - **Docker:** HEALTHCHECK configurado via `curl /health` (intervalo 30s, timeout 10s, 3 retries)
@@ -36,11 +37,18 @@ cp .env.example .env          # ajuste as variáveis se for usar OCI
 uvicorn app.main:app --reload --port 8000
 ```
 
-Para treinar o modelo do zero:
+Para treinar o modelo do zero com dados reais da Wikipedia (recomendado):
 
 ```bash
-python scripts/generate_realistic_dataset.py   # gera dataset com exemplos realistas (preferencial)
-python scripts/train.py                        # treina e salva models/modelo.joblib + models/vectorizer.joblib
+python scripts/ingest_wikipedia.py              # baixa dados reais da Wikipedia (597 exemplos, 10 categorias)
+python scripts/train.py                         # treina e salva models/modelo.joblib + models/vectorizer.joblib
+```
+
+Para treinar com dados sintéticos (legado):
+
+```bash
+python scripts/generate_realistic_dataset.py    # gera dataset com exemplos sintéticos
+python scripts/train.py                         # treina e salva os artefatos
 ```
 
 Para acompanhar EDA + treino no notebook:
@@ -64,7 +72,8 @@ ia/
 │   ├── keywords.py               # extração de palavras-chave com fallback decision_function/predict_proba
 │   └── logging_config.py         # formatter JSON estruturado para logs de produção
 ├── scripts/
-│   ├── generate_realistic_dataset.py  # gera dataset com 630 exemplos, 5 categorias, variação de comprimento
+│   ├── generate_realistic_dataset.py  # gera dataset sintético (legado)
+│   ├── ingest_wikipedia.py            # gera dataset real via Wikipedia API (597 exemplos, 10 categorias) ⭐
 │   ├── train.py                   # treina o pipeline (TF-IDF + LogisticRegression) e salva métricas
 │   ├── evaluate.py                # testa o modelo salvo manualmente via input no terminal
 │   └── upload_to_oci.py           # upload dos artefatos .joblib para OCI Object Storage
@@ -72,7 +81,7 @@ ia/
 │   ├── __init__.py
 │   └── test_predict.py            # suite de testes pytest (8 testes: validação, schemas, keywords)
 ├── data/
-│   └── dataset.csv                # dataset principal (630 exemplos, 5 categorias)
+│   └── dataset.csv                # dataset principal (597 exemplos, 10 categorias, Wikipedia)
 ├── models/
 │   ├── modelo.joblib              # classificador LogisticRegression serializado
 │   ├── vectorizer.joblib           # vetorizador TF-IDF serializado
@@ -117,7 +126,7 @@ O serviço expõe o endpoint interno `POST /predict` (consumido pelo backend Jav
 Lista as categorias suportadas pelo modelo treinado:
 
 ```json
-{ "categorias": ["Backend", "Dados", "DevOps", "Frontend", "Outros"] }
+{ "categorias": ["Backend", "Dados", "DevOps", "Frontend", "Saude", "Direito", "Financas", "Marketing", "Educacao", "Outros"] }
 ```
 
 ### GET /health
