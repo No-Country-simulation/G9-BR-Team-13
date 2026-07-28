@@ -2,13 +2,11 @@ package com.time13.techcontentclassifier.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +19,6 @@ import java.util.Map;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     /**
      * Trata erros de validação de campos anotados com @Valid nos DTOs.
      * 
@@ -74,8 +71,22 @@ public class GlobalExceptionHandler {
                 "Tipo de Mídia Não Suportado",
                 mensagem
         );
-
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(error);
+    }
+
+    /**
+     * HTTP 500 - Captura qualquer erro não tratado explicitamente.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<RespostaErros> tratarErroInternoGenerico(Exception ex) {
+        // Recomenda-se registrar no log com um logger (ex: log.error("Erro interno não esperado", ex);)
+
+        RespostaErros error = new RespostaErros(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Erro Interno no Servidor",
+                "Ocorreu um erro inesperado. Tente novamente mais tarde."
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
 
