@@ -3,6 +3,7 @@ package com.time13.techcontentclassifier.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -59,6 +60,22 @@ public class GlobalExceptionHandler {
         erro.put("erro", "ML_SERVICE_UNAVAILABLE");
         erro.put("mensagem", ex.getMessage());
         return erro;
+    }
+
+    /**
+     * HTTP 415 - Trata envios com Content-Type incompatível (ex: enviou 'text/plain' em vez de 'application/json').
+     */
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<RespostaErros> tratarMediaTypeNaoSuportado(HttpMediaTypeNotSupportedException ex) {
+        String mensagem = String.format("O tipo de mídia '%s' não é suportado. Use 'application/json'.", ex.getContentType());
+
+        RespostaErros error = new RespostaErros(
+                HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),
+                "Tipo de Mídia Não Suportado",
+                mensagem
+        );
+
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(error);
     }
 }
 
