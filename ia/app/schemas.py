@@ -6,7 +6,11 @@ from pydantic import BaseModel, Field
 from typing import List
 
 
-CATEGORIAS = ["Backend", "Dados", "DevOps", "Frontend"]
+CATEGORIAS = [
+    "Backend", "Dados", "DevOps", "Frontend",
+    "Saude", "Direito", "Financas", "Marketing", "Educacao",
+    "Outros",
+]
 
 
 class TextInput(BaseModel):
