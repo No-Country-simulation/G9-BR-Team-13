@@ -45,13 +45,6 @@ python scripts/ingest_wikipedia.py              # baixa dados reais da Wikipedia
 python scripts/train.py                         # treina e salva models/modelo.joblib + models/vectorizer.joblib
 ```
 
-Para treinar com dados sintéticos (legado):
-
-```bash
-python scripts/generate_realistic_dataset.py    # gera dataset com exemplos sintéticos
-python scripts/train.py                         # treina e salva os artefatos
-```
-
 Para acompanhar EDA + treino no notebook:
 
 ```bash
@@ -73,7 +66,6 @@ ia/
 │   ├── keywords.py               # extração de palavras-chave com fallback decision_function/predict_proba
 │   └── logging_config.py         # formatter JSON estruturado para logs de produção
 ├── scripts/
-│   ├── generate_realistic_dataset.py  # gera dataset sintético (legado)
 │   ├── ingest_wikipedia.py            # gera dataset real via Wikipedia API (~1500 exemplos, 10 categorias tech) ⭐
 │   ├── train.py                   # treina o pipeline (TF-IDF + LogisticRegression) e salva métricas
 │   ├── evaluate.py                # testa o modelo salvo manualmente via input no terminal

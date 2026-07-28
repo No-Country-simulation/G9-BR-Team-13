@@ -5,8 +5,7 @@ Utiliza a API de consulta da Wikipedia em portugues (pt.wikipedia.org) para busc
 artigos de temas exclusivamente de tecnologia, extrair seus resumos e estrutura-los
 no formato CSV esperado pelo pipeline de treinamento (titulo, texto, categoria).
 
-Diferente do script generate_realistic_dataset.py que cria dados sinteticos,
-este script obtem dados reais e variados, melhorando a capacidade de generalizacao
+Este script obtem dados reais e variados, melhorando a capacidade de generalizacao
 do modelo para diferentes dominios tech.
 
 Estrategia de API:
