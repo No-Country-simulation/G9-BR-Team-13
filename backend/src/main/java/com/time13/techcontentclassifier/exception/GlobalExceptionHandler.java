@@ -1,12 +1,15 @@
 package com.time13.techcontentclassifier.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,15 +28,22 @@ public class GlobalExceptionHandler {
      * @return Mapa com o nome do campo e a mensagem de erro correspondente (HTTP 400 Bad Request)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> tratarValidacao(MethodArgumentNotValidException ex){
+    public ResponseEntity<RespostaErros> tratarValidacao(MethodArgumentNotValidException ex) {
+        List<RespostaErros.FieldErrorDetail> campoErros = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(erro -> new RespostaErros.FieldErrorDetail(
+                        erro.getField(),
+                        erro.getDefaultMessage()))
+                .toList();
 
-        Map<String, String> erros = new HashMap<>();
-
-        ex.getBindingResult().getFieldErrors().forEach(erro ->
-                erros.put(erro.getField(), erro.getDefaultMessage()));
-
-        return erros;
+        RespostaErros error = new RespostaErros(
+                HttpStatus.BAD_REQUEST.value(),
+                "Erro de Validação",
+                "Um ou mais campos contêm valores inválidos.",
+                campoErros
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**
