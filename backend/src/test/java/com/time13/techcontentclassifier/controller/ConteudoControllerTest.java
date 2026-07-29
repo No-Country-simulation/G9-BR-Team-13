@@ -71,7 +71,7 @@ class ConteudoControllerTest {
                                 }
                                 """))
                 .andExpect(status().isServiceUnavailable())
-                .andExpect(jsonPath("$.erro").value("ML_SERVICE_UNAVAILABLE"))
+                .andExpect(jsonPath("$.titulo").value("Serviço de IA Indisponível"))
                 .andExpect(jsonPath("$.mensagem").value(
                         "Não foi possível processar o conteúdo no momento. Tente novamente."));
     }

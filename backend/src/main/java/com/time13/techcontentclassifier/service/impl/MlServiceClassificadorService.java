@@ -57,22 +57,6 @@ public class MlServiceClassificadorService implements ClassificadorService {
      */
     @Override
     public ConteudoResponseDTO classificar(ConteudoRequestDTO request) {
-        // =========================================================================
-        //   CÓDIGO TEMPORÁRIO PARA TESTES (Pode remover após testar)
-        // =========================================================================
-
-        // 1. Testa o HTTP 500 (Dispara ANTES do try para não ser capturado pelo catch)
-        if (request != null && "PROVOCAR_ERRO_INTERNO".equals(request.texto())) { // ou request.getTexto() se usar DTO tradicional
-            throw new NullPointerException("Simulação de NullPointer grave no sistema!");
-        }
-
-        // 2. Opcional: Testa o HTTP 503 manualmente (sem precisar desligar a API externa)
-        if (request != null && "SIMULAR_FALHA_IA_NOME_GRANDE_PARA_NAO_CAIR_NO_400".equals(request.texto())) {
-            throw new MlServiceException("Serviço externo de IA fora do ar para testes.", null);
-        }
-
-        // =========================================================================
-
         try {
             return restClient.post()
                     .uri("/predict")

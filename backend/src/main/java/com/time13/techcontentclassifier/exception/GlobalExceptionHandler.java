@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
@@ -88,6 +89,21 @@ public class GlobalExceptionHandler {
                 mensagem
         );
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(error);
+    }
+
+    /**
+     * HTTP 400 - Trata requisições que omitem um parâmetro obrigatório (ex: "palavra-chave" na busca).
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<RespostaErros> tratarParametroObrigatorioAusente(MissingServletRequestParameterException ex) {
+        String mensagem = String.format("O parâmetro obrigatório '%s' não foi informado.", ex.getParameterName());
+
+        RespostaErros error = new RespostaErros(
+                HttpStatus.BAD_REQUEST.value(),
+                "Parâmetro Obrigatório Ausente",
+                mensagem
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**
