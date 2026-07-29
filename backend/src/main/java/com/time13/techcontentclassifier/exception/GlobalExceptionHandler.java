@@ -1,13 +1,14 @@
 package com.time13.techcontentclassifier.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Manipulador global de exceções (@RestControllerAdvice).
@@ -17,7 +18,6 @@ import java.util.Map;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     /**
      * Trata erros de validação de campos anotados com @Valid nos DTOs.
      * 
@@ -25,15 +25,39 @@ public class GlobalExceptionHandler {
      * @return Mapa com o nome do campo e a mensagem de erro correspondente (HTTP 400 Bad Request)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> tratarValidacao(MethodArgumentNotValidException ex){
+    public ResponseEntity<RespostaErros> tratarValidacao(MethodArgumentNotValidException ex) {
+        List<RespostaErros.FieldErrorDetail> campoErros = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(erro -> new RespostaErros.FieldErrorDetail(
+                        erro.getField(),
+                        erro.getDefaultMessage()))
+                .toList();
 
-        Map<String, String> erros = new HashMap<>();
+        RespostaErros error = new RespostaErros(
+                HttpStatus.BAD_REQUEST.value(),
+                "Erro de Validação",
+                "Um ou mais campos contêm valores inválidos.",
+                campoErros
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 
-        ex.getBindingResult().getFieldErrors().forEach(erro ->
-                erros.put(erro.getField(), erro.getDefaultMessage()));
-
-        return erros;
+    /**
+     * HTTP 400 - Trata requisições com JSON malformado ou tipos incompatíveis.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<RespostaErros> tratarJsonMalformado(HttpMessageNotReadableException ex) {
+        String detalhe = "O JSON enviado na requisição está malformado, vazio ou possui tipos de dados incompatíveis.";
+        if (ex.getCause() instanceof com.fasterxml.jackson.databind.JsonMappingException) {
+            detalhe = "A estrutura do JSON é incompatível com o objeto esperado.";
+        }
+        RespostaErros error = new RespostaErros(
+                HttpStatus.BAD_REQUEST.value(),
+                "Corpo da Requisição Inválido",
+                detalhe
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**
@@ -43,12 +67,56 @@ public class GlobalExceptionHandler {
      * @return JSON estruturado indicando indisponibilidade do serviço de IA (HTTP 503 Service Unavailable)
      */
     @ExceptionHandler(MlServiceException.class)
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    public Map<String, String> tratarErroServicoIa(MlServiceException ex) {
-        Map<String, String> erro = new HashMap<>();
-        erro.put("erro", "ML_SERVICE_UNAVAILABLE");
-        erro.put("mensagem", ex.getMessage());
-        return erro;
+    public ResponseEntity<RespostaErros> tratarErroServicoIa(MlServiceException ex) {
+        RespostaErros error = new RespostaErros(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Serviço de IA Indisponível",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+    /**
+     * HTTP 415 - Trata envios com Content-Type incompatível (ex: enviou 'text/plain' em vez de 'application/json').
+     */
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<RespostaErros> tratarMediaTypeNaoSuportado(HttpMediaTypeNotSupportedException ex) {
+        String mensagem = String.format("O tipo de mídia '%s' não é suportado. Use 'application/json'.", ex.getContentType());
+
+        RespostaErros error = new RespostaErros(
+                HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),
+                "Tipo de Mídia Não Suportado",
+                mensagem
+        );
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(error);
+    }
+
+    /**
+     * HTTP 400 - Trata requisições que omitem um parâmetro obrigatório (ex: "palavra-chave" na busca).
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<RespostaErros> tratarParametroObrigatorioAusente(MissingServletRequestParameterException ex) {
+        String mensagem = String.format("O parâmetro obrigatório '%s' não foi informado.", ex.getParameterName());
+
+        RespostaErros error = new RespostaErros(
+                HttpStatus.BAD_REQUEST.value(),
+                "Parâmetro Obrigatório Ausente",
+                mensagem
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * HTTP 500 - Captura qualquer erro não tratado explicitamente.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<RespostaErros> tratarErroInternoGenerico(Exception ex) {
+        RespostaErros error = new RespostaErros(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Erro Interno no Servidor",
+                "Ocorreu um erro inesperado. Tente novamente mais tarde."
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
 
