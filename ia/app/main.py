@@ -8,12 +8,14 @@ carregando os artefatos de IA durante a inicialização (lifespan).
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from app.schemas import TextInput, PredictionOutput
 from app import model_loader
 from app.keywords import extract_keywords
+from app.logging_config import setup_json_logging
 
-# Configuração de Logs da aplicação
-logging.basicConfig(level=logging.INFO)
+# Configuração de logs estruturados em JSON para produção
+setup_json_logging()
 logger = logging.getLogger(__name__)
 
 
@@ -30,10 +32,25 @@ async def lifespan(app: FastAPI):
 # Inicialização da instância FastAPI com título e manipulador do ciclo de vida
 app = FastAPI(title="TechKnowledge ML Service", lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/health")
 async def health():
     return {"status": "healthy", "model_loaded": model_loader.modelo is not None}
+
+
+@app.get("/categorias")
+async def listar_categorias():
+    if model_loader.modelo is not None:
+        return {"categorias": list(model_loader.modelo.classes_)}
+    return {"categorias": ["Backend", "Dados", "DevOps", "Frontend"]}
 
 
 @app.post("/predict", response_model=PredictionOutput)
