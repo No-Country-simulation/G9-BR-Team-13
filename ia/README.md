@@ -8,7 +8,6 @@ Serviço de Ciência de Dados / Machine Learning: treina o modelo de classifica�
 - Algoritmo: TF-IDF + **LogisticRegression** (multinomial, `predict_proba` nativo)
 - Categorias: **10 exclusivamente tech** (Backend, Dados, DevOps, Frontend, Mobile, Ciberseguranca, Cloud/Infra, QA, Blockchain, UX/UI)
 - Testes: **pytest** (8 testes unitários em `tests/`)
-- Logging: **JSON estruturado** (`app/logging_config.py` — formato padronizado para observabilidade)
 - Stopwords: **português** (lista curada inline no `config.yaml`)
 - CORS habilitado (allow_origins=["*"])
 - OCI Object Storage (`app/model_loader.py` baixa os artefatos de lá se `OCI_NAMESPACE` estiver configurado; autenticação via Resource Principal (fallback `~/.oci/config`), região configurável via `OCI_REGION`; roda localmente sem OCI se os `.joblib` já existirem)
@@ -23,8 +22,6 @@ Serviço de Ciência de Dados / Machine Learning: treina o modelo de classifica�
 - **Validação de entrada:** Pydantic com `Field(min_length, max_length)` — titulo (3-200), texto (20-5000)
 - **Contrato:** campo `informacoes_adicionais` conforme seção 14.2 do doc
 - **Testes:** 8 testes pytest em `tests/test_predict.py`
-- **Logging:** JSON estruturado com `JsonFormatter` em `app/logging_config.py`
-- **Docker:** HEALTHCHECK configurado via `curl /health` (intervalo 30s, timeout 10s, 3 retries)
 
 ## Como rodar localmente
 
@@ -38,7 +35,7 @@ cp .env.example .env          # ajuste as variáveis se for usar OCI
 uvicorn app.main:app --reload --port 8000
 ```
 
-Para treinar o modelo do zero com dados reais da Wikipedia (recomendado):
+Para treinar o modelo do zero:
 
 ```bash
 python scripts/ingest_wikipedia.py              # baixa dados reais da Wikipedia (~1500 exemplos, 10 categorias tech)
@@ -62,9 +59,8 @@ ia/
 │   ├── __init__.py
 │   ├── main.py                   # FastAPI app, endpoints POST /predict, GET /categorias, GET /health
 │   ├── schemas.py                # Pydantic models com validação (TextInput, PredictionOutput)
-│   ├── model_loader.py           # download do OCI + carga dos artefatos .joblib (paths absolutos, timeout 30s)
-│   ├── keywords.py               # extração de palavras-chave com fallback decision_function/predict_proba
-│   └── logging_config.py         # formatter JSON estruturado para logs de produção
+│   ├── model_loader.py           # download do OCI + carga dos artefatos .joblib (paths absolutos)
+│   └── keywords.py               # extração de palavras-chave a partir dos coeficientes do classificador
 ├── scripts/
 │   ├── ingest_wikipedia.py            # gera dataset real via Wikipedia API (~1500 exemplos, 10 categorias tech) ⭐
 │   ├── train.py                   # treina o pipeline (TF-IDF + LogisticRegression) e salva métricas
@@ -82,7 +78,7 @@ ia/
 ├── config.yaml                    # hiperparâmetros do TF-IDF / LogisticRegression + stopwords pt
 ├── requirements.txt
 ├── requirements-dev.txt   # dependências para o notebook (matplotlib, seaborn, jupyter)
-├── Dockerfile                    # HEALTHCHECK via curl /health, python:3.11-slim, 4 workers
+├── Dockerfile
 └── .env.example
 ```
 
@@ -128,8 +124,9 @@ Verificação de saúde do serviço:
 
 ```json
 {
-  "status": "healthy",
-  "model_loaded": true
+  "status": "ok",
+  "modelo_carregado": true,
+  "categorias": ["Backend", "Dados", "DevOps", "Frontend", "Mobile", "Ciberseguranca", "Cloud/Infra", "QA", "Blockchain", "UX/UI"]
 }
 ```
 
