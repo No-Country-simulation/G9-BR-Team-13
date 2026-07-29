@@ -69,6 +69,9 @@ services:
     container_name: techcontent-ml
     environment:
       - PORT=8000
+      - OCI_BUCKET_NAME=${OCI_BUCKET_NAME:-techknowledge-models}
+      - OCI_NAMESPACE=${OCI_NAMESPACE:-grzhgqdehci7}
+      - OCI_REGION=${OCI_REGION:-sa-saopaulo-1}
     ports:
       - "8000:8000"
     volumes:
