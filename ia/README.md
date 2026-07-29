@@ -6,19 +6,21 @@ Serviço de Ciência de Dados / Machine Learning: treina o modelo de classifica�
 
 - Python 3.11, FastAPI, Scikit-Learn, `joblib`, Pydantic (validação)
 - Algoritmo: TF-IDF + **LogisticRegression** (multinomial, `predict_proba` nativo)
+- Categorias: **10 exclusivamente tech** (Backend, Dados, DevOps, Frontend, Mobile, Ciberseguranca, Cloud/Infra, QA, Blockchain, UX/UI)
 - Testes: **pytest** (8 testes unitários em `tests/`)
 - Stopwords: **português** (lista curada inline no `config.yaml`)
 - CORS habilitado (allow_origins=["*"])
-- OCI Object Storage (`app/model_loader.py` baixa os artefatos de lá se `OCI_NAMESPACE` estiver configurado; roda localmente sem OCI se `models/modelo.joblib` e `models/vectorizer.joblib` já existirem)
+- OCI Object Storage (`app/model_loader.py` baixa os artefatos de lá se `OCI_NAMESPACE` estiver configurado; autenticação via Resource Principal (fallback `~/.oci/config`), região configurável via `OCI_REGION`; roda localmente sem OCI se os `.joblib` já existirem)
 
 ## Status
 
 - **Modelo treinado:** TF-IDF + LogisticRegression (multinomial)
-- **Acurácia atual:** ~84.9% (F1-weighted: ~0.84, validação cruzada com GridSearchCV)
+- **Acurácia atual:** ~88.2% (F1-weighted: ~0.88, validação cruzada com GridSearchCV)
+- **Dataset:** 1481 exemplos reais da Wikipedia em português, 10 categorias exclusivamente tech (Backend, Dados, DevOps, Frontend, Mobile, Ciberseguranca, Cloud/Infra, QA, Blockchain, UX/UI), ~148 por categoria, média de ~987 caracteres
+- **Origem dos dados:** Wikipedia API via `scripts/ingest_wikipedia.py` (dados reais, não sintéticos)
 - **Stopwords:** português (lista curada no `config.yaml`)
 - **Validação de entrada:** Pydantic com `Field(min_length, max_length)` — titulo (3-200), texto (20-5000)
 - **Contrato:** campo `informacoes_adicionais` conforme seção 14.2 do doc
-- **Dataset:** 200 exemplos realistas de documentação técnica (50 por categoria, 4 categorias), gerados por `scripts/generate_realistic_dataset.py`
 - **Testes:** 8 testes pytest em `tests/test_predict.py`
 
 ## Como rodar localmente
@@ -36,8 +38,8 @@ uvicorn app.main:app --reload --port 8000
 Para treinar o modelo do zero:
 
 ```bash
-python scripts/generate_realistic_dataset.py   # gera dataset com exemplos realistas (preferencial)
-python scripts/train.py                        # treina e salva models/modelo.joblib + models/vectorizer.joblib
+python scripts/ingest_wikipedia.py              # baixa dados reais da Wikipedia (~1500 exemplos, 10 categorias tech)
+python scripts/train.py                         # treina e salva models/modelo.joblib + models/vectorizer.joblib
 ```
 
 Para acompanhar EDA + treino no notebook:
@@ -60,7 +62,7 @@ ia/
 │   ├── model_loader.py           # download do OCI + carga dos artefatos .joblib (paths absolutos)
 │   └── keywords.py               # extração de palavras-chave a partir dos coeficientes do classificador
 ├── scripts/
-│   ├── generate_realistic_dataset.py  # gera dataset com exemplos realistas de documentação técnica
+│   ├── ingest_wikipedia.py            # gera dataset real via Wikipedia API (~1500 exemplos, 10 categorias tech) ⭐
 │   ├── train.py                   # treina o pipeline (TF-IDF + LogisticRegression) e salva métricas
 │   ├── evaluate.py                # testa o modelo salvo manualmente via input no terminal
 │   └── upload_to_oci.py           # upload dos artefatos .joblib para OCI Object Storage
@@ -68,7 +70,7 @@ ia/
 │   ├── __init__.py
 │   └── test_predict.py            # suite de testes pytest (8 testes: validação, schemas, keywords)
 ├── data/
-│   └── dataset.csv                # dataset principal (200 exemplos realistas)
+│   └── dataset.csv                # dataset principal (1481 exemplos, 10 categorias tech, Wikipedia)
 ├── models/
 │   ├── modelo.joblib              # classificador LogisticRegression serializado
 │   ├── vectorizer.joblib           # vetorizador TF-IDF serializado
@@ -113,7 +115,7 @@ O serviço expõe o endpoint interno `POST /predict` (consumido pelo backend Jav
 Lista as categorias suportadas pelo modelo treinado:
 
 ```json
-{ "categorias": ["Backend", "Dados", "DevOps", "Frontend"] }
+{ "categorias": ["Backend", "Dados", "DevOps", "Frontend", "Mobile", "Ciberseguranca", "Cloud/Infra", "QA", "Blockchain", "UX/UI"] }
 ```
 
 ### GET /health
@@ -124,7 +126,7 @@ Verificação de saúde do serviço:
 {
   "status": "ok",
   "modelo_carregado": true,
-  "categorias": ["Backend", "Dados", "DevOps", "Frontend"]
+  "categorias": ["Backend", "Dados", "DevOps", "Frontend", "Mobile", "Ciberseguranca", "Cloud/Infra", "QA", "Blockchain", "UX/UI"]
 }
 ```
 
@@ -150,6 +152,7 @@ Após treinar o modelo, para publicar os artefatos no OCI:
 cd ia
 export OCI_BUCKET_NAME=techknowledge-models
 export OCI_NAMESPACE=seu-namespace
+export OCI_REGION=us-ashburn-1          # opcional, padrão us-ashburn-1
 python scripts/upload_to_oci.py
 ```
 

@@ -57,9 +57,10 @@ def download_from_oci(local_path, object_name):
 
         try:
             signer = oci.auth.signers.get_resource_principals_signer()
-            object_storage = oci.object_storage.ObjectStorageClient(config={}, signer=signer)
+            object_storage = oci.object_storage.ObjectStorageClient(
+                config={"region": OCI_REGION}, signer=signer
+            )
         except Exception:
-            # Fallback para a configuração local via arquivo ~/.oci/config
             config = oci.config.from_file("~/.oci/config")
             object_storage = oci.object_storage.ObjectStorageClient(config)
 

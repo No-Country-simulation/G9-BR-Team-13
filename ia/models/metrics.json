@@ -1,39 +1,75 @@
 {
     "Backend": {
-        "precision": 0.875,
+        "precision": 0.7777777777777778,
         "recall": 0.7,
-        "f1-score": 0.7777777777777778,
-        "support": 10.0
+        "f1-score": 0.7368421052631579,
+        "support": 30.0
+    },
+    "Blockchain": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 29.0
+    },
+    "Ciberseguranca": {
+        "precision": 0.9333333333333333,
+        "recall": 0.9655172413793104,
+        "f1-score": 0.9491525423728814,
+        "support": 29.0
+    },
+    "Cloud/Infra": {
+        "precision": 0.6956521739130435,
+        "recall": 0.5333333333333333,
+        "f1-score": 0.6037735849056604,
+        "support": 30.0
     },
     "Dados": {
-        "precision": 0.9,
-        "recall": 0.9,
-        "f1-score": 0.9,
-        "support": 10.0
+        "precision": 0.9375,
+        "recall": 1.0,
+        "f1-score": 0.967741935483871,
+        "support": 30.0
     },
     "DevOps": {
-        "precision": 0.9,
-        "recall": 0.9,
-        "f1-score": 0.9,
-        "support": 10.0
+        "precision": 0.6875,
+        "recall": 0.7586206896551724,
+        "f1-score": 0.7213114754098361,
+        "support": 29.0
     },
     "Frontend": {
-        "precision": 0.75,
-        "recall": 0.9,
-        "f1-score": 0.8181818181818182,
-        "support": 10.0
+        "precision": 0.8571428571428571,
+        "recall": 1.0,
+        "f1-score": 0.9230769230769231,
+        "support": 30.0
     },
-    "accuracy": 0.85,
+    "Mobile": {
+        "precision": 1.0,
+        "recall": 0.9333333333333333,
+        "f1-score": 0.9655172413793104,
+        "support": 30.0
+    },
+    "QA": {
+        "precision": 0.9354838709677419,
+        "recall": 0.9666666666666667,
+        "f1-score": 0.9508196721311475,
+        "support": 30.0
+    },
+    "UX/UI": {
+        "precision": 0.9666666666666667,
+        "recall": 0.9666666666666667,
+        "f1-score": 0.9666666666666667,
+        "support": 30.0
+    },
+    "accuracy": 0.8821548821548821,
     "macro avg": {
-        "precision": 0.85625,
-        "recall": 0.85,
-        "f1-score": 0.8489898989898991,
-        "support": 40.0
+        "precision": 0.879105667980142,
+        "recall": 0.8824137931034484,
+        "f1-score": 0.8784902146689454,
+        "support": 297.0
     },
     "weighted avg": {
-        "precision": 0.85625,
-        "recall": 0.85,
-        "f1-score": 0.848989898989899,
-        "support": 40.0
+        "precision": 0.8791611685545767,
+        "recall": 0.8821548821548821,
+        "f1-score": 0.8783723918616192,
+        "support": 297.0
     }
 }
