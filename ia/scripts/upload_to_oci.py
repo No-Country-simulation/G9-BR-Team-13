@@ -47,12 +47,12 @@ def upload_to_oci(bucket_name: str, namespace: str, region: str = "us-ashburn-1"
             logger.error(f"Arquivo {local_path} nao encontrado. Execute train.py primeiro.")
             continue
 
-        # Tenta autenticar via Resource Principal (OCI cloud) com fallback para config local
         try:
             signer = oci.auth.signers.get_resource_principals_signer()
-            object_storage = oci.object_storage.ObjectStorageClient(config={}, signer=signer)
+            object_storage = oci.object_storage.ObjectStorageClient(
+                config={"region": region}, signer=signer
+            )
         except Exception:
-            # Fallback para o arquivo de configuração OCI no diretório home
             config = oci.config.from_file("~/.oci/config")
             object_storage = oci.object_storage.ObjectStorageClient(config)
 

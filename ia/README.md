@@ -11,7 +11,7 @@ Serviço de Ciência de Dados / Machine Learning: treina o modelo de classifica�
 - Logging: **JSON estruturado** (`app/logging_config.py` — formato padronizado para observabilidade)
 - Stopwords: **português** (lista curada inline no `config.yaml`)
 - CORS habilitado (allow_origins=["*"])
-- OCI Object Storage (`app/model_loader.py` baixa os artefatos de lá se `OCI_NAMESPACE` estiver configurado; roda localmente sem OCI se `models/modelo.joblib` e `models/vectorizer.joblib` já existirem)
+- OCI Object Storage (`app/model_loader.py` baixa os artefatos de lá se `OCI_NAMESPACE` estiver configurado; autenticação via Resource Principal (fallback `~/.oci/config`), região configurável via `OCI_REGION`; roda localmente sem OCI se os `.joblib` já existirem)
 
 ## Status
 
@@ -155,6 +155,7 @@ Após treinar o modelo, para publicar os artefatos no OCI:
 cd ia
 export OCI_BUCKET_NAME=techknowledge-models
 export OCI_NAMESPACE=seu-namespace
+export OCI_REGION=us-ashburn-1          # opcional, padrão us-ashburn-1
 python scripts/upload_to_oci.py
 ```
 
