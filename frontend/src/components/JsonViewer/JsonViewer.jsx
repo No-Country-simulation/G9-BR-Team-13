@@ -1,10 +1,36 @@
-import { Copy, FileJson } from "lucide-react";
+import { useState } from "react";
+import {
+  Check,
+  Copy,
+  FileJson,
+} from "lucide-react";
 
 function JsonViewer({ data }) {
-  async function handleCopy() {
-    if (!data) return;
+  const [isCopied, setIsCopied] = useState(false);
+  const [copyError, setCopyError] = useState("");
 
-    await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+  async function handleCopy() {
+    if (!data) {
+      return;
+    }
+
+    setCopyError("");
+
+    try {
+      await navigator.clipboard.writeText(
+        JSON.stringify(data, null, 2),
+      );
+
+      setIsCopied(true);
+
+      window.setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+    } catch {
+      setCopyError(
+        "Não foi possível copiar o JSON. Tente novamente.",
+      );
+    }
   }
 
   return (
@@ -30,12 +56,34 @@ function JsonViewer({ data }) {
           type="button"
           onClick={handleCopy}
           disabled={!data}
-          className="flex items-center justify-center gap-2 rounded-xl bg-slate-800 px-4 py-2.5 text-sm text-slate-300 transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-40 sm:self-center"
+          className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40 sm:self-center ${
+            isCopied
+              ? "bg-emerald-500/15 text-emerald-300"
+              : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+          }`}
         >
-          <Copy size={16} />
-          Copiar
+          {isCopied ? (
+            <>
+              <Check size={16} />
+              Copiado!
+            </>
+          ) : (
+            <>
+              <Copy size={16} />
+              Copiar
+            </>
+          )}
         </button>
       </div>
+
+      {copyError && (
+        <p
+          role="alert"
+          className="mb-4 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+        >
+          {copyError}
+        </p>
+      )}
 
       <pre className="overflow-auto rounded-2xl bg-slate-950 p-4 text-xs leading-6 text-emerald-300 sm:p-5 sm:text-sm sm:leading-7">
         {data
