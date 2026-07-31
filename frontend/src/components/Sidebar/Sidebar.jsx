@@ -118,7 +118,7 @@ function Sidebar({ isMobileOpen, onClose }) {
       </aside>
 
       <div
-        className={`fixed inset-0 z-50 transition-visibility lg:hidden ${
+        className={`fixed inset-0 z-50 lg:hidden ${
           isMobileOpen
             ? "visible pointer-events-auto"
             : "invisible pointer-events-none"
