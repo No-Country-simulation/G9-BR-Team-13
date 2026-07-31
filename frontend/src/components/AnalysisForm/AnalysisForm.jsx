@@ -23,10 +23,15 @@ function AnalysisForm({ onSubmit, isLoading, error }) {
       return;
     }
 
-    await onSubmit({
+    const wasSuccessful = await onSubmit({
       titulo: trimmedTitle,
       texto: trimmedContent,
     });
+
+    if (wasSuccessful) {
+      setTitle("");
+      setContent("");
+    }
   }
 
   return (

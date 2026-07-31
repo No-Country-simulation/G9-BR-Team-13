@@ -19,13 +19,8 @@ function Home() {
     outletContext?.backendStatus ?? "checking";
 
   const [result, setResult] = useState(null);
-
-  const [relatedContents, setRelatedContents] =
-    useState([]);
-
-  const [isLoading, setIsLoading] =
-    useState(false);
-
+  const [relatedContents, setRelatedContents] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   async function handleAnalyze(payload) {
@@ -34,8 +29,7 @@ function Home() {
     setRelatedContents([]);
 
     try {
-      const response =
-        await analyzeContent(payload);
+      const response = await analyzeContent(payload);
 
       setResult(response);
 
@@ -48,6 +42,8 @@ function Home() {
         getRelatedAnalyses(savedAnalysis);
 
       setRelatedContents(relatedAnalyses);
+
+      return true;
     } catch (requestError) {
       console.error(requestError);
 
@@ -56,6 +52,8 @@ function Home() {
           ? requestError.message
           : "Não foi possível analisar o conteúdo.",
       );
+
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -63,9 +61,7 @@ function Home() {
 
   return (
     <>
-      <StatusCards
-        backendStatus={backendStatus}
-      />
+      <StatusCards backendStatus={backendStatus} />
 
       <section className="grid gap-5 lg:gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <AnalysisForm
@@ -77,13 +73,9 @@ function Home() {
         <ResultCard result={result} />
       </section>
 
-      {result && (
-        <JsonViewer data={result} />
-      )}
+      {result && <JsonViewer data={result} />}
 
-      <RelatedContent
-        items={relatedContents}
-      />
+      <RelatedContent items={relatedContents} />
     </>
   );
 }
