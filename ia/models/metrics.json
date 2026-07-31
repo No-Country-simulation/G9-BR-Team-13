@@ -1,75 +1,75 @@
 {
     "Backend": {
-        "precision": 0.7777777777777778,
-        "recall": 0.7,
-        "f1-score": 0.7368421052631579,
-        "support": 30.0
+        "precision": 0.6363636363636364,
+        "recall": 0.5833333333333334,
+        "f1-score": 0.6086956521739131,
+        "support": 12.0
     },
     "Blockchain": {
         "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
-        "support": 29.0
+        "recall": 0.9473684210526315,
+        "f1-score": 0.972972972972973,
+        "support": 19.0
     },
     "Ciberseguranca": {
-        "precision": 0.9333333333333333,
-        "recall": 0.9655172413793104,
-        "f1-score": 0.9491525423728814,
-        "support": 29.0
+        "precision": 0.9230769230769231,
+        "recall": 0.8571428571428571,
+        "f1-score": 0.8888888888888888,
+        "support": 14.0
     },
     "Cloud/Infra": {
-        "precision": 0.6956521739130435,
-        "recall": 0.5333333333333333,
-        "f1-score": 0.6037735849056604,
-        "support": 30.0
+        "precision": 0.42857142857142855,
+        "recall": 0.6,
+        "f1-score": 0.5,
+        "support": 10.0
     },
     "Dados": {
-        "precision": 0.9375,
+        "precision": 1.0,
         "recall": 1.0,
-        "f1-score": 0.967741935483871,
-        "support": 30.0
+        "f1-score": 1.0,
+        "support": 11.0
     },
     "DevOps": {
-        "precision": 0.6875,
-        "recall": 0.7586206896551724,
-        "f1-score": 0.7213114754098361,
-        "support": 29.0
+        "precision": 0.5714285714285714,
+        "recall": 0.4,
+        "f1-score": 0.47058823529411764,
+        "support": 10.0
     },
     "Frontend": {
-        "precision": 0.8571428571428571,
+        "precision": 0.8333333333333334,
         "recall": 1.0,
-        "f1-score": 0.9230769230769231,
-        "support": 30.0
+        "f1-score": 0.9090909090909091,
+        "support": 5.0
     },
     "Mobile": {
         "precision": 1.0,
-        "recall": 0.9333333333333333,
-        "f1-score": 0.9655172413793104,
-        "support": 30.0
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 3.0
     },
     "QA": {
-        "precision": 0.9354838709677419,
-        "recall": 0.9666666666666667,
-        "f1-score": 0.9508196721311475,
-        "support": 30.0
+        "precision": 0.8888888888888888,
+        "recall": 0.9411764705882353,
+        "f1-score": 0.9142857142857143,
+        "support": 17.0
     },
     "UX/UI": {
-        "precision": 0.9666666666666667,
-        "recall": 0.9666666666666667,
-        "f1-score": 0.9666666666666667,
-        "support": 30.0
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 1.0
     },
-    "accuracy": 0.8821548821548821,
+    "accuracy": 0.8137254901960784,
     "macro avg": {
-        "precision": 0.879105667980142,
-        "recall": 0.8824137931034484,
-        "f1-score": 0.8784902146689454,
-        "support": 297.0
+        "precision": 0.8281662781662782,
+        "recall": 0.8329021082117057,
+        "f1-score": 0.8264522372706515,
+        "support": 102.0
     },
     "weighted avg": {
-        "precision": 0.8791611685545767,
-        "recall": 0.8821548821548821,
-        "f1-score": 0.8783723918616192,
-        "support": 297.0
+        "precision": 0.8219335131099837,
+        "recall": 0.8137254901960784,
+        "f1-score": 0.8140144391987328,
+        "support": 102.0
     }
 }
