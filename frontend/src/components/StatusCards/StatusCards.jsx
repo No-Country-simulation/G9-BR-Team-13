@@ -1,15 +1,46 @@
-import { Cloud, Database, FileJson, Server } from "lucide-react";
+import {
+  Cloud,
+  Database,
+  FileJson,
+  Server,
+} from "lucide-react";
 
-function StatusCards() {
-  const cards = [
-    {
+function getApiCard(backendStatus) {
+  if (backendStatus === "online") {
+    return {
       title: "API REST",
       value: "Online",
-      description: "Spring Boot preparado",
+      description: "Backend conectado",
       icon: Server,
       color: "text-emerald-300",
       bg: "bg-emerald-400/10",
-    },
+    };
+  }
+
+  if (backendStatus === "offline") {
+    return {
+      title: "API REST",
+      value: "Offline",
+      description: "Backend indisponível",
+      icon: Server,
+      color: "text-red-300",
+      bg: "bg-red-400/10",
+    };
+  }
+
+  return {
+    title: "API REST",
+    value: "Verificando",
+    description: "Testando conexão",
+    icon: Server,
+    color: "text-amber-300",
+    bg: "bg-amber-400/10",
+  };
+}
+
+function StatusCards({ backendStatus }) {
+  const cards = [
+    getApiCard(backendStatus),
     {
       title: "OCI Object Storage",
       value: "Modelo",
@@ -54,9 +85,13 @@ function StatusCards() {
               </div>
             </div>
 
-            <p className="text-xs text-slate-400 sm:text-sm">{card.title}</p>
+            <p className="text-xs text-slate-400 sm:text-sm">
+              {card.title}
+            </p>
 
-            <h3 className={`mt-1 text-lg font-bold sm:text-xl ${card.color}`}>
+            <h3
+              className={`mt-1 text-lg font-bold sm:text-xl ${card.color}`}
+            >
               {card.value}
             </h3>
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 
 import AnalysisForm from "../../components/AnalysisForm/AnalysisForm";
 import JsonViewer from "../../components/JsonViewer/JsonViewer";
@@ -12,10 +13,19 @@ import {
 } from "../../services/history";
 
 function Home() {
+  const outletContext = useOutletContext();
+
+  const backendStatus =
+    outletContext?.backendStatus ?? "checking";
+
   const [result, setResult] = useState(null);
+
   const [relatedContents, setRelatedContents] =
     useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [isLoading, setIsLoading] =
+    useState(false);
+
   const [error, setError] = useState(null);
 
   async function handleAnalyze(payload) {
@@ -24,7 +34,8 @@ function Home() {
     setRelatedContents([]);
 
     try {
-      const response = await analyzeContent(payload);
+      const response =
+        await analyzeContent(payload);
 
       setResult(response);
 
@@ -52,7 +63,9 @@ function Home() {
 
   return (
     <>
-      <StatusCards />
+      <StatusCards
+        backendStatus={backendStatus}
+      />
 
       <section className="grid gap-5 lg:gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <AnalysisForm
@@ -64,9 +77,13 @@ function Home() {
         <ResultCard result={result} />
       </section>
 
-      {result && <JsonViewer data={result} />}
+      {result && (
+        <JsonViewer data={result} />
+      )}
 
-      <RelatedContent items={relatedContents} />
+      <RelatedContent
+        items={relatedContents}
+      />
     </>
   );
 }

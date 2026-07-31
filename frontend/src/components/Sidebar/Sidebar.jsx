@@ -6,11 +6,40 @@ import {
   History,
   Settings,
   Wifi,
+  WifiOff,
   X,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-function Sidebar({ isMobileOpen, onClose }) {
+function getBackendStatusData(backendStatus) {
+  if (backendStatus === "online") {
+    return {
+      label: "Conectado",
+      textColor: "text-emerald-300",
+      Icon: Wifi,
+    };
+  }
+
+  if (backendStatus === "offline") {
+    return {
+      label: "Desconectado",
+      textColor: "text-red-300",
+      Icon: WifiOff,
+    };
+  }
+
+  return {
+    label: "Verificando conexão",
+    textColor: "text-amber-300",
+    Icon: Wifi,
+  };
+}
+
+function Sidebar({
+  isMobileOpen,
+  onClose,
+  backendStatus,
+}) {
   const menuItems = [
     {
       label: "Dashboard",
@@ -39,6 +68,12 @@ function Sidebar({ isMobileOpen, onClose }) {
     },
   ];
 
+  const backendStatusData =
+    getBackendStatusData(backendStatus);
+
+  const BackendStatusIcon =
+    backendStatusData.Icon;
+
   const content = (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5 sm:px-6">
       <div className="mb-8 flex items-start gap-3">
@@ -48,8 +83,13 @@ function Sidebar({ isMobileOpen, onClose }) {
 
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-bold leading-tight">
-            <span className="text-white">InfoHub </span>
-            <span className="text-cyan-400">AI</span>
+            <span className="text-white">
+              InfoHub{" "}
+            </span>
+
+            <span className="text-cyan-400">
+              AI
+            </span>
           </h1>
 
           <p className="mt-1 text-xs leading-5 text-slate-400">
@@ -76,8 +116,14 @@ function Sidebar({ isMobileOpen, onClose }) {
                 }`
               }
             >
-              <Icon size={19} className="shrink-0" />
-              <span className="truncate">{item.label}</span>
+              <Icon
+                size={19}
+                className="shrink-0"
+              />
+
+              <span className="truncate">
+                {item.label}
+              </span>
             </NavLink>
           );
         })}
@@ -91,18 +137,31 @@ function Sidebar({ isMobileOpen, onClose }) {
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-white">InfoHub AI</p>
-              <p className="text-xs text-slate-500">Versão 1.0.0</p>
+              <p className="text-sm font-semibold text-white">
+                InfoHub AI
+              </p>
+
+              <p className="text-xs text-slate-500">
+                Versão 1.0.0
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 rounded-2xl bg-slate-950 px-3 py-3">
-            <Wifi size={17} className="shrink-0 text-amber-300" />
+            <BackendStatusIcon
+              size={17}
+              className={`shrink-0 ${backendStatusData.textColor}`}
+            />
 
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-slate-500">Status do backend</p>
-              <p className="text-sm font-medium text-amber-300">
-                Aguardando conexão
+              <p className="text-xs text-slate-500">
+                Status do backend
+              </p>
+
+              <p
+                className={`text-sm font-medium ${backendStatusData.textColor}`}
+              >
+                {backendStatusData.label}
               </p>
             </div>
           </div>
@@ -127,7 +186,9 @@ function Sidebar({ isMobileOpen, onClose }) {
       >
         <div
           className={`fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300 ${
-            isMobileOpen ? "opacity-100" : "opacity-0"
+            isMobileOpen
+              ? "opacity-100"
+              : "opacity-0"
           }`}
           onClick={onClose}
           aria-hidden="true"
@@ -135,11 +196,15 @@ function Sidebar({ isMobileOpen, onClose }) {
 
         <aside
           className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[calc(100vw-3rem)] flex-col bg-slate-950 shadow-2xl shadow-slate-950/80 transition-transform duration-300 ease-out ${
-            isMobileOpen ? "translate-x-0" : "-translate-x-full"
+            isMobileOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
           }`}
         >
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-4 sm:px-6">
-            <span className="text-sm font-semibold text-slate-400">Menu</span>
+            <span className="text-sm font-semibold text-slate-400">
+              Menu
+            </span>
 
             <button
               type="button"
