@@ -76,6 +76,7 @@ function MainLayout() {
         <main className="flex min-w-0 flex-1 flex-col p-4 pb-[calc(1rem+var(--sab))] sm:p-6 sm:pb-[calc(1.5rem+var(--sab))] lg:p-8 lg:pb-[calc(2rem+var(--sab))]">
           <Header
             onToggleMenu={openMobileMenu}
+            backendStatus={backendStatus}
           />
 
           <div className="flex flex-1 flex-col">

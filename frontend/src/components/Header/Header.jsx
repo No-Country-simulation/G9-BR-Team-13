@@ -1,6 +1,45 @@
-import { Menu } from "lucide-react";
+import {
+  Menu,
+  Wifi,
+  WifiOff,
+  LoaderCircle,
+} from "lucide-react";
 
-function Header({ onToggleMenu }) {
+function Header({
+  onToggleMenu,
+  backendStatus = "checking",
+}) {
+  function getStatus() {
+    switch (backendStatus) {
+      case "online":
+        return {
+          text: "API Online",
+          color:
+            "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
+          Icon: Wifi,
+        };
+
+      case "offline":
+        return {
+          text: "API Offline",
+          color:
+            "border-red-400/30 bg-red-400/10 text-red-300",
+          Icon: WifiOff,
+        };
+
+      default:
+        return {
+          text: "Verificando...",
+          color:
+            "border-amber-400/30 bg-amber-400/10 text-amber-300",
+          Icon: LoaderCircle,
+        };
+    }
+  }
+
+  const status = getStatus();
+  const StatusIcon = status.Icon;
+
   return (
     <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5 lg:mb-8 lg:flex-row lg:items-center lg:justify-between lg:p-6">
       <div className="flex items-start gap-3 lg:gap-0">
@@ -25,8 +64,19 @@ function Header({ onToggleMenu }) {
         </div>
       </div>
 
-      <div className="shrink-0 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-3 py-2.5 text-xs text-emerald-300 sm:px-4 sm:text-sm">
-        ● API Online
+      <div
+        className={`flex shrink-0 items-center gap-2 rounded-2xl px-3 py-2.5 text-xs sm:px-4 sm:text-sm ${status.color}`}
+      >
+        <StatusIcon
+          size={16}
+          className={
+            backendStatus === "checking"
+              ? "animate-spin"
+              : ""
+          }
+        />
+
+        {status.text}
       </div>
     </header>
   );
