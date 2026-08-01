@@ -1,4 +1,8 @@
-import { Database, Server, Settings as SettingsIcon } from "lucide-react";
+import {
+  Database,
+  Server,
+  Settings as SettingsIcon,
+} from "lucide-react";
 
 function Settings() {
   return (
@@ -21,7 +25,10 @@ function Settings() {
             </div>
 
             <div className="min-w-0 flex-1">
-              <h3 className="font-bold text-white">Configuração da API</h3>
+              <h3 className="font-bold text-white">
+                Configuração da API
+              </h3>
+
               <p className="text-xs text-slate-500 sm:text-sm">
                 Endereço utilizado pelo frontend
               </p>
@@ -29,7 +36,10 @@ function Settings() {
           </div>
 
           <div className="rounded-2xl bg-slate-950 p-3 sm:p-4">
-            <p className="text-xs text-slate-500">URL padrão</p>
+            <p className="text-xs text-slate-500">
+              URL padrão
+            </p>
+
             <p className="mt-1 break-all text-xs text-slate-300 sm:text-sm">
               http://localhost:8080
             </p>
@@ -43,7 +53,10 @@ function Settings() {
             </div>
 
             <div className="min-w-0 flex-1">
-              <h3 className="font-bold text-white">Armazenamento</h3>
+              <h3 className="font-bold text-white">
+                Armazenamento
+              </h3>
+
               <p className="text-xs text-slate-500 sm:text-sm">
                 Integração com banco e OCI
               </p>
@@ -61,10 +74,22 @@ function Settings() {
 
       <article className="mt-5 rounded-3xl border border-white/10 bg-slate-900 p-4 sm:mt-6 sm:p-6">
         <div className="flex items-center gap-3">
-          <SettingsIcon size={20} className="shrink-0 text-amber-300" />
+          <SettingsIcon
+            size={20}
+            className="shrink-0 text-amber-300"
+          />
 
           <div className="min-w-0 flex-1">
-            <h3 className="font-bold text-white">InfoHub AI</h3>
+            <h3 className="font-bold">
+              <span className="text-cyan-400">
+                Tech
+              </span>
+
+              <span className="text-white">
+                Mind
+              </span>
+            </h3>
+
             <p className="text-xs text-slate-500 sm:text-sm">
               Versão inicial da plataforma — 1.0.0
             </p>

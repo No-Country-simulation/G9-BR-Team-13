@@ -42,7 +42,8 @@ function MainLayout() {
     let isMounted = true;
 
     async function updateBackendStatus() {
-      const isOnline = await checkBackendStatus();
+      const isOnline =
+        await checkBackendStatus();
 
       if (isMounted) {
         setBackendStatus(
@@ -73,9 +74,19 @@ function MainLayout() {
         />
 
         <main className="flex min-w-0 flex-1 flex-col p-4 pb-[calc(1rem+var(--sab))] sm:p-6 sm:pb-[calc(1.5rem+var(--sab))] lg:p-8 lg:pb-[calc(2rem+var(--sab))]">
-          <Header onToggleMenu={openMobileMenu} />
+          <Header
+            onToggleMenu={openMobileMenu}
+          />
 
-          <Outlet context={{ backendStatus }} />
+          <div className="flex flex-1 flex-col">
+            <Outlet
+              context={{ backendStatus }}
+            />
+          </div>
+
+          <footer className="mt-8 border-t border-white/10 pt-5 text-center text-xs text-slate-500">
+            © 2026 TechMind • Desenvolvido pela equipe G9-BR Team 13
+          </footer>
         </main>
       </div>
     </div>

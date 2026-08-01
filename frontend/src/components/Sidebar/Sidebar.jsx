@@ -1,7 +1,6 @@
 import {
   BarChart3,
   BookOpen,
-  BrainCircuit,
   FileSearch,
   History,
   Settings,
@@ -33,6 +32,15 @@ function getBackendStatusData(backendStatus) {
     textColor: "text-amber-300",
     Icon: Wifi,
   };
+}
+
+function ProjectName({ className = "" }) {
+  return (
+    <span className={className}>
+      <span className="text-cyan-400">Tech</span>
+      <span className="text-white">Mind</span>
+    </span>
+  );
 }
 
 function Sidebar({
@@ -77,19 +85,15 @@ function Sidebar({
   const content = (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5 sm:px-6">
       <div className="mb-8 flex items-start gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-cyan-400 text-sm font-bold text-slate-950">
-          IH
-        </div>
+        <img
+          src="/logo-techmind.jpg"
+          alt="Logo do TechMind"
+          className="h-12 w-12 shrink-0 rounded-2xl object-cover"
+        />
 
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-bold leading-tight">
-            <span className="text-white">
-              InfoHub{" "}
-            </span>
-
-            <span className="text-cyan-400">
-              AI
-            </span>
+            <ProjectName />
           </h1>
 
           <p className="mt-1 text-xs leading-5 text-slate-400">
@@ -132,13 +136,18 @@ function Sidebar({
       <div className="mt-auto pt-6">
         <div className="rounded-3xl border border-white/10 bg-slate-900 p-4 sm:p-5">
           <div className="mb-3 flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
-              <BrainCircuit size={20} />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-cyan-400/10">
+              <img
+                src="/logo-techmind.jpg"
+                alt=""
+                aria-hidden="true"
+                className="h-full w-full object-cover"
+              />
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-white">
-                InfoHub AI
+              <p className="text-sm font-semibold">
+                <ProjectName />
               </p>
 
               <p className="text-xs text-slate-500">
