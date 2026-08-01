@@ -1,6 +1,6 @@
-# InfoHub AI — Front-end
+# TechMind — Front-end
 
-Interface do projeto **InfoHub AI**, desenvolvida em React para organização e classificação de conteúdo técnico.
+Interface do projeto **TechMind**, desenvolvida em React para organização e classificação de conteúdo técnico.
 
 ## Tecnologias
 
