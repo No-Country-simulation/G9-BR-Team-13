@@ -111,12 +111,12 @@ function RelatedContent({ items = [] }) {
 
       {selectedContent && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/80 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
           role="presentation"
           onMouseDown={closeModal}
         >
           <div
-            className="flex max-h-[85vh] w-full flex-col rounded-t-3xl border border-white/10 bg-slate-900 shadow-2xl sm:max-h-[75vh] sm:max-w-2xl sm:rounded-3xl"
+            className="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-3xl border border-white/10 bg-slate-900 shadow-2xl"
             role="dialog"
             aria-modal="true"
             aria-labelledby="related-content-modal-title"
