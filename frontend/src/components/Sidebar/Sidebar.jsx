@@ -7,31 +7,33 @@ import {
   Wifi,
   WifiOff,
   X,
+  LoaderCircle,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 function getBackendStatusData(backendStatus) {
-  if (backendStatus === "online") {
-    return {
-      label: "Conectado",
-      textColor: "text-emerald-300",
-      Icon: Wifi,
-    };
-  }
+  switch (backendStatus) {
+    case "online":
+      return {
+        label: "Conectado",
+        textColor: "text-emerald-300",
+        Icon: Wifi,
+      };
 
-  if (backendStatus === "offline") {
-    return {
-      label: "Desconectado",
-      textColor: "text-red-300",
-      Icon: WifiOff,
-    };
-  }
+    case "offline":
+      return {
+        label: "Desconectado",
+        textColor: "text-red-300",
+        Icon: WifiOff,
+      };
 
-  return {
-    label: "Verificando conexão",
-    textColor: "text-amber-300",
-    Icon: Wifi,
-  };
+    default:
+      return {
+        label: "Verificando conexão",
+        textColor: "text-amber-300",
+        Icon: LoaderCircle,
+      };
+  }
 }
 
 function ProjectName({ className = "" }) {
@@ -50,14 +52,14 @@ function Sidebar({
 }) {
   const menuItems = [
     {
-      label: "Dashboard",
-      icon: BarChart3,
-      to: "/dashboard",
-    },
-    {
       label: "Analisar Conteúdo",
       icon: FileSearch,
       to: "/analisar",
+    },
+    {
+      label: "Dashboard",
+      icon: BarChart3,
+      to: "/dashboard",
     },
     {
       label: "Base de Conhecimento",
@@ -87,7 +89,7 @@ function Sidebar({
       <div className="mb-8 flex items-start gap-3">
         <img
           src="/logo-techmind.jpg"
-          alt="Logo do TechMind"
+          alt="Logo TechMind"
           className="h-12 w-12 shrink-0 rounded-2xl object-cover"
         />
 
@@ -159,7 +161,11 @@ function Sidebar({
           <div className="flex items-center gap-2 rounded-2xl bg-slate-950 px-3 py-3">
             <BackendStatusIcon
               size={17}
-              className={`shrink-0 ${backendStatusData.textColor}`}
+              className={`shrink-0 ${backendStatusData.textColor} ${
+                backendStatus === "checking"
+                  ? "animate-spin"
+                  : ""
+              }`}
             />
 
             <div className="min-w-0 flex-1">
