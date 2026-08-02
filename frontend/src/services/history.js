@@ -1,4 +1,4 @@
-const HISTORY_STORAGE_KEY = "infohub-analysis-history";
+const HISTORY_STORAGE_KEY = "techmind-analysis-history";
 
 function normalizeText(value, fallback = "") {
   return typeof value === "string" && value.trim()

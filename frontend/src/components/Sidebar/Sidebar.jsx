@@ -1,26 +1,65 @@
 import {
   BarChart3,
   BookOpen,
-  BrainCircuit,
   FileSearch,
   History,
   Settings,
   Wifi,
+  WifiOff,
   X,
+  LoaderCircle,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-function Sidebar({ isMobileOpen, onClose }) {
+function getBackendStatusData(backendStatus) {
+  switch (backendStatus) {
+    case "online":
+      return {
+        label: "Conectado",
+        textColor: "text-emerald-300",
+        Icon: Wifi,
+      };
+
+    case "offline":
+      return {
+        label: "Desconectado",
+        textColor: "text-red-300",
+        Icon: WifiOff,
+      };
+
+    default:
+      return {
+        label: "Verificando conexão",
+        textColor: "text-amber-300",
+        Icon: LoaderCircle,
+      };
+  }
+}
+
+function ProjectName({ className = "" }) {
+  return (
+    <span className={className}>
+      <span className="text-cyan-400">Tech</span>
+      <span className="text-white">Mind</span>
+    </span>
+  );
+}
+
+function Sidebar({
+  isMobileOpen,
+  onClose,
+  backendStatus,
+}) {
   const menuItems = [
-    {
-      label: "Dashboard",
-      icon: BarChart3,
-      to: "/dashboard",
-    },
     {
       label: "Analisar Conteúdo",
       icon: FileSearch,
       to: "/analisar",
+    },
+    {
+      label: "Dashboard",
+      icon: BarChart3,
+      to: "/dashboard",
     },
     {
       label: "Base de Conhecimento",
@@ -39,17 +78,24 @@ function Sidebar({ isMobileOpen, onClose }) {
     },
   ];
 
+  const backendStatusData =
+    getBackendStatusData(backendStatus);
+
+  const BackendStatusIcon =
+    backendStatusData.Icon;
+
   const content = (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5 sm:px-6">
       <div className="mb-8 flex items-start gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-cyan-400 text-sm font-bold text-slate-950">
-          IH
-        </div>
+        <img
+          src="/logo-techmind.jpg"
+          alt="Logo TechMind"
+          className="h-12 w-12 shrink-0 rounded-2xl object-cover"
+        />
 
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-bold leading-tight">
-            <span className="text-white">InfoHub </span>
-            <span className="text-cyan-400">AI</span>
+            <ProjectName />
           </h1>
 
           <p className="mt-1 text-xs leading-5 text-slate-400">
@@ -76,8 +122,14 @@ function Sidebar({ isMobileOpen, onClose }) {
                 }`
               }
             >
-              <Icon size={19} className="shrink-0" />
-              <span className="truncate">{item.label}</span>
+              <Icon
+                size={19}
+                className="shrink-0"
+              />
+
+              <span className="truncate">
+                {item.label}
+              </span>
             </NavLink>
           );
         })}
@@ -86,23 +138,45 @@ function Sidebar({ isMobileOpen, onClose }) {
       <div className="mt-auto pt-6">
         <div className="rounded-3xl border border-white/10 bg-slate-900 p-4 sm:p-5">
           <div className="mb-3 flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
-              <BrainCircuit size={20} />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-cyan-400/10">
+              <img
+                src="/logo-techmind.jpg"
+                alt=""
+                aria-hidden="true"
+                className="h-full w-full object-cover"
+              />
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-white">InfoHub AI</p>
-              <p className="text-xs text-slate-500">Versão 1.0.0</p>
+              <p className="text-sm font-semibold">
+                <ProjectName />
+              </p>
+
+              <p className="text-xs text-slate-500">
+                Versão 1.0.0
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 rounded-2xl bg-slate-950 px-3 py-3">
-            <Wifi size={17} className="shrink-0 text-amber-300" />
+            <BackendStatusIcon
+              size={17}
+              className={`shrink-0 ${backendStatusData.textColor} ${
+                backendStatus === "checking"
+                  ? "animate-spin"
+                  : ""
+              }`}
+            />
 
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-slate-500">Status do backend</p>
-              <p className="text-sm font-medium text-amber-300">
-                Aguardando conexão
+              <p className="text-xs text-slate-500">
+                Status do backend
+              </p>
+
+              <p
+                className={`text-sm font-medium ${backendStatusData.textColor}`}
+              >
+                {backendStatusData.label}
               </p>
             </div>
           </div>
@@ -118,7 +192,7 @@ function Sidebar({ isMobileOpen, onClose }) {
       </aside>
 
       <div
-        className={`fixed inset-0 z-50 transition-visibility lg:hidden ${
+        className={`fixed inset-0 z-50 lg:hidden ${
           isMobileOpen
             ? "visible pointer-events-auto"
             : "invisible pointer-events-none"
@@ -127,7 +201,9 @@ function Sidebar({ isMobileOpen, onClose }) {
       >
         <div
           className={`fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300 ${
-            isMobileOpen ? "opacity-100" : "opacity-0"
+            isMobileOpen
+              ? "opacity-100"
+              : "opacity-0"
           }`}
           onClick={onClose}
           aria-hidden="true"
@@ -135,11 +211,15 @@ function Sidebar({ isMobileOpen, onClose }) {
 
         <aside
           className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[calc(100vw-3rem)] flex-col bg-slate-950 shadow-2xl shadow-slate-950/80 transition-transform duration-300 ease-out ${
-            isMobileOpen ? "translate-x-0" : "-translate-x-full"
+            isMobileOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
           }`}
         >
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-4 sm:px-6">
-            <span className="text-sm font-semibold text-slate-400">Menu</span>
+            <span className="text-sm font-semibold text-slate-400">
+              Menu
+            </span>
 
             <button
               type="button"

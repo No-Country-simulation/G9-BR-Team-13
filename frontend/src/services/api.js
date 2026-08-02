@@ -32,7 +32,8 @@ function normalizeResponse(data) {
 
   return {
     categoria:
-      typeof data?.categoria === "string" && data.categoria.trim()
+      typeof data?.categoria === "string" &&
+      data.categoria.trim()
         ? data.categoria
         : "Não informada",
 
@@ -41,10 +42,34 @@ function normalizeResponse(data) {
         ? data.probabilidade
         : null,
 
-    informacoesAdicionais: Array.isArray(additionalInformation)
+    informacoesAdicionais: Array.isArray(
+      additionalInformation,
+    )
       ? additionalInformation
       : [],
   };
+}
+
+export async function checkBackendStatus() {
+  const controller = new AbortController();
+
+  const timeoutId = window.setTimeout(() => {
+    controller.abort();
+  }, 5000);
+
+  try {
+    await fetch(`${API_URL}/conteudo`, {
+      method: "GET",
+      cache: "no-store",
+      signal: controller.signal,
+    });
+
+    return true;
+  } catch {
+    return false;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 }
 
 export async function analyzeContent(payload) {
@@ -70,7 +95,7 @@ export async function analyzeContent(payload) {
     try {
       errorData = await response.json();
     } catch {
-      // Vai manter a mensagem padrão se o backend não retornar JSON.
+      // Mantém a mensagem padrão se o backend não retornar JSON.
     }
 
     throw new Error(getErrorMessage(errorData));

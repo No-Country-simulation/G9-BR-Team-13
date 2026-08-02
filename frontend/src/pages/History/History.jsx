@@ -34,7 +34,11 @@ function History() {
     setCopyError("");
 
     try {
-      const formattedJson = JSON.stringify(item.response, null, 2);
+      const formattedJson = JSON.stringify(
+        item.response,
+        null,
+        2,
+      );
 
       await navigator.clipboard.writeText(formattedJson);
 
@@ -55,7 +59,9 @@ function History() {
       return;
     }
 
-    const updatedHistory = deleteAnalysis(analysisToDelete.id);
+    const updatedHistory = deleteAnalysis(
+      analysisToDelete.id,
+    );
 
     setHistory(updatedHistory);
     setAnalysisToDelete(null);
@@ -105,13 +111,16 @@ function History() {
           {history.map((item) => {
             const percentage =
               item.summary.probabilidade !== null
-                ? Math.round(item.summary.probabilidade * 100)
+                ? Math.round(
+                    item.summary.probabilidade * 100,
+                  )
                 : 0;
 
             const keywords =
               item.response?.informacoesAdicionais ?? [];
 
-            const wasCopied = copiedAnalysisId === item.id;
+            const wasCopied =
+              copiedAnalysisId === item.id;
 
             return (
               <article
@@ -133,9 +142,9 @@ function History() {
                     <Calendar size={14} />
 
                     <span>
-                      {new Date(item.createdAt).toLocaleString(
-                        "pt-BR",
-                      )}
+                      {new Date(
+                        item.createdAt,
+                      ).toLocaleString("pt-BR")}
                     </span>
                   </div>
                 </div>
@@ -222,7 +231,9 @@ function History() {
                   <button
                     type="button"
                     className="flex items-center gap-1.5 rounded-xl border border-red-500/70 px-3 py-2 text-xs font-medium text-red-400 transition hover:bg-red-500/10 sm:gap-2 sm:px-4 sm:text-sm"
-                    onClick={() => setAnalysisToDelete(item)}
+                    onClick={() =>
+                      setAnalysisToDelete(item)
+                    }
                   >
                     <Trash2 size={14} />
                     Excluir
@@ -236,16 +247,18 @@ function History() {
 
       {selectedAnalysis !== null && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/80 p-0 sm:p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
           role="presentation"
           onMouseDown={closeJsonModal}
         >
           <div
-            className="flex max-h-[85vh] w-full flex-col rounded-t-3xl border border-white/10 bg-slate-900 shadow-2xl sm:max-h-[75vh] sm:max-w-3xl sm:rounded-3xl"
+            className="flex max-h-[85vh] w-full max-w-3xl flex-col rounded-3xl border border-white/10 bg-slate-900 shadow-2xl"
             role="dialog"
             aria-modal="true"
             aria-labelledby="json-modal-title"
-            onMouseDown={(event) => event.stopPropagation()}
+            onMouseDown={(event) =>
+              event.stopPropagation()
+            }
           >
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-4 sm:px-6 sm:py-5">
               <div className="min-w-0 flex-1">
@@ -257,7 +270,8 @@ function History() {
                 </h3>
 
                 <p className="mt-0.5 text-xs text-slate-400 sm:mt-1 sm:text-sm">
-                  JSON armazenado no histórico desta análise.
+                  JSON armazenado no histórico desta
+                  análise.
                 </p>
               </div>
 
@@ -274,7 +288,11 @@ function History() {
             <div className="flex-1 overflow-auto p-4 sm:p-6">
               <pre className="overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-3 text-xs leading-5 text-cyan-200 sm:p-5 sm:text-sm sm:leading-6">
                 <code>
-                  {JSON.stringify(selectedAnalysis, null, 2)}
+                  {JSON.stringify(
+                    selectedAnalysis,
+                    null,
+                    2,
+                  )}
                 </code>
               </pre>
             </div>
@@ -282,7 +300,7 @@ function History() {
             <div className="flex justify-end border-t border-white/10 px-4 py-3 sm:px-6 sm:py-4">
               <button
                 type="button"
-                className="rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-cyan-400 sm:py-2"
+                className="w-full rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-cyan-400 sm:w-auto sm:py-2"
                 onClick={closeJsonModal}
               >
                 Fechar
@@ -294,16 +312,18 @@ function History() {
 
       {analysisToDelete !== null && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/80 p-0 sm:p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
           role="presentation"
           onMouseDown={closeDeleteModal}
         >
           <div
-            className="w-full rounded-t-3xl border border-white/10 bg-slate-900 p-5 shadow-2xl sm:max-w-md sm:rounded-3xl sm:p-6"
+            className="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-5 shadow-2xl sm:p-6"
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-modal-title"
-            onMouseDown={(event) => event.stopPropagation()}
+            onMouseDown={(event) =>
+              event.stopPropagation()
+            }
           >
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-red-500/10 text-red-400 sm:h-12 sm:w-12">
               <Trash2 size={22} />
@@ -321,13 +341,14 @@ function History() {
               <strong className="text-slate-200">
                 {analysisToDelete.summary.categoria}
               </strong>{" "}
-              será removida permanentemente do histórico local.
+              será removida permanentemente do histórico
+              local.
             </p>
 
-            <div className="mt-5 flex justify-end gap-2 sm:mt-6 sm:gap-3">
+            <div className="mt-5 flex flex-col-reverse gap-2 sm:mt-6 sm:flex-row sm:justify-end sm:gap-3">
               <button
                 type="button"
-                className="flex-1 rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-slate-800 sm:flex-initial"
+                className="w-full rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-slate-800 sm:w-auto"
                 onClick={closeDeleteModal}
               >
                 Cancelar
@@ -335,7 +356,7 @@ function History() {
 
               <button
                 type="button"
-                className="flex-1 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-red-400 sm:flex-initial"
+                className="w-full rounded-xl bg-red-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-red-400 sm:w-auto"
                 onClick={confirmDeleteAnalysis}
               >
                 Excluir

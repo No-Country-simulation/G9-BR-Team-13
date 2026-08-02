@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 
 import AnalysisForm from "../../components/AnalysisForm/AnalysisForm";
 import JsonViewer from "../../components/JsonViewer/JsonViewer";
@@ -12,9 +13,13 @@ import {
 } from "../../services/history";
 
 function Home() {
+  const outletContext = useOutletContext();
+
+  const backendStatus =
+    outletContext?.backendStatus ?? "checking";
+
   const [result, setResult] = useState(null);
-  const [relatedContents, setRelatedContents] =
-    useState([]);
+  const [relatedContents, setRelatedContents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -37,6 +42,8 @@ function Home() {
         getRelatedAnalyses(savedAnalysis);
 
       setRelatedContents(relatedAnalyses);
+
+      return true;
     } catch (requestError) {
       console.error(requestError);
 
@@ -45,6 +52,8 @@ function Home() {
           ? requestError.message
           : "Não foi possível analisar o conteúdo.",
       );
+
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +61,7 @@ function Home() {
 
   return (
     <>
-      <StatusCards />
+      <StatusCards backendStatus={backendStatus} />
 
       <section className="grid gap-5 lg:gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <AnalysisForm
