@@ -1,3 +1,12 @@
+/**
+ * Componente de Cards de Status (StatusCards).
+ * Exibe uma grade de cards informativos com as principais métricas e conectores da plataforma:
+ * status da API REST, conexão OCI Object Storage, Base de dados do Histórico e Formato de saída JSON.
+ *
+ * @param {Object} props
+ * @param {string} props.backendStatus Estado da API backend ("online", "offline" ou "checking")
+ */
+
 import {
   Cloud,
   Database,
@@ -5,6 +14,12 @@ import {
   Server,
 } from "lucide-react";
 
+/**
+ * Retorna as propriedades visuais do card da API REST conforme o status atual da conexão.
+ *
+ * @param {string} backendStatus Status da API
+ * @returns {Object} Dados formatados do card da API
+ */
 function getApiCard(backendStatus) {
   if (backendStatus === "online") {
     return {
@@ -39,6 +54,7 @@ function getApiCard(backendStatus) {
 }
 
 function StatusCards({ backendStatus }) {
+  // Lista de cards informativos exibidos no topo da página
   const cards = [
     getApiCard(backendStatus),
     {
@@ -77,6 +93,7 @@ function StatusCards({ backendStatus }) {
             key={card.title}
             className="rounded-3xl border border-white/10 bg-slate-900 p-4 shadow-xl shadow-slate-950/30 sm:p-5"
           >
+            {/* Ícone com fundo colorido */}
             <div className="mb-3 flex items-center sm:mb-4">
               <div
                 className={`flex h-10 w-10 items-center justify-center rounded-2xl sm:h-11 sm:w-11 ${card.bg} ${card.color}`}
@@ -85,16 +102,19 @@ function StatusCards({ backendStatus }) {
               </div>
             </div>
 
+            {/* Rótulo / Título do card */}
             <p className="text-xs text-slate-400 sm:text-sm">
               {card.title}
             </p>
 
+            {/* Valor de destaque */}
             <h3
               className={`mt-1 text-lg font-bold sm:text-xl ${card.color}`}
             >
               {card.value}
             </h3>
 
+            {/* Breve descrição */}
             <p className="mt-1 text-xs text-slate-500 sm:text-sm">
               {card.description}
             </p>

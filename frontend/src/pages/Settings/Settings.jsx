@@ -1,3 +1,9 @@
+/**
+ * Componente da Página de Configurações (Settings).
+ * Exibe as informações técnicas sobre as integrações da plataforma (URL padrão da API backend,
+ * status do armazenamento no OCI e versão da aplicação).
+ */
+
 import {
   Database,
   Server,
@@ -7,6 +13,7 @@ import {
 function Settings() {
   return (
     <section>
+      {/* Título e introdução da página */}
       <div className="mb-5 sm:mb-6">
         <h2 className="text-2xl font-bold text-white sm:text-3xl">
           Configurações
@@ -17,7 +24,9 @@ function Settings() {
         </p>
       </div>
 
+      {/* Grid com cartões de detalhes de integração */}
       <div className="grid gap-4 sm:gap-6 xl:grid-cols-2">
+        {/* Card: Configuração da API Backend */}
         <article className="rounded-3xl border border-white/10 bg-slate-900 p-4 sm:p-6">
           <div className="mb-3 flex items-center gap-3 sm:mb-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300 sm:h-11 sm:w-11">
@@ -46,6 +55,7 @@ function Settings() {
           </div>
         </article>
 
+        {/* Card: Armazenamento e Nuvem OCI */}
         <article className="rounded-3xl border border-white/10 bg-slate-900 p-4 sm:p-6">
           <div className="mb-3 flex items-center gap-3 sm:mb-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-purple-400/10 text-purple-300 sm:h-11 sm:w-11">
@@ -72,6 +82,7 @@ function Settings() {
         </article>
       </div>
 
+      {/* Card de versão do sistema */}
       <article className="mt-5 rounded-3xl border border-white/10 bg-slate-900 p-4 sm:mt-6 sm:p-6">
         <div className="flex items-center gap-3">
           <SettingsIcon

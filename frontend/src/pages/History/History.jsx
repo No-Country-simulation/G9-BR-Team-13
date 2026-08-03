@@ -1,3 +1,10 @@
+/**
+ * Componente da Página de Histórico (History).
+ * Exibe a lista completa de todas as análises realizadas e salvas no localStorage.
+ * Permite visualizar o JSON completo retornado pela API, copiar o JSON para a área de transferência
+ * e excluir análises individuais por meio de uma janela modal de confirmação.
+ */
+
 import { useState } from "react";
 import {
   Calendar,
@@ -16,20 +23,32 @@ import {
 } from "../../services/history";
 
 function History() {
+  // Estado local contendo a lista de análises do histórico
   const [history, setHistory] = useState(() => getHistory());
+  
+  // Estados para controlar o modal de visualização de JSON e feedback de cópia
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [copiedAnalysisId, setCopiedAnalysisId] = useState(null);
+  
+  // Estado para controlar o modal de confirmação de exclusão
   const [analysisToDelete, setAnalysisToDelete] = useState(null);
   const [copyError, setCopyError] = useState("");
 
+  // Fecha o modal de exibição do JSON
   function closeJsonModal() {
     setSelectedAnalysis(null);
   }
 
+  // Fecha o modal de confirmação de exclusão
   function closeDeleteModal() {
     setAnalysisToDelete(null);
   }
 
+  /**
+   * Copia o JSON formatado de uma análise específica para a área de transferência.
+   *
+   * @param {Object} item Objeto do histórico contendo os dados da análise
+   */
   async function copyAnalysisJson(item) {
     setCopyError("");
 
@@ -44,6 +63,7 @@ function History() {
 
       setCopiedAnalysisId(item.id);
 
+      // Limpa o indicador visual de "Copiado" após 2 segundos
       window.setTimeout(() => {
         setCopiedAnalysisId(null);
       }, 2000);
@@ -54,6 +74,9 @@ function History() {
     }
   }
 
+  /**
+   * Confirma a remoção permanente de uma análise do histórico no localStorage.
+   */
   function confirmDeleteAnalysis() {
     if (!analysisToDelete) {
       return;
@@ -69,6 +92,7 @@ function History() {
 
   return (
     <section>
+      {/* Cabeçalho da página */}
       <div className="mb-5 sm:mb-6">
         <h2 className="text-2xl font-bold text-white sm:text-3xl">
           Histórico de Análises
@@ -79,6 +103,7 @@ function History() {
         </p>
       </div>
 
+      {/* Alerta de erro de cópia */}
       {copyError && (
         <div
           className="mb-5 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 sm:mb-6"
@@ -88,6 +113,7 @@ function History() {
         </div>
       )}
 
+      {/* Estado vazio (caso não existam análises no histórico) */}
       {history.length === 0 ? (
         <div className="flex min-h-64 flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-slate-900 p-6 text-center sm:min-h-72 sm:p-8">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-400/10 text-purple-300 sm:h-14 sm:w-14">
@@ -107,6 +133,7 @@ function History() {
           </div>
         </div>
       ) : (
+        /* Lista de cartões das análises salvas */
         <div className="space-y-4 sm:space-y-6">
           {history.map((item) => {
             const percentage =
@@ -127,6 +154,7 @@ function History() {
                 key={item.id}
                 className="rounded-3xl border border-white/10 bg-slate-900 p-4 shadow-lg sm:p-6"
               >
+                {/* Topo do Card: Categoria e Data */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <h3 className="text-xl font-bold text-cyan-300 sm:text-2xl">
@@ -149,6 +177,7 @@ function History() {
                   </div>
                 </div>
 
+                {/* Barra de Progresso / Confiança da IA */}
                 <div className="mt-4 sm:mt-6">
                   <div className="mb-1.5 flex items-center justify-between sm:mb-2">
                     <span className="text-sm font-medium text-slate-300">
@@ -172,6 +201,7 @@ function History() {
                   </div>
                 </div>
 
+                {/* Seção de Palavras-chave */}
                 <div className="mt-4 sm:mt-6">
                   <div className="mb-2.5 flex items-center gap-2 text-slate-300 sm:mb-3">
                     <Tag size={16} />
@@ -199,6 +229,7 @@ function History() {
                   </div>
                 </div>
 
+                {/* Botões de Ação do Card */}
                 <div className="mt-5 flex flex-wrap gap-2 sm:mt-8 sm:gap-3">
                   <button
                     type="button"
@@ -245,6 +276,7 @@ function History() {
         </div>
       )}
 
+      {/* Modal para Visualização do JSON Completo */}
       {selectedAnalysis !== null && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
@@ -310,6 +342,7 @@ function History() {
         </div>
       )}
 
+      {/* Modal de Confirmação de Exclusão */}
       {analysisToDelete !== null && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"

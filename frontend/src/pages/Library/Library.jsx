@@ -1,3 +1,9 @@
+/**
+ * Componente da Página da Base de Conhecimento (Library).
+ * Exibe os conteúdos salvos organizados com funcionalidades de busca textual em tempo real
+ * e filtragem dinâmica por categoria.
+ */
+
 import { useMemo, useState } from "react";
 import {
   BookOpen,
@@ -9,12 +15,18 @@ import {
 
 import { getHistory } from "../../services/history";
 
+/**
+ * Normaliza um texto garantindo que seja uma string válida e sem espaços sobressalentes.
+ */
 function normalizeText(value, fallback = "") {
   return typeof value === "string" && value.trim()
     ? value.trim()
     : fallback;
 }
 
+/**
+ * Extrai o título do conteúdo ou um fallback caso esteja ausente.
+ */
 function getContentTitle(item) {
   return normalizeText(
     item?.input?.titulo,
@@ -22,6 +34,9 @@ function getContentTitle(item) {
   );
 }
 
+/**
+ * Extrai a categoria do conteúdo.
+ */
 function getContentCategory(item) {
   return normalizeText(
     item?.summary?.categoria ??
@@ -30,10 +45,16 @@ function getContentCategory(item) {
   );
 }
 
+/**
+ * Extrai o corpo do texto do conteúdo.
+ */
 function getContentText(item) {
   return normalizeText(item?.input?.texto);
 }
 
+/**
+ * Extrai e normaliza as informações adicionais / palavras-chave do item do histórico.
+ */
 function getAdditionalInformation(item) {
   const additionalInformation =
     item?.response?.informacoesAdicionais;
@@ -65,10 +86,16 @@ function getAdditionalInformation(item) {
     .filter(Boolean);
 }
 
+/**
+ * Extrai a data de criação do item.
+ */
 function getContentDate(item) {
   return item?.createdAt ?? null;
 }
 
+/**
+ * Formata a data para exibição no padrão brasileiro.
+ */
 function formatDate(dateValue) {
   if (!dateValue) {
     return "Data não informada";
@@ -87,12 +114,15 @@ function formatDate(dateValue) {
 }
 
 function Library() {
+  // Estados para termo de busca e filtro de categoria
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] =
     useState("Todas");
 
+  // Recupera o histórico do localStorage
   const history = getHistory();
 
+  // Calcula dinamicamente a lista de categorias únicas para o selector de filtro
   const categories = useMemo(() => {
     const availableCategories = history
       .map(getContentCategory)
@@ -104,6 +134,7 @@ function Library() {
     ];
   }, [history]);
 
+  // Filtra e ordena os conteúdos conforme o termo digitado e a categoria selecionada
   const filteredContents = useMemo(() => {
     const normalizedSearch = searchTerm
       .trim()
@@ -125,6 +156,7 @@ function Library() {
             .join(" ")
             .toLowerCase();
 
+        // Verifica se o termo pesquisado combina com o título, categoria, texto ou palavras-chave
         const matchesSearch =
           normalizedSearch.length === 0 ||
           title.includes(normalizedSearch) ||
@@ -134,6 +166,7 @@ function Library() {
             normalizedSearch,
           );
 
+        // Verifica se a categoria corresponde à selecionada no filtro
         const matchesCategory =
           selectedCategory === "Todas" ||
           getContentCategory(item) ===
@@ -142,6 +175,7 @@ function Library() {
         return matchesSearch && matchesCategory;
       })
       .sort((firstItem, secondItem) => {
+        // Ordena por data decrescente (mais recentes primeiro)
         const firstDate = new Date(
           getContentDate(firstItem) ?? 0,
         ).getTime();
@@ -160,6 +194,7 @@ function Library() {
 
   return (
     <section>
+      {/* Cabeçalho da página */}
       <div className="mb-5 sm:mb-6">
         <h2 className="text-2xl font-bold text-white sm:text-3xl">
           Base de Conhecimento
@@ -171,8 +206,10 @@ function Library() {
         </p>
       </div>
 
+      {/* Caixa de Pesquisa e Filtro de Categoria */}
       <div className="rounded-3xl border border-white/10 bg-slate-900 p-4 sm:p-6">
         <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
+          {/* Input de Pesquisa */}
           <div className="relative">
             <Search
               size={18}
@@ -190,6 +227,7 @@ function Library() {
             />
           </div>
 
+          {/* Select de Categoria */}
           <select
             value={selectedCategory}
             onChange={(event) =>
@@ -210,6 +248,7 @@ function Library() {
           </select>
         </div>
 
+        {/* Contador de resultados */}
         <div className="mt-4 flex items-center gap-2 text-xs text-slate-400 sm:text-sm">
           <Database
             size={16}
@@ -224,6 +263,7 @@ function Library() {
           </span>
         </div>
 
+        {/* Estado Vazio ou Grid de Resultados */}
         {filteredContents.length === 0 ? (
           <div className="mt-5 flex min-h-56 flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-slate-950/60 p-6 text-center sm:mt-6 sm:min-h-64 sm:p-8">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300 sm:h-14 sm:w-14">
@@ -245,20 +285,11 @@ function Library() {
         ) : (
           <div className="mt-5 grid gap-4 sm:mt-6 lg:grid-cols-2">
             {filteredContents.map((item) => {
-              const title =
-                getContentTitle(item);
-
-              const category =
-                getContentCategory(item);
-
-              const text =
-                getContentText(item);
-
-              const additionalInformation =
-                getAdditionalInformation(item);
-
-              const date =
-                getContentDate(item);
+              const title = getContentTitle(item);
+              const category = getContentCategory(item);
+              const text = getContentText(item);
+              const additionalInformation = getAdditionalInformation(item);
+              const date = getContentDate(item);
 
               return (
                 <article
@@ -277,13 +308,8 @@ function Library() {
                         </h3>
 
                         <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
-                          <CalendarDays
-                            size={14}
-                          />
-
-                          <span>
-                            {formatDate(date)}
-                          </span>
+                          <CalendarDays size={14} />
+                          <span>{formatDate(date)}</span>
                         </div>
                       </div>
                     </div>
@@ -299,31 +325,6 @@ function Library() {
                     </p>
                   )}
 
-                  {additionalInformation.length >
-                    0 && (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {additionalInformation
-                        .slice(0, 5)
-                        .map(
-                          (
-                            information,
-                            index,
-                          ) => (
-                            <span
-                              key={`${information}-${index}`}
-                              className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300"
-                            >
-                              <Tag size={12} />
-
-                              {information}
-                            </span>
-                          ),
-                        )}
-
-                      {additionalInformation.length >
-                        5 && (
-                        <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-400">
-                          +
                           {additionalInformation.length -
                             5}
                         </span>

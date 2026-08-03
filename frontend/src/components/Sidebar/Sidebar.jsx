@@ -1,3 +1,15 @@
+/**
+ * Componente da Barra Lateral de Navegação (Sidebar).
+ * Exibe o menu principal com os links para cada rota da aplicação (Analisar, Dashboard, etc.),
+ * além da logo, nome do projeto e o indicador do status do servidor backend.
+ * Suporta modo Desktop (fixo na tela) e modo Mobile (gaveta deslizante com backdrop).
+ *
+ * @param {Object} props
+ * @param {boolean} props.isMobileOpen Indica se a gaveta do menu móvel está aberta
+ * @param {Function} props.onClose Função callback para fechar o menu móvel
+ * @param {string} props.backendStatus Estado do backend ("online", "offline" ou "checking")
+ */
+
 import {
   BarChart3,
   BookOpen,
@@ -11,6 +23,12 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
+/**
+ * Mapeia o status do backend para rótulo legível, cor do texto e ícone correspondente.
+ *
+ * @param {string} backendStatus Status da conexão com o servidor
+ * @returns {Object} { label, textColor, Icon }
+ */
 function getBackendStatusData(backendStatus) {
   switch (backendStatus) {
     case "online":
@@ -36,6 +54,9 @@ function getBackendStatusData(backendStatus) {
   }
 }
 
+/**
+ * Componente utilitário para renderizar o nome do projeto com estilo de cores.
+ */
 function ProjectName({ className = "" }) {
   return (
     <span className={className}>
@@ -50,6 +71,7 @@ function Sidebar({
   onClose,
   backendStatus,
 }) {
+  // Lista dos itens do menu principal da aplicação
   const menuItems = [
     {
       label: "Analisar Conteúdo",
@@ -84,8 +106,10 @@ function Sidebar({
   const BackendStatusIcon =
     backendStatusData.Icon;
 
+  // Conteúdo do menu que é reutilizado tanto na versão Desktop quanto na versão Mobile
   const content = (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5 sm:px-6">
+      {/* Cabeçalho da Sidebar com a Logo do Projeto */}
       <div className="mb-8 flex items-start gap-3">
         <img
           src="/logo-techmind.jpg"
@@ -104,6 +128,7 @@ function Sidebar({
         </div>
       </div>
 
+      {/* Navegação principal */}
       <nav className="space-y-1.5">
         {menuItems.map((item) => {
           const Icon = item.icon;
@@ -135,6 +160,7 @@ function Sidebar({
         })}
       </nav>
 
+      {/* Rodapé da Sidebar com informações da versão e status da API */}
       <div className="mt-auto pt-6">
         <div className="rounded-3xl border border-white/10 bg-slate-900 p-4 sm:p-5">
           <div className="mb-3 flex items-center gap-3">
@@ -158,6 +184,7 @@ function Sidebar({
             </div>
           </div>
 
+          {/* Widget do status da conexão com o Backend */}
           <div className="flex items-center gap-2 rounded-2xl bg-slate-950 px-3 py-3">
             <BackendStatusIcon
               size={17}
@@ -187,10 +214,12 @@ function Sidebar({
 
   return (
     <>
+      {/* Menu Fixo para Desktop (telas grandes >= 1024px) */}
       <aside className="hidden min-h-screen w-72 shrink-0 flex-col border-r border-white/10 bg-slate-950 lg:flex">
         {content}
       </aside>
 
+      {/* Menu Gaveta para Mobile (telas pequenas < 1024px) */}
       <div
         className={`fixed inset-0 z-50 lg:hidden ${
           isMobileOpen
@@ -199,6 +228,7 @@ function Sidebar({
         }`}
         aria-hidden={!isMobileOpen}
       >
+        {/* Backdrop escuro com efeito de desfoque */}
         <div
           className={`fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300 ${
             isMobileOpen
@@ -209,6 +239,7 @@ function Sidebar({
           aria-hidden="true"
         />
 
+        {/* Conteúdo deslizante do menu móvel */}
         <aside
           className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[calc(100vw-3rem)] flex-col bg-slate-950 shadow-2xl shadow-slate-950/80 transition-transform duration-300 ease-out ${
             isMobileOpen
@@ -216,6 +247,7 @@ function Sidebar({
               : "-translate-x-full"
           }`}
         >
+          {/* Botão de Fechar no topo do menu móvel */}
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-4 sm:px-6">
             <span className="text-sm font-semibold text-slate-400">
               Menu
