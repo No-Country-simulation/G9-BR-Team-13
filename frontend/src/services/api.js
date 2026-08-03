@@ -1,6 +1,18 @@
+/**
+ * Módulo de comunicação HTTP com o serviço Backend.
+ * Centraliza as requisições de verificação de status e análise de conteúdo.
+ */
+
+// URL base do Backend obtida das variáveis de ambiente (Vite) com fallback local
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:8080";
 
+/**
+ * Extrai e formata a mensagem de erro retornada pelo backend ou gera uma mensagem padrão.
+ *
+ * @param {Object|null} errorData Objeto contendo dados da resposta de erro do servidor
+ * @returns {string} Mensagem amigável descrevendo o erro ocorrido
+ */
 function getErrorMessage(errorData) {
   if (!errorData || typeof errorData !== "object") {
     return "Erro ao comunicar com o servidor.";
@@ -14,6 +26,7 @@ function getErrorMessage(errorData) {
     return errorData.message;
   }
 
+  // Tratamento para mensagens de validação vindas como pares chave/valor no objeto
   const validationMessages = Object.values(errorData).filter(
     (value) => typeof value === "string",
   );
@@ -25,6 +38,13 @@ function getErrorMessage(errorData) {
   return "Não foi possível processar a solicitação.";
 }
 
+/**
+ * Normaliza os dados recebidos da API backend garantindo valores padrão
+ * e estrutura consistente para o restante do sistema frontend.
+ *
+ * @param {Object} data Objeto retornado pela API backend
+ * @returns {Object} Dados padronizados com categoria, probabilidade e informacoesAdicionais
+ */
 function normalizeResponse(data) {
   const additionalInformation =
     data?.informacoesAdicionais ??
@@ -50,9 +70,16 @@ function normalizeResponse(data) {
   };
 }
 
+/**
+ * Verifica o status de disponibilidade do servidor backend enviando uma requisição GET.
+ * Possui um limite de tempo (timeout) de 5 segundos.
+ *
+ * @returns {Promise<boolean>} Retorna true se o backend respondeu, ou false caso contrário
+ */
 export async function checkBackendStatus() {
   const controller = new AbortController();
 
+  // Define um tempo limite de 5 segundos para cancelar a requisição se demorar muito
   const timeoutId = window.setTimeout(() => {
     controller.abort();
   }, 5000);
@@ -72,6 +99,13 @@ export async function checkBackendStatus() {
   }
 }
 
+/**
+ * Submete um conteúdo técnico (título e texto) para ser analisado e classificado pelo Backend.
+ *
+ * @param {Object} payload Objeto contendo { titulo, texto }
+ * @returns {Promise<Object>} Dados normalizados do resultado da análise
+ * @throws {Error} Lança exceção com a mensagem amigável em caso de falha
+ */
 export async function analyzeContent(payload) {
   let response;
 

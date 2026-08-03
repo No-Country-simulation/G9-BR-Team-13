@@ -1,3 +1,10 @@
+/**
+ * Componente da Página de Dashboard.
+ * Apresenta uma visão geral consolidada da utilização da plataforma, exibindo cartões de métricas
+ * (total de análises realizadas, tamanho da base de conhecimento, data da última análise)
+ * e uma lista com as 3 análises mais recentes do histórico.
+ */
+
 import {
   Activity,
   BookOpen,
@@ -7,6 +14,12 @@ import {
 
 import { getHistory } from "../../services/history";
 
+/**
+ * Formata uma string ou objeto de data no padrão brasileiro (dd/mm/aaaa hh:mm).
+ *
+ * @param {string|Date} dateValue Data a ser formatada
+ * @returns {string} Data formatada ou "--" se for inválida
+ */
 function formatDate(dateValue) {
   if (!dateValue) {
     return "--";
@@ -24,6 +37,12 @@ function formatDate(dateValue) {
   }).format(date);
 }
 
+/**
+ * Converte um valor numérico de probabilidade/confiança para string percentual com 1 casa decimal.
+ *
+ * @param {number|string} probability Probabilidade (de 0 a 1 ou de 0 a 100)
+ * @returns {string} Confiança formatada (ex: "95.5%")
+ */
 function formatConfidence(probability) {
   const numericProbability = Number(probability);
 
@@ -40,10 +59,13 @@ function formatConfidence(probability) {
 }
 
 function Dashboard() {
+  // Busca todas as análises salvas no localStorage
   const history = getHistory();
+  // Filtra apenas as 3 análises mais recentes
   const recentAnalyses = history.slice(0, 3);
   const lastAnalysis = history[0];
 
+  // Configuração dos cartões de métricas do topo do Dashboard
   const summaryCards = [
     {
       title: "Análises realizadas",
@@ -80,6 +102,7 @@ function Dashboard() {
 
   return (
     <section>
+      {/* Título e descrição da página */}
       <div className="mb-5 sm:mb-6">
         <h2 className="text-2xl font-bold text-white sm:text-3xl">
           Dashboard
@@ -90,6 +113,7 @@ function Dashboard() {
         </p>
       </div>
 
+      {/* Grid com cartões de indicadores/métricas */}
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
         {summaryCards.map((card) => {
           const Icon = card.icon;
@@ -119,6 +143,7 @@ function Dashboard() {
         })}
       </div>
 
+      {/* Seção de atividade recente */}
       <div className="mt-5 rounded-3xl border border-white/10 bg-slate-900 p-4 sm:mt-6 sm:p-6">
         <h3 className="text-lg font-bold text-white sm:text-xl">
           Atividade recente

@@ -1,3 +1,12 @@
+/**
+ * Componente de Conteúdos Relacionados (RelatedContent).
+ * Exibe cartões com recomendações de análises/documentações anteriores com base na similaridade.
+ * Também inclui uma janela modal acessível para leitura do texto completo do item selecionado.
+ *
+ * @param {Object} props
+ * @param {Array<Object>} [props.items=[]] Lista de conteúdos relacionados recomendados
+ */
+
 import { useEffect, useState } from "react";
 import {
   BookOpen,
@@ -7,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 
+// Mapeamento de tipos de conteúdo para ícones representativos
 const iconMap = {
   repository: GitBranch,
   database: Layers3,
@@ -14,12 +24,15 @@ const iconMap = {
 };
 
 function RelatedContent({ items = [] }) {
+  // Estado que armazena o item selecionado para ser exibido na modal
   const [selectedContent, setSelectedContent] = useState(null);
 
+  // Fecha a modal zerando o item selecionado
   function closeModal() {
     setSelectedContent(null);
   }
 
+  // Efeito para fechar a modal pressionando a tecla 'Escape' e bloquear a rolagem de fundo
   useEffect(() => {
     if (!selectedContent) {
       return undefined;
@@ -42,6 +55,7 @@ function RelatedContent({ items = [] }) {
 
   return (
     <>
+      {/* Seção Principal de Cards de Conteúdo Relacionado */}
       <section className="mt-5 rounded-3xl border border-white/10 bg-slate-900 p-4 shadow-2xl shadow-slate-950/40 sm:mt-6 sm:p-6">
         <div className="mb-5 sm:mb-6">
           <h3 className="text-lg font-bold text-white sm:text-xl">
@@ -82,18 +96,22 @@ function RelatedContent({ items = [] }) {
                     </button>
                   </div>
 
+                  {/* Tag de categoria */}
                   <span className="inline-flex rounded-full bg-purple-400/10 px-2.5 py-0.5 text-xs font-medium text-purple-300 sm:px-3 sm:py-1">
                     {content.category}
                   </span>
 
+                  {/* Título do Conteúdo */}
                   <h4 className="mt-3 text-base font-bold text-white sm:mt-4 sm:text-lg">
                     {content.title}
                   </h4>
 
+                  {/* Resumo/Descrição */}
                   <p className="mt-1.5 line-clamp-3 text-xs leading-5 text-slate-400 sm:mt-2 sm:text-sm sm:leading-6">
                     {content.description}
                   </p>
 
+                  {/* Botão de ação para abrir a modal */}
                   <button
                     type="button"
                     onClick={() => setSelectedContent(content)}
@@ -109,6 +127,7 @@ function RelatedContent({ items = [] }) {
         )}
       </section>
 
+      {/* Janela Modal de Visualização Detalhada */}
       {selectedContent && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
@@ -122,6 +141,7 @@ function RelatedContent({ items = [] }) {
             aria-labelledby="related-content-modal-title"
             onMouseDown={(event) => event.stopPropagation()}
           >
+            {/* Cabeçalho da Modal */}
             <div className="flex items-start justify-between gap-4 border-b border-white/10 px-4 py-4 sm:px-6 sm:py-5">
               <div className="min-w-0 flex-1">
                 <span className="inline-flex rounded-full bg-purple-400/10 px-3 py-1 text-xs font-medium text-purple-300">
@@ -146,6 +166,7 @@ function RelatedContent({ items = [] }) {
               </button>
             </div>
 
+            {/* Corpo da Modal com o texto integral */}
             <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
                 {(() => {
@@ -162,6 +183,7 @@ function RelatedContent({ items = [] }) {
               </p>
             </div>
 
+            {/* Rodapé da Modal */}
             <div className="flex justify-end border-t border-white/10 px-4 py-3 sm:px-6 sm:py-4">
               <button
                 type="button"
