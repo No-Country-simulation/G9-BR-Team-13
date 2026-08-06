@@ -30,7 +30,21 @@ function normalizeResponse(data) {
     data?.informacoesAdicionais ??
     data?.informacoes_adicionais;
 
+  const createdAt = data?.criadoEm ?? data?.criado_em;
+
   return {
+    id: data?.id ?? null,
+
+    titulo:
+      typeof data?.titulo === "string"
+        ? data.titulo
+        : null,
+
+    texto:
+      typeof data?.texto === "string"
+        ? data.texto
+        : null,
+
     categoria:
       typeof data?.categoria === "string" &&
       data.categoria.trim()
@@ -47,6 +61,9 @@ function normalizeResponse(data) {
     )
       ? additionalInformation
       : [],
+
+    criadoEm:
+      typeof createdAt === "string" ? createdAt : null,
   };
 }
 
@@ -129,10 +146,16 @@ export async function searchContents(searchTerm = "") {
     return [];
   }
 
-  return data.map((item, index) => ({
-    id: `${item?.categoria ?? "conteudo"}-${index}`,
-    ...normalizeResponse(item),
-  }));
+  return data.map((item, index) => {
+    const normalized = normalizeResponse(item);
+
+    return {
+      ...normalized,
+      id:
+        normalized.id ??
+        `${normalized.categoria}-${index}`,
+    };
+  });
 }
 
 export async function analyzeContent(payload) {
