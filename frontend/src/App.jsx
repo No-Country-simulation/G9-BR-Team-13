@@ -1,4 +1,9 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout/MainLayout";
 import Analysis from "./pages/Analysis/Analysis";
@@ -12,12 +17,40 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/analisar" element={<Analysis />} />
-          <Route path="/base-conhecimento" element={<Library />} />
-          <Route path="/historico" element={<History />} />
-          <Route path="/configuracoes" element={<Settings />} />
+          <Route
+            path="/"
+            element={
+              <Navigate
+                to="/analisar"
+                replace
+              />
+            }
+          />
+
+          <Route
+            path="/analisar"
+            element={<Analysis />}
+          />
+
+          <Route
+            path="/dashboard"
+            element={<Dashboard />}
+          />
+
+          <Route
+            path="/base-conhecimento"
+            element={<Library />}
+          />
+
+          <Route
+            path="/historico"
+            element={<History />}
+          />
+
+          <Route
+            path="/configuracoes"
+            element={<Settings />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>
