@@ -6,11 +6,16 @@ import JsonViewer from "../../components/JsonViewer/JsonViewer";
 import RelatedContent from "../../components/RelatedContent/RelatedContent";
 import ResultCard from "../../components/ResultCard/ResultCard";
 import StatusCards from "../../components/StatusCards/StatusCards";
+import {
+  getAnalysisSession,
+  saveAnalysisSession,
+} from "../../services/analysisSession";
 import { analyzeContent } from "../../services/api";
 import {
   getRelatedAnalyses,
   saveAnalysis,
 } from "../../services/history";
+import { getRelatedContentLimit } from "../../services/preferences";
 
 function Home() {
   const outletContext = useOutletContext();
@@ -18,9 +23,22 @@ function Home() {
   const backendStatus =
     outletContext?.backendStatus ?? "checking";
 
+  const [initialSession] = useState(() =>
+    getAnalysisSession(),
+  );
+
   const [result, setResult] = useState(null);
-  const [relatedContents, setRelatedContents] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [
+    relatedContents,
+    setRelatedContents,
+  ] = useState(
+    initialSession.relatedContents,
+  );
+
+  const [isLoading, setIsLoading] =
+    useState(false);
+
   const [error, setError] = useState(null);
 
   async function handleAnalyze(payload) {
@@ -29,19 +47,29 @@ function Home() {
     setRelatedContents([]);
 
     try {
-      const response = await analyzeContent(payload);
-
-      setResult(response);
+      const response =
+        await analyzeContent(payload);
 
       const savedAnalysis = saveAnalysis(
         response,
         payload,
       );
 
-      const relatedAnalyses =
-        getRelatedAnalyses(savedAnalysis);
+      const relatedContentLimit =
+        getRelatedContentLimit();
 
+      const relatedAnalyses =
+        getRelatedAnalyses(
+          savedAnalysis,
+          relatedContentLimit,
+        );
+
+      setResult(response);
       setRelatedContents(relatedAnalyses);
+
+      saveAnalysisSession(
+        relatedAnalyses,
+      );
 
       return true;
     } catch (requestError) {
@@ -61,7 +89,9 @@ function Home() {
 
   return (
     <>
-      <StatusCards backendStatus={backendStatus} />
+      <StatusCards
+        backendStatus={backendStatus}
+      />
 
       <section className="grid gap-5 lg:gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <AnalysisForm
@@ -73,9 +103,13 @@ function Home() {
         <ResultCard result={result} />
       </section>
 
-      {result && <JsonViewer data={result} />}
+      {result && (
+        <JsonViewer data={result} />
+      )}
 
-      <RelatedContent items={relatedContents} />
+      <RelatedContent
+        items={relatedContents}
+      />
     </>
   );
 }

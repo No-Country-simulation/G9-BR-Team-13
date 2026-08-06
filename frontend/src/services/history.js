@@ -161,6 +161,19 @@ function createRelatedContent(historyItem) {
   };
 }
 
+function createExportFileName() {
+  const now = new Date();
+
+  const date = now.toISOString().slice(0, 10);
+
+  const time = now
+    .toTimeString()
+    .slice(0, 8)
+    .replaceAll(":", "-");
+
+  return `techmind-historico-${date}-${time}.json`;
+}
+
 export function getHistory() {
   try {
     const storedHistory = localStorage.getItem(
@@ -238,6 +251,58 @@ export function getRelatedAnalyses(
     .map(({ historyItem }) =>
       createRelatedContent(historyItem),
     );
+}
+
+export function exportHistoryAsJson() {
+  const history = getHistory();
+
+  if (history.length === 0) {
+    return {
+      success: false,
+      message: "Nenhuma análise disponível para exportação.",
+    };
+  }
+
+  const exportData = {
+    projeto: "TechMind",
+    exportadoEm: new Date().toISOString(),
+    totalDeAnalises: history.length,
+    analises: history,
+  };
+
+  const jsonContent = JSON.stringify(
+    exportData,
+    null,
+    2,
+  );
+
+  const fileBlob = new Blob(
+    [jsonContent],
+    {
+      type: "application/json;charset=utf-8",
+    },
+  );
+
+  const fileUrl = URL.createObjectURL(fileBlob);
+  const downloadLink = document.createElement("a");
+
+  downloadLink.href = fileUrl;
+  downloadLink.download = createExportFileName();
+
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  downloadLink.remove();
+
+  URL.revokeObjectURL(fileUrl);
+
+  return {
+    success: true,
+    message: `${history.length} ${
+      history.length === 1
+        ? "análise exportada"
+        : "análises exportadas"
+    } com sucesso.`,
+  };
 }
 
 export function deleteAnalysis(id) {
