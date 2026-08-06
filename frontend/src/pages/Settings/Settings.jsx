@@ -4,6 +4,7 @@ import {
   Download,
   FileJson,
   Info,
+  Layers3,
   Moon,
   Palette,
   Sun,
@@ -20,6 +21,10 @@ import {
   exportHistoryAsJson,
   getHistory,
 } from "../../services/history";
+import {
+  getRelatedContentLimit,
+  saveRelatedContentLimit,
+} from "../../services/preferences";
 import {
   getStoredTheme,
   saveTheme,
@@ -44,14 +49,41 @@ const themeOptions = [
   },
 ];
 
+const relatedContentOptions = [
+  {
+    value: 3,
+    title: "3 conteúdos",
+    description:
+      "Exibição compacta e direta.",
+  },
+  {
+    value: 5,
+    title: "5 conteúdos",
+    description:
+      "Equilíbrio entre variedade e espaço.",
+  },
+  {
+    value: 10,
+    title: "10 conteúdos",
+    description:
+      "Maior quantidade de sugestões relacionadas.",
+  },
+];
+
 function Settings() {
   const [theme, setTheme] = useState(() =>
     getStoredTheme(),
   );
 
-  const [historyCount, setHistoryCount] = useState(
-    () => getHistory().length,
+  const [
+    relatedContentLimit,
+    setRelatedContentLimit,
+  ] = useState(() =>
+    getRelatedContentLimit(),
   );
+
+  const [historyCount, setHistoryCount] =
+    useState(() => getHistory().length);
 
   const [exportMessage, setExportMessage] =
     useState("");
@@ -66,9 +98,19 @@ function Settings() {
     useState(false);
 
   function handleThemeChange(selectedTheme) {
-    const savedTheme = saveTheme(selectedTheme);
+    const savedTheme =
+      saveTheme(selectedTheme);
 
     setTheme(savedTheme);
+  }
+
+  function handleRelatedContentLimitChange(
+    selectedLimit,
+  ) {
+    const savedLimit =
+      saveRelatedContentLimit(selectedLimit);
+
+    setRelatedContentLimit(savedLimit);
   }
 
   function handleExportHistory() {
@@ -174,6 +216,7 @@ function Settings() {
           >
             {themeOptions.map((option) => {
               const Icon = option.icon;
+
               const isSelected =
                 theme === option.value;
 
@@ -184,7 +227,9 @@ function Settings() {
                   role="radio"
                   aria-checked={isSelected}
                   onClick={() =>
-                    handleThemeChange(option.value)
+                    handleThemeChange(
+                      option.value,
+                    )
                   }
                   className={`relative rounded-3xl border p-4 text-left transition sm:p-5 ${
                     isSelected
@@ -234,6 +279,87 @@ function Settings() {
                 : "Claro"}
             </strong>
             . A preferência fica salva automaticamente.
+          </p>
+        </article>
+
+        <article className="mt-5 rounded-3xl border border-white/10 bg-slate-900 p-4 sm:mt-6 sm:p-6">
+          <div className="mb-5 flex items-start gap-3 sm:mb-6">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
+              <Layers3 size={21} />
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <h3 className="text-lg font-bold text-white sm:text-xl">
+                Conteúdos relacionados
+              </h3>
+
+              <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+                Defina quantas sugestões serão exibidas
+                depois de cada análise.
+              </p>
+            </div>
+          </div>
+
+          <div
+            className="grid gap-3 sm:grid-cols-3"
+            role="radiogroup"
+            aria-label="Quantidade de conteúdos relacionados"
+          >
+            {relatedContentOptions.map(
+              (option) => {
+                const isSelected =
+                  relatedContentLimit ===
+                  option.value;
+
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() =>
+                      handleRelatedContentLimitChange(
+                        option.value,
+                      )
+                    }
+                    className={`relative rounded-3xl border p-4 text-left transition sm:p-5 ${
+                      isSelected
+                        ? "border-cyan-400 bg-cyan-400/10"
+                        : "border-white/10 bg-slate-950/40 hover:border-cyan-400/40"
+                    }`}
+                  >
+                    {isSelected && (
+                      <span className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full bg-cyan-400 text-slate-950">
+                        <Check size={16} />
+                      </span>
+                    )}
+
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-400/10 text-lg font-bold text-cyan-300">
+                      {option.value}
+                    </div>
+
+                    <h4 className="mt-4 pr-8 text-base font-bold text-white">
+                      {option.title}
+                    </h4>
+
+                    <p className="mt-1.5 text-xs leading-5 text-slate-400 sm:text-sm">
+                      {option.description}
+                    </p>
+                  </button>
+                );
+              },
+            )}
+          </div>
+
+          <p
+            className="mt-4 text-xs text-slate-500 sm:text-sm"
+            aria-live="polite"
+          >
+            O TechMind exibirá até{" "}
+            <strong className="text-cyan-300">
+              {relatedContentLimit}
+            </strong>{" "}
+            conteúdos relacionados após cada análise.
           </p>
         </article>
 
