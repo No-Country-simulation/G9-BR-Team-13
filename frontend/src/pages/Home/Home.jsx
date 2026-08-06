@@ -6,6 +6,10 @@ import JsonViewer from "../../components/JsonViewer/JsonViewer";
 import RelatedContent from "../../components/RelatedContent/RelatedContent";
 import ResultCard from "../../components/ResultCard/ResultCard";
 import StatusCards from "../../components/StatusCards/StatusCards";
+import {
+  getAnalysisSession,
+  saveAnalysisSession,
+} from "../../services/analysisSession";
 import { analyzeContent } from "../../services/api";
 import {
   getRelatedAnalyses,
@@ -19,10 +23,18 @@ function Home() {
   const backendStatus =
     outletContext?.backendStatus ?? "checking";
 
+  const [initialSession] = useState(() =>
+    getAnalysisSession(),
+  );
+
   const [result, setResult] = useState(null);
 
-  const [relatedContents, setRelatedContents] =
-    useState([]);
+  const [
+    relatedContents,
+    setRelatedContents,
+  ] = useState(
+    initialSession.relatedContents,
+  );
 
   const [isLoading, setIsLoading] =
     useState(false);
@@ -38,8 +50,6 @@ function Home() {
       const response =
         await analyzeContent(payload);
 
-      setResult(response);
-
       const savedAnalysis = saveAnalysis(
         response,
         payload,
@@ -54,7 +64,12 @@ function Home() {
           relatedContentLimit,
         );
 
+      setResult(response);
       setRelatedContents(relatedAnalyses);
+
+      saveAnalysisSession(
+        relatedAnalyses,
+      );
 
       return true;
     } catch (requestError) {
