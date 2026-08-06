@@ -15,8 +15,18 @@
     text-size-adjust: 100%;
   }
 
+  html,
   body {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
     overscroll-behavior: none;
+    background-color: #020617;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
   }
 
   :root {
@@ -27,6 +37,357 @@
   }
 }
 
+/* =========================================================
+   TEMA CLARO TECHMIND
+   Cinza-azulado corporativo com contraste reforçado
+   ========================================================= */
+
+html[data-theme="light"] body {
+  background-color: #d9e2ec;
+  color: #0f172a;
+}
+
+/* Fundo geral */
+
+html[data-theme="light"] .bg-slate-950 {
+  background-color: #d9e2ec !important;
+}
+
+/* Cards principais */
+
+html[data-theme="light"] .bg-slate-900 {
+  background-color: #becddd !important;
+}
+
+/* Superfícies secundárias */
+
+html[data-theme="light"] .bg-slate-800 {
+  background-color: #aebfd1 !important;
+}
+
+html[data-theme="light"] .bg-slate-700 {
+  background-color: #9fb2c7 !important;
+}
+
+/* Áreas internas dos cards */
+
+html[data-theme="light"] .bg-slate-950\/60 {
+  background-color: rgba(235, 241, 247, 0.96) !important;
+}
+
+html[data-theme="light"] .bg-slate-950\/40 {
+  background-color: rgba(225, 233, 241, 0.92) !important;
+}
+
+html[data-theme="light"] .bg-white\/5 {
+  background-color: #becddd !important;
+}
+
+html[data-theme="light"] .bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Bordas */
+
+html[data-theme="light"] .border-white\/10 {
+  border-color: #93a8bd !important;
+}
+
+html[data-theme="light"] .border-slate-600 {
+  border-color: #8299b0 !important;
+}
+
+html[data-theme="light"] .border-slate-700 {
+  border-color: #93a8bd !important;
+}
+
+/* Textos neutros */
+
+html[data-theme="light"] .text-white {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .text-slate-200 {
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .text-slate-300 {
+  color: #29394d !important;
+}
+
+html[data-theme="light"] .text-slate-400 {
+  color: #40536a !important;
+}
+
+html[data-theme="light"] .text-slate-500 {
+  color: #586b80 !important;
+}
+
+html[data-theme="light"] .text-slate-600 {
+  color: #718399 !important;
+}
+
+/* =========================================================
+   CORES DE DESTAQUE COM MAIS CONTRASTE
+   ========================================================= */
+
+/* Ciano / azul do projeto */
+
+html[data-theme="light"] .text-cyan-200 {
+  color: #0e7490 !important;
+}
+
+html[data-theme="light"] .text-cyan-300 {
+  color: #0891b2 !important;
+}
+
+html[data-theme="light"] .text-cyan-400 {
+  color: #0369a1 !important;
+}
+
+html[data-theme="light"] .bg-cyan-400\/10,
+html[data-theme="light"] .bg-cyan-500\/10 {
+  background-color: rgba(14, 165, 233, 0.18) !important;
+}
+
+html[data-theme="light"] .border-cyan-400\/20,
+html[data-theme="light"] .border-cyan-400\/30,
+html[data-theme="light"] .border-cyan-400\/40,
+html[data-theme="light"] .border-cyan-500 {
+  border-color: #38bdf8 !important;
+}
+
+/* Verde / online */
+
+html[data-theme="light"] .text-emerald-300 {
+  color: #15803d !important;
+}
+
+html[data-theme="light"] .text-emerald-400 {
+  color: #166534 !important;
+}
+
+html[data-theme="light"] .bg-emerald-400\/10 {
+  background-color: rgba(34, 197, 94, 0.18) !important;
+}
+
+html[data-theme="light"] .border-emerald-400\/30 {
+  border-color: #4ade80 !important;
+}
+
+/* Roxo */
+
+html[data-theme="light"] .text-purple-300 {
+  color: #7e22ce !important;
+}
+
+html[data-theme="light"] .text-purple-400 {
+  color: #6b21a8 !important;
+}
+
+html[data-theme="light"] .bg-purple-400\/10 {
+  background-color: rgba(147, 51, 234, 0.16) !important;
+}
+
+/* Amarelo / laranja */
+
+html[data-theme="light"] .text-amber-300 {
+  color: #b45309 !important;
+}
+
+html[data-theme="light"] .text-amber-400 {
+  color: #92400e !important;
+}
+
+html[data-theme="light"] .bg-amber-400\/10 {
+  background-color: rgba(245, 158, 11, 0.17) !important;
+}
+
+/* Vermelho */
+
+html[data-theme="light"] .text-red-300,
+html[data-theme="light"] .text-red-400 {
+  color: #b91c1c !important;
+}
+
+html[data-theme="light"] .bg-red-400\/10,
+html[data-theme="light"] .bg-red-500\/10 {
+  background-color: rgba(239, 68, 68, 0.14) !important;
+}
+
+html[data-theme="light"] .border-red-400\/20,
+html[data-theme="light"] .border-red-500\/30,
+html[data-theme="light"] .border-red-500\/70 {
+  border-color: #f87171 !important;
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+html[data-theme="light"] aside.bg-slate-950 {
+  background-color: #a8bbcf !important;
+  border-color: #7f96ad !important;
+}
+
+html[data-theme="light"] aside .bg-slate-900 {
+  background-color: #b8c8d8 !important;
+}
+
+html[data-theme="light"] aside .bg-slate-950 {
+  background-color: #d2dde7 !important;
+}
+
+/* Item ativo do menu */
+
+html[data-theme="light"] aside a[aria-current="page"] {
+  background-color: #7eb8dc !important;
+  color: #075985 !important;
+}
+
+html[data-theme="light"] aside a[aria-current="page"] svg {
+  color: #0369a1 !important;
+}
+
+/* Hover do menu */
+
+html[data-theme="light"] aside a:hover {
+  background-color: #96b9d2 !important;
+  color: #0f172a !important;
+}
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+
+html[data-theme="light"] header.bg-white\/5 {
+  background-color: #becddd !important;
+  border-color: #93a8bd !important;
+}
+
+/* =========================================================
+   FORMULÁRIOS
+   ========================================================= */
+
+html[data-theme="light"] input,
+html[data-theme="light"] textarea,
+html[data-theme="light"] select {
+  background-color: #eef3f7 !important;
+  color: #0f172a !important;
+  border-color: #93a8bd !important;
+}
+
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder {
+  color: #718399 !important;
+}
+
+html[data-theme="light"] option {
+  background-color: #eef3f7;
+  color: #0f172a;
+}
+
+html[data-theme="light"] input:focus,
+html[data-theme="light"] textarea:focus,
+html[data-theme="light"] select:focus {
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.16);
+}
+
+/* =========================================================
+   BADGES E PALAVRAS-CHAVE
+   ========================================================= */
+
+html[data-theme="light"] .rounded-full.bg-cyan-400\/10,
+html[data-theme="light"] .rounded-full.bg-cyan-500\/10 {
+  background-color: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border-color: #93c5fd !important;
+}
+
+html[data-theme="light"] .rounded-full.bg-purple-400\/10 {
+  background-color: #ede9fe !important;
+  color: #6d28d9 !important;
+  border-color: #c4b5fd !important;
+}
+
+html[data-theme="light"] .rounded-full.bg-emerald-400\/10 {
+  background-color: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #86efac !important;
+}
+
+html[data-theme="light"] .rounded-full.bg-amber-400\/10 {
+  background-color: #fef3c7 !important;
+  color: #b45309 !important;
+  border-color: #fcd34d !important;
+}
+
+/* =========================================================
+   HOVERS
+   ========================================================= */
+
+html[data-theme="light"] .hover\:bg-white\/5:hover,
+html[data-theme="light"] .hover\:bg-white\/10:hover {
+  background-color: #d5dfe9 !important;
+}
+
+html[data-theme="light"] .hover\:bg-slate-700:hover,
+html[data-theme="light"] .hover\:bg-slate-800:hover {
+  background-color: #a3b5c8 !important;
+}
+
+html[data-theme="light"] .hover\:text-cyan-200:hover,
+html[data-theme="light"] .hover\:text-cyan-300:hover {
+  color: #075985 !important;
+}
+
+/* =========================================================
+   SOMBRAS
+   ========================================================= */
+
+html[data-theme="light"] .shadow-slate-950\/30,
+html[data-theme="light"] .shadow-slate-950\/40,
+html[data-theme="light"] .shadow-slate-950\/80 {
+  --tw-shadow-color: rgba(71, 85, 105, 0.18) !important;
+}
+
+/* =========================================================
+   MODAIS
+   ========================================================= */
+
+html[data-theme="light"] .bg-slate-950\/80 {
+  background-color: rgba(2, 6, 23, 0.8) !important;
+}
+
+html[data-theme="light"] [role="dialog"].bg-slate-900 {
+  background-color: #d5e0ea !important;
+}
+
+/* JSON */
+
+html[data-theme="light"] pre.bg-slate-950 {
+  background-color: #172033 !important;
+  color: #a5f3fc !important;
+}
+
+html[data-theme="light"] pre .text-cyan-200 {
+  color: #a5f3fc !important;
+}
+
+/* =========================================================
+   RODAPÉ
+   ========================================================= */
+
+html[data-theme="light"] footer {
+  border-color: #93a8bd !important;
+  color: #586b80 !important;
+}
+
+/* =========================================================
+   RESPONSIVIDADE E ACESSIBILIDADE
+   ========================================================= */
+
 @media (pointer: coarse) {
   input,
   select,
@@ -34,5 +395,16 @@
   button,
   a {
     min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

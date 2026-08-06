@@ -1,10 +1,47 @@
 import {
-  Database,
-  Server,
-  Settings as SettingsIcon,
+  Check,
+  Info,
+  Moon,
+  Palette,
+  Sun,
 } from "lucide-react";
+import { useState } from "react";
+
+import {
+  getStoredTheme,
+  saveTheme,
+} from "../../services/theme";
+
+const themeOptions = [
+  {
+    value: "dark",
+    title: "Tema escuro",
+    description:
+      "Interface atual do TechMind, com fundos escuros e destaques em azul.",
+    icon: Moon,
+    previewClass: "bg-slate-950",
+  },
+  {
+    value: "light",
+    title: "Tema claro",
+    description:
+      "Visual claro e profissional, inspirado em interfaces corporativas.",
+    icon: Sun,
+    previewClass: "bg-slate-100",
+  },
+];
 
 function Settings() {
+  const [theme, setTheme] = useState(() =>
+    getStoredTheme(),
+  );
+
+  function handleThemeChange(selectedTheme) {
+    const savedTheme = saveTheme(selectedTheme);
+
+    setTheme(savedTheme);
+  }
+
   return (
     <section>
       <div className="mb-5 sm:mb-6">
@@ -13,71 +50,104 @@ function Settings() {
         </h2>
 
         <p className="mt-1.5 text-sm text-slate-400 sm:mt-2">
-          Informações e preferências da plataforma.
+          Personalize a aparência e as preferências da
+          plataforma.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:gap-6 xl:grid-cols-2">
-        <article className="rounded-3xl border border-white/10 bg-slate-900 p-4 sm:p-6">
-          <div className="mb-3 flex items-center gap-3 sm:mb-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300 sm:h-11 sm:w-11">
-              <Server size={20} />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <h3 className="font-bold text-white">
-                Configuração da API
-              </h3>
-
-              <p className="text-xs text-slate-500 sm:text-sm">
-                Endereço utilizado pelo frontend
-              </p>
-            </div>
+      <article className="rounded-3xl border border-white/10 bg-slate-900 p-4 sm:p-6">
+        <div className="mb-5 flex items-start gap-3 sm:mb-6">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
+            <Palette size={21} />
           </div>
 
-          <div className="rounded-2xl bg-slate-950 p-3 sm:p-4">
-            <p className="text-xs text-slate-500">
-              URL padrão
-            </p>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg font-bold text-white sm:text-xl">
+              Aparência
+            </h3>
 
-            <p className="mt-1 break-all text-xs text-slate-300 sm:text-sm">
-              http://localhost:8080
+            <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+              Escolha como o TechMind será exibido neste
+              navegador.
             </p>
           </div>
-        </article>
+        </div>
 
-        <article className="rounded-3xl border border-white/10 bg-slate-900 p-4 sm:p-6">
-          <div className="mb-3 flex items-center gap-3 sm:mb-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-purple-400/10 text-purple-300 sm:h-11 sm:w-11">
-              <Database size={20} />
-            </div>
+        <div
+          className="grid gap-3 sm:grid-cols-2 sm:gap-4"
+          role="radiogroup"
+          aria-label="Tema da plataforma"
+        >
+          {themeOptions.map((option) => {
+            const Icon = option.icon;
+            const isSelected =
+              theme === option.value;
 
-            <div className="min-w-0 flex-1">
-              <h3 className="font-bold text-white">
-                Armazenamento
-              </h3>
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                onClick={() =>
+                  handleThemeChange(option.value)
+                }
+                className={`relative rounded-3xl border p-4 text-left transition sm:p-5 ${
+                  isSelected
+                    ? "border-cyan-400 bg-cyan-400/10"
+                    : "border-white/10 bg-slate-950/40 hover:border-cyan-400/40"
+                }`}
+              >
+                {isSelected && (
+                  <span className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full bg-cyan-400 text-slate-950">
+                    <Check size={16} />
+                  </span>
+                )}
 
-              <p className="text-xs text-slate-500 sm:text-sm">
-                Integração com banco e OCI
-              </p>
-            </div>
-          </div>
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 ${option.previewClass}`}
+                >
+                  <Icon
+                    size={22}
+                    className={
+                      option.value === "dark"
+                        ? "text-cyan-300"
+                        : "text-amber-500"
+                    }
+                  />
+                </div>
 
-          <div className="rounded-2xl bg-slate-950 p-3 sm:p-4">
-            <p className="text-xs text-slate-400 sm:text-sm">
-              As configurações de armazenamento serão disponibilizadas
-              futuramente.
-            </p>
-          </div>
-        </article>
-      </div>
+                <h4 className="mt-4 pr-8 text-base font-bold text-white">
+                  {option.title}
+                </h4>
+
+                <p className="mt-1.5 text-xs leading-5 text-slate-400 sm:text-sm sm:leading-6">
+                  {option.description}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+
+        <p
+          className="mt-4 text-xs text-slate-500 sm:text-sm"
+          aria-live="polite"
+        >
+          Tema selecionado:{" "}
+          <strong className="text-cyan-300">
+            {theme === "dark"
+              ? "Escuro"
+              : "Claro"}
+          </strong>
+          . A preferência fica salva automaticamente.
+        </p>
+      </article>
 
       <article className="mt-5 rounded-3xl border border-white/10 bg-slate-900 p-4 sm:mt-6 sm:p-6">
-        <div className="flex items-center gap-3">
-          <SettingsIcon
-            size={20}
-            className="shrink-0 text-amber-300"
-          />
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-400/10 text-amber-300">
+            <Info size={19} />
+          </div>
 
           <div className="min-w-0 flex-1">
             <h3 className="font-bold">
@@ -90,8 +160,9 @@ function Settings() {
               </span>
             </h3>
 
-            <p className="text-xs text-slate-500 sm:text-sm">
-              Versão inicial da plataforma — 1.0.0
+            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+              Plataforma de organização inteligente de
+              conteúdo técnico — versão 1.0.0.
             </p>
           </div>
         </div>
