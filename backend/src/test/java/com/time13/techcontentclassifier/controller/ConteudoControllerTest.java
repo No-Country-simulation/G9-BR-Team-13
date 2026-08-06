@@ -1,5 +1,6 @@
 package com.time13.techcontentclassifier.controller;
 
+import com.time13.techcontentclassifier.dto.ConteudoHistoricoDTO;
 import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
 import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
 import com.time13.techcontentclassifier.exception.MlServiceException;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -116,9 +118,11 @@ class ConteudoControllerTest {
 
     @Test
     void deveBuscarConteudosPorPalavraChaveComSucesso() throws Exception {
-        List<ConteudoResponseDTO> resultadosMock = List.of(
-                new ConteudoResponseDTO("Backend", 0.92, List.of("Java", "Spring Boot")),
-                new ConteudoResponseDTO("Backend", 0.88, List.of("API", "REST"))
+        List<ConteudoHistoricoDTO> resultadosMock = List.of(
+                new ConteudoHistoricoDTO(1L, "Introdução ao Spring Boot", "Texto de exemplo com tamanho suficiente.",
+                        "Backend", 0.92, List.of("Java", "Spring Boot"), LocalDateTime.of(2026, 8, 1, 10, 0)),
+                new ConteudoHistoricoDTO(2L, "API REST com Spring", "Texto de exemplo com tamanho suficiente.",
+                        "Backend", 0.88, List.of("API", "REST"), LocalDateTime.of(2026, 8, 2, 10, 0))
         );
 
         when(conteudoService.buscarPorPalavraChave(eq("Spring"))).thenReturn(resultadosMock);
@@ -128,6 +132,8 @@ class ConteudoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].titulo").value("Introdução ao Spring Boot"))
                 .andExpect(jsonPath("$[0].categoria").value("Backend"))
                 .andExpect(jsonPath("$[0].probabilidade").value(0.92))
                 .andExpect(jsonPath("$[0].informacoes_adicionais[0]").value("Java"))
