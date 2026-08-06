@@ -1,5 +1,6 @@
 package com.time13.techcontentclassifier.controller;
 
+import com.time13.techcontentclassifier.dto.ConteudoHistoricoDTO;
 import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
 import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
 import com.time13.techcontentclassifier.service.ConteudoService;
@@ -47,7 +48,7 @@ public class ConteudoController {
      * @return Lista de conteúdos encontrados correspondentes ao termo informado
      */
     @GetMapping
-    public List<ConteudoResponseDTO> buscarPorPalavraChave(@RequestParam("palavra-chave") String termo) {
+    public List<ConteudoHistoricoDTO> buscarPorPalavraChave(@RequestParam("palavra-chave") String termo) {
         return conteudoService.buscarPorPalavraChave(termo);
     }
 }
