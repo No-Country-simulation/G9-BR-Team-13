@@ -50,6 +50,18 @@ function normalizeResponse(data) {
   };
 }
 
+async function readErrorResponse(response) {
+  let errorData = null;
+
+  try {
+    errorData = await response.json();
+  } catch {
+    // Mantém a mensagem padrão quando a resposta não contém JSON.
+  }
+
+  return getErrorMessage(errorData);
+}
+
 export async function checkBackendStatus() {
   const controller = new AbortController();
 
@@ -58,18 +70,69 @@ export async function checkBackendStatus() {
   }, 5000);
 
   try {
-    await fetch(`${API_URL}/conteudo`, {
-      method: "GET",
-      cache: "no-store",
-      signal: controller.signal,
-    });
+    const response = await fetch(
+      `${API_URL}/conteudo?palavra-chave=`,
+      {
+        method: "GET",
+        cache: "no-store",
+        signal: controller.signal,
+      },
+    );
 
-    return true;
+    return response.ok;
   } catch {
     return false;
   } finally {
     window.clearTimeout(timeoutId);
   }
+}
+
+export async function searchContents(searchTerm = "") {
+  const normalizedSearchTerm =
+    typeof searchTerm === "string"
+      ? searchTerm.trim()
+      : "";
+
+  const searchParams = new URLSearchParams({
+    "palavra-chave": normalizedSearchTerm,
+  });
+
+  let response;
+
+  try {
+    response = await fetch(
+      `${API_URL}/conteudo?${searchParams.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-store",
+      },
+    );
+  } catch {
+    throw new Error(
+      "Não foi possível conectar ao backend. Verifique se o servidor está em execução.",
+    );
+  }
+
+  if (!response.ok) {
+    const errorMessage =
+      await readErrorResponse(response);
+
+    throw new Error(errorMessage);
+  }
+
+  const data = await response.json();
+
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data.map((item, index) => ({
+    id: `${item?.categoria ?? "conteudo"}-${index}`,
+    ...normalizeResponse(item),
+  }));
 }
 
 export async function analyzeContent(payload) {
@@ -90,15 +153,10 @@ export async function analyzeContent(payload) {
   }
 
   if (!response.ok) {
-    let errorData = null;
+    const errorMessage =
+      await readErrorResponse(response);
 
-    try {
-      errorData = await response.json();
-    } catch {
-      // Mantém a mensagem padrão se o backend não retornar JSON.
-    }
-
-    throw new Error(getErrorMessage(errorData));
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();
