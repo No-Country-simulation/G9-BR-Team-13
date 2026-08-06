@@ -1,5 +1,6 @@
 package com.time13.techcontentclassifier.mapper;
 
+import com.time13.techcontentclassifier.dto.ConteudoHistoricoDTO;
 import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
 import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
 import com.time13.techcontentclassifier.entity.Conteudo;
@@ -52,23 +53,49 @@ public class ConteudoMapper {
      * @return Objeto ConteudoResponseDTO formatado para ser retornado na API
      */
     public ConteudoResponseDTO toResponseDTO(Conteudo entity) {
-        // Recupera as informações adicionais gravadas na coluna de texto
+        return new ConteudoResponseDTO(
+                entity.getCategoria(),
+                entity.getProbabilidade(),
+                montarInformacoesAdicionais(entity)
+        );
+    }
+
+    /**
+     * Converte uma entidade Conteudo em um {@link ConteudoHistoricoDTO}, usado pelo endpoint
+     * de consulta (GET /conteudo). Diferente do toResponseDTO, também expõe id, título, texto
+     * e data de criação — necessários para telas de listagem/detalhe no frontend.
+     *
+     * @param entity Entidade Conteudo vinda do repositório
+     * @return Objeto ConteudoHistoricoDTO formatado para ser retornado na API
+     */
+    public ConteudoHistoricoDTO toHistoricoDTO(Conteudo entity) {
+        return new ConteudoHistoricoDTO(
+                entity.getId(),
+                entity.getTitulo(),
+                entity.getTexto(),
+                entity.getCategoria(),
+                entity.getProbabilidade(),
+                montarInformacoesAdicionais(entity),
+                entity.getCriadoEm()
+        );
+    }
+
+    /**
+     * Reúne as informações adicionais gravadas na coluna de texto com os nomes das tags
+     * vinculadas à entidade, formando a lista completa exposta pela API.
+     */
+    private List<String> montarInformacoesAdicionais(Conteudo entity) {
         List<String> infoAdicionais = entity.getInformacoesAdicionais() != null
                 ? new ArrayList<>(List.of(entity.getInformacoesAdicionais().split(", ")))
                 : new ArrayList<>();
 
-        // Extrai os nomes das Tags vinculadas e adiciona à lista de informações adicionais
         if (entity.getTagsSugeridas() != null) {
             List<String> tagsNomes = entity.getTagsSugeridas().stream()
                     .map(Tags::getNome)
                     .toList();
             infoAdicionais.addAll(tagsNomes);
         }
-        return new ConteudoResponseDTO(
-                entity.getCategoria(),
-                entity.getProbabilidade(),
-                infoAdicionais // Retorna a lista completa para a resposta DTO
-        );
+        return infoAdicionais;
     }
 }
 
