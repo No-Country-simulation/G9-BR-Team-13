@@ -1,12 +1,17 @@
 import {
   AlertTriangle,
+  BrainCircuit,
   Check,
+  Cloud,
+  Code2,
+  Database,
   Download,
   FileJson,
   Info,
   Layers3,
   Moon,
   Palette,
+  Server,
   Sun,
   Trash2,
   X,
@@ -67,6 +72,61 @@ const relatedContentOptions = [
     title: "10 conteúdos",
     description:
       "Maior quantidade de sugestões relacionadas.",
+  },
+];
+
+const applicationInformation = [
+  {
+    title: "Versão",
+    value: "1.0.0",
+    description: "Versão atual da plataforma",
+    icon: Info,
+    iconClass:
+      "bg-amber-400/10 text-amber-300",
+  },
+  {
+    title: "Frontend",
+    value: "React + Vite",
+    description:
+      "JavaScript, Tailwind CSS e Lucide React",
+    icon: Code2,
+    iconClass:
+      "bg-cyan-400/10 text-cyan-300",
+  },
+  {
+    title: "Backend",
+    value: "Spring Boot",
+    description: "Java e API REST",
+    icon: Server,
+    iconClass:
+      "bg-emerald-400/10 text-emerald-300",
+  },
+  {
+    title: "Inteligência Artificial",
+    value: "FastAPI",
+    description:
+      "Scikit-learn, TF-IDF e Regressão Logística",
+    icon: BrainCircuit,
+    iconClass:
+      "bg-purple-400/10 text-purple-300",
+  },
+  {
+    title: "Banco de dados",
+    value: "PostgreSQL",
+    description:
+      "Persistência dos conteúdos analisados",
+    icon: Database,
+    iconClass:
+      "bg-blue-400/10 text-blue-300",
+  },
+  {
+    title: "Infraestrutura",
+    value: "Oracle Cloud",
+    description:
+      "Oracle Cloud Infrastructure — OCI",
+    icon: Cloud,
+    iconClass:
+      "bg-orange-400/10 text-orange-300",
   },
 ];
 
@@ -464,13 +524,13 @@ function Settings() {
         </article>
 
         <article className="mt-5 rounded-3xl border border-white/10 bg-slate-900 p-4 sm:mt-6 sm:p-6">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-400/10 text-amber-300">
-              <Info size={19} />
+          <div className="mb-5 flex items-start gap-3 sm:mb-6">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-400/10 text-amber-300">
+              <Info size={21} />
             </div>
 
             <div className="min-w-0 flex-1">
-              <h3 className="font-bold">
+              <h3 className="text-lg font-bold">
                 <span className="text-cyan-400">
                   Tech
                 </span>
@@ -480,11 +540,44 @@ function Settings() {
                 </span>
               </h3>
 
-              <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+              <p className="mt-1 text-xs text-slate-400 sm:text-sm">
                 Plataforma de organização inteligente de
-                conteúdo técnico — versão 1.0.0.
+                conteúdo técnico.
               </p>
             </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {applicationInformation.map(
+              (information) => {
+                const Icon = information.icon;
+
+                return (
+                  <div
+                    key={information.title}
+                    className="rounded-3xl border border-white/10 bg-slate-950/40 p-4 sm:p-5"
+                  >
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center rounded-2xl ${information.iconClass}`}
+                    >
+                      <Icon size={19} />
+                    </div>
+
+                    <p className="mt-4 text-xs font-medium text-slate-500 sm:text-sm">
+                      {information.title}
+                    </p>
+
+                    <h4 className="mt-1 text-base font-bold text-white">
+                      {information.value}
+                    </h4>
+
+                    <p className="mt-1 text-xs leading-5 text-slate-400 sm:text-sm">
+                      {information.description}
+                    </p>
+                  </div>
+                );
+              },
+            )}
           </div>
         </article>
       </section>
