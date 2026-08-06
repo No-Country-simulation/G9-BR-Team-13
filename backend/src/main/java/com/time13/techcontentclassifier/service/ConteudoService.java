@@ -1,5 +1,6 @@
 package com.time13.techcontentclassifier.service;
 
+import com.time13.techcontentclassifier.dto.ConteudoHistoricoDTO;
 import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
 import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
 import com.time13.techcontentclassifier.entity.Conteudo;
@@ -84,12 +85,12 @@ public class ConteudoService {
      * no título, texto, categoria, informações adicionais ou tags.
      * 
      * @param termo Termo/palavra-chave a ser pesquisado
-     * @return Lista de conteúdos formatados como ConteudoResponseDTO
+     * @return Lista de conteúdos formatados como ConteudoHistoricoDTO
      */
-    public List<ConteudoResponseDTO> buscarPorPalavraChave(String termo) {
+    public List<ConteudoHistoricoDTO> buscarPorPalavraChave(String termo) {
         List<Conteudo> resultados = conteudoRepository.buscarPorPalavraChave(termo);
         return resultados.stream()
-                .map(conteudoMapper::toResponseDTO)
+                .map(conteudoMapper::toHistoricoDTO)
                 .toList();
     }
 }
