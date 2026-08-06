@@ -2,6 +2,7 @@ import {
   AlertCircle,
   BookOpen,
   Database,
+  Eye,
   LoaderCircle,
   RefreshCw,
   Search,
@@ -14,12 +15,20 @@ import {
   useState,
 } from "react";
 
+import ContentModal from "../../components/ContentModal/ContentModal";
 import { searchContents } from "../../services/api";
 
 function normalizeText(value, fallback = "") {
   return typeof value === "string" && value.trim()
     ? value.trim()
     : fallback;
+}
+
+function getContentTitle(item) {
+  return normalizeText(
+    item?.titulo,
+    "Conteúdo sem título",
+  );
 }
 
 function getContentCategory(item) {
@@ -84,6 +93,8 @@ function Library() {
   const [contents, setContents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedContent, setSelectedContent] =
+    useState(null);
 
   const loadContents = useCallback(
     async (term = "") => {
@@ -313,6 +324,8 @@ const filteredContents = useMemo(() => {
             <div className="mt-5 grid gap-4 sm:mt-6 lg:grid-cols-2">
               {filteredContents.map(
                 (item, index) => {
+                  const title = getContentTitle(item);
+
                   const category =
                     getContentCategory(item);
 
@@ -341,7 +354,7 @@ const filteredContents = useMemo(() => {
 
                           <div className="min-w-0">
                             <h3 className="break-words text-base font-bold text-white">
-                              Conteúdo classificado
+                              {title}
                             </h3>
 
                             <p className="mt-1 text-xs text-slate-400">
@@ -389,6 +402,17 @@ const filteredContents = useMemo(() => {
                           </p>
                         )}
                       </div>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSelectedContent(item)
+                        }
+                        className="mt-4 inline-flex items-center gap-2 rounded-xl border border-white/10 px-3.5 py-2 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-400/10"
+                      >
+                        <Eye size={15} />
+                        Ver conteúdo
+                      </button>
                     </article>
                   );
                 },
@@ -396,6 +420,13 @@ const filteredContents = useMemo(() => {
             </div>
           )}
       </div>
+
+      {selectedContent && (
+        <ContentModal
+          item={selectedContent}
+          onClose={() => setSelectedContent(null)}
+        />
+      )}
     </section>
   );
 }
