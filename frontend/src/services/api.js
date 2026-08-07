@@ -30,21 +30,7 @@ function normalizeResponse(data) {
     data?.informacoesAdicionais ??
     data?.informacoes_adicionais;
 
-  const createdAt = data?.criadoEm ?? data?.criado_em;
-
   return {
-    id: data?.id ?? null,
-
-    titulo:
-      typeof data?.titulo === "string"
-        ? data.titulo
-        : null,
-
-    texto:
-      typeof data?.texto === "string"
-        ? data.texto
-        : null,
-
     categoria:
       typeof data?.categoria === "string" &&
       data.categoria.trim()
@@ -61,6 +47,26 @@ function normalizeResponse(data) {
     )
       ? additionalInformation
       : [],
+  };
+}
+
+// Campos extras que só existem no GET /conteudo (histórico persistido),
+// nunca no contrato do POST /conteudo — por isso ficam fora do normalizeResponse.
+function extractHistoricoFields(data) {
+  const createdAt = data?.criadoEm ?? data?.criado_em;
+
+  return {
+    id: data?.id ?? null,
+
+    titulo:
+      typeof data?.titulo === "string"
+        ? data.titulo
+        : null,
+
+    texto:
+      typeof data?.texto === "string"
+        ? data.texto
+        : null,
 
     criadoEm:
       typeof createdAt === "string" ? createdAt : null,
@@ -148,11 +154,13 @@ export async function searchContents(searchTerm = "") {
 
   return data.map((item, index) => {
     const normalized = normalizeResponse(item);
+    const historicoFields = extractHistoricoFields(item);
 
     return {
       ...normalized,
+      ...historicoFields,
       id:
-        normalized.id ??
+        historicoFields.id ??
         `${normalized.categoria}-${index}`,
     };
   });
