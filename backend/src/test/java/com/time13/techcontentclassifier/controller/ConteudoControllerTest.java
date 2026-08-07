@@ -12,7 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -120,9 +120,9 @@ class ConteudoControllerTest {
     void deveBuscarConteudosPorPalavraChaveComSucesso() throws Exception {
         List<ConteudoHistoricoDTO> resultadosMock = List.of(
                 new ConteudoHistoricoDTO(1L, "Introdução ao Spring Boot", "Texto de exemplo com tamanho suficiente.",
-                        "Backend", 0.92, List.of("Java", "Spring Boot"), LocalDateTime.of(2026, 8, 1, 10, 0)),
+                        "Backend", 0.92, List.of("Java", "Spring Boot"), Instant.parse("2026-08-01T10:00:00Z")),
                 new ConteudoHistoricoDTO(2L, "API REST com Spring", "Texto de exemplo com tamanho suficiente.",
-                        "Backend", 0.88, List.of("API", "REST"), LocalDateTime.of(2026, 8, 2, 10, 0))
+                        "Backend", 0.88, List.of("API", "REST"), Instant.parse("2026-08-02T10:00:00Z"))
         );
 
         when(conteudoService.buscarPorPalavraChave(eq("Spring"))).thenReturn(resultadosMock);
@@ -134,6 +134,7 @@ class ConteudoControllerTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].titulo").value("Introdução ao Spring Boot"))
+                .andExpect(jsonPath("$[0].criado_em").value("2026-08-01T10:00:00Z"))
                 .andExpect(jsonPath("$[0].categoria").value("Backend"))
                 .andExpect(jsonPath("$[0].probabilidade").value(0.92))
                 .andExpect(jsonPath("$[0].informacoes_adicionais[0]").value("Java"))
