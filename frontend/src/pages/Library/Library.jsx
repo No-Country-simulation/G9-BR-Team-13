@@ -16,6 +16,8 @@ import {
 
 import { searchContents } from "../../services/api";
 
+const MINIMUM_CONFIDENCE = 0.7;
+
 function normalizeText(value, fallback = "") {
   return typeof value === "string" && value.trim()
     ? value.trim()
@@ -61,28 +63,51 @@ function getAdditionalInformation(item) {
     .filter(Boolean);
 }
 
-function formatConfidence(probability) {
+function getNormalizedProbability(probability) {
   const numericProbability = Number(probability);
 
   if (Number.isNaN(numericProbability)) {
+    return null;
+  }
+
+  return numericProbability > 1
+    ? numericProbability / 100
+    : numericProbability;
+}
+
+function hasMinimumConfidence(item) {
+  const probability = getNormalizedProbability(
+    item?.probabilidade,
+  );
+
+  return (
+    probability !== null &&
+    probability >= MINIMUM_CONFIDENCE
+  );
+}
+
+function formatConfidence(probability) {
+  const normalizedProbability =
+    getNormalizedProbability(probability);
+
+  if (normalizedProbability === null) {
     return "Não informada";
   }
 
-  const percentage =
-    numericProbability <= 1
-      ? numericProbability * 100
-      : numericProbability;
-
-  return `${percentage.toFixed(1)}%`;
+  return `${(normalizedProbability * 100).toFixed(1)}%`;
 }
 
 function Library() {
   const [searchTerm, setSearchTerm] = useState("");
+
   const [selectedCategory, setSelectedCategory] =
     useState("Todas");
 
   const [contents, setContents] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+
+  const [isLoading, setIsLoading] =
+    useState(true);
+
   const [error, setError] = useState("");
 
   const loadContents = useCallback(
@@ -93,7 +118,9 @@ function Library() {
       try {
         const data = await searchContents(term);
 
-        setContents(Array.isArray(data) ? data : []);
+        setContents(
+          Array.isArray(data) ? data : [],
+        );
       } catch (requestError) {
         console.error(requestError);
 
@@ -121,33 +148,49 @@ function Library() {
     };
   }, [loadContents, searchTerm]);
 
+  /*
+   * A Base de Conhecimento exibe apenas conteúdos
+   * com confiança igual ou superior a 70%.
+   *
+   * Todos os conteúdos continuam armazenados no banco.
+   */
+  const approvedContents = useMemo(
+    () => contents.filter(hasMinimumConfidence),
+    [contents],
+  );
+
   const categories = useMemo(() => {
-    const availableCategories = contents
-      .map(getContentCategory)
-      .filter(Boolean);
+    const availableCategories =
+      approvedContents
+        .map(getContentCategory)
+        .filter(Boolean);
 
     return [
       "Todas",
       ...new Set(availableCategories),
     ];
-  }, [contents]);
+  }, [approvedContents]);
 
-const activeCategory = categories.includes(
-  selectedCategory,
-)
-  ? selectedCategory
-  : "Todas";
+  const activeCategory = categories.includes(
+    selectedCategory,
+  )
+    ? selectedCategory
+    : "Todas";
 
-const filteredContents = useMemo(() => {
-  if (activeCategory === "Todas") {
-    return contents;
-  }
+  const filteredContents = useMemo(() => {
+    if (activeCategory === "Todas") {
+      return approvedContents;
+    }
 
-  return contents.filter(
-    (item) =>
-      getContentCategory(item) === activeCategory,
-  );
-}, [activeCategory, contents]);
+    return approvedContents.filter(
+      (item) =>
+        getContentCategory(item) ===
+        activeCategory,
+    );
+  }, [
+    activeCategory,
+    approvedContents,
+  ]);
 
   return (
     <section>
@@ -197,7 +240,10 @@ const filteredContents = useMemo(() => {
                 event.target.value,
               )
             }
-            disabled={isLoading || contents.length === 0}
+            disabled={
+              isLoading ||
+              approvedContents.length === 0
+            }
             aria-label="Filtrar por categoria"
             className="rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
@@ -236,6 +282,14 @@ const filteredContents = useMemo(() => {
             </span>
           )}
         </div>
+
+        {!isLoading && !error && (
+          <p className="mt-2 text-xs text-slate-500">
+            A Base de Conhecimento exibe apenas
+            conteúdos com confiança igual ou superior
+            a 70%.
+          </p>
+        )}
 
         {error && !isLoading && (
           <div
@@ -301,8 +355,8 @@ const filteredContents = useMemo(() => {
 
               <p className="mt-2 max-w-md text-xs text-slate-400 sm:text-sm">
                 {searchTerm.trim()
-                  ? "Tente pesquisar outra palavra-chave ou selecionar outra categoria."
-                  : "Os conteúdos armazenados no banco serão exibidos nesta área."}
+                  ? "Nenhum conteúdo com confiança mínima de 70% foi encontrado para esta pesquisa."
+                  : "Ainda não existem conteúdos com confiança mínima de 70% disponíveis na Base de Conhecimento."}
               </p>
             </div>
           )}
