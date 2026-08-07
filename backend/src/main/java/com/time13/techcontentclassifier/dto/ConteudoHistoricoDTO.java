@@ -2,7 +2,7 @@ package com.time13.techcontentclassifier.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -19,7 +19,11 @@ import java.util.List;
  * @param categoria Categoria identificada pelo modelo de IA
  * @param probabilidade Grau de confiança do modelo na classificação feita (0.0 a 1.0)
  * @param informacoesAdicionais Tags e termos adicionais identificados sobre o conteúdo
- * @param criadoEm Data e hora em que o conteúdo foi classificado e persistido
+ * @param criadoEm Data e hora (UTC, com offset explícito) em que o conteúdo foi classificado
+ *                 e persistido. Usar Instant (em vez de LocalDateTime) garante que o JSON
+ *                 saia com o sufixo "Z", para o frontend converter corretamente pro fuso
+ *                 local de quem está vendo em vez de interpretar a hora UTC como se já
+ *                 fosse hora local.
  */
 public record ConteudoHistoricoDTO(
         Long id,
@@ -28,6 +32,6 @@ public record ConteudoHistoricoDTO(
         @JsonProperty("categoria") String categoria,
         double probabilidade,
         @JsonProperty("informacoes_adicionais") List<String> informacoesAdicionais,
-        @JsonProperty("criado_em") LocalDateTime criadoEm
+        @JsonProperty("criado_em") Instant criadoEm
 ) {
 }

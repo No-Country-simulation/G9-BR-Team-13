@@ -6,6 +6,8 @@ import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
 import com.time13.techcontentclassifier.entity.Conteudo;
 import com.time13.techcontentclassifier.entity.Tags;
 import org.springframework.stereotype.Component;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +71,14 @@ public class ConteudoMapper {
      * @return Objeto ConteudoHistoricoDTO formatado para ser retornado na API
      */
     public ConteudoHistoricoDTO toHistoricoDTO(Conteudo entity) {
+        // entity.getCriadoEm() e um LocalDateTime "sem fuso", mas na pratica sempre
+        // representa o relogio UTC do container (ver @PrePersist em Conteudo).
+        // Convertendo explicitamente pra Instant, o JSON sai com o sufixo "Z" e o
+        // frontend consegue converter pro fuso local de quem esta vendo.
+        Instant criadoEm = entity.getCriadoEm() != null
+                ? entity.getCriadoEm().toInstant(ZoneOffset.UTC)
+                : null;
+
         return new ConteudoHistoricoDTO(
                 entity.getId(),
                 entity.getTitulo(),
@@ -76,7 +86,7 @@ public class ConteudoMapper {
                 entity.getCategoria(),
                 entity.getProbabilidade(),
                 montarInformacoesAdicionais(entity),
-                entity.getCriadoEm()
+                criadoEm
         );
     }
 
