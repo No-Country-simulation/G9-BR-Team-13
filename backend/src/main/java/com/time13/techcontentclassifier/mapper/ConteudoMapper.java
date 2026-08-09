@@ -3,6 +3,7 @@ package com.time13.techcontentclassifier.mapper;
 import com.time13.techcontentclassifier.dto.ConteudoHistoricoDTO;
 import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
 import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
+import com.time13.techcontentclassifier.dto.ExplicabilidadeDTO;
 import com.time13.techcontentclassifier.entity.Conteudo;
 import com.time13.techcontentclassifier.entity.Tags;
 import org.springframework.stereotype.Component;
@@ -58,7 +59,8 @@ public class ConteudoMapper {
         return new ConteudoResponseDTO(
                 entity.getCategoria(),
                 entity.getProbabilidade(),
-                montarInformacoesAdicionais(entity)
+                montarInformacoesAdicionais(entity),
+                List.of() // Entidade não armazena explicabilidade; retorna lista vazia
         );
     }
 
@@ -86,6 +88,7 @@ public class ConteudoMapper {
                 entity.getCategoria(),
                 entity.getProbabilidade(),
                 montarInformacoesAdicionais(entity),
+                List.of(), // Entidade não armazena explicabilidade; retorna lista vazia
                 criadoEm
         );
     }

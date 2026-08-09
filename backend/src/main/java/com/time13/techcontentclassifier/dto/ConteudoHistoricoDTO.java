@@ -19,6 +19,7 @@ import java.util.List;
  * @param categoria Categoria identificada pelo modelo de IA
  * @param probabilidade Grau de confiança do modelo na classificação feita (0.0 a 1.0)
  * @param informacoesAdicionais Tags e termos adicionais identificados sobre o conteúdo
+ * @param explicabilidade Lista de pares termo/peso que explicam a classificação realizada
  * @param criadoEm Data e hora (UTC, com offset explícito) em que o conteúdo foi classificado
  *                 e persistido. Usar Instant (em vez de LocalDateTime) garante que o JSON
  *                 saia com o sufixo "Z", para o frontend converter corretamente pro fuso
@@ -32,6 +33,10 @@ public record ConteudoHistoricoDTO(
         @JsonProperty("categoria") String categoria,
         double probabilidade,
         @JsonProperty("informacoes_adicionais") List<String> informacoesAdicionais,
+        @JsonProperty("explicabilidade") List<ExplicabilidadeDTO> explicabilidade,
         @JsonProperty("criado_em") Instant criadoEm
 ) {
+    public ConteudoHistoricoDTO(Long id, String titulo, String texto, String categoria, double probabilidade, List<String> informacoesAdicionais, Instant criadoEm) {
+        this(id, titulo, texto, categoria, probabilidade, informacoesAdicionais, List.of(), criadoEm);
+    }
 }

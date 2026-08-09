@@ -13,12 +13,17 @@ import java.util.List;
  * @param categoria Categoria principal identificada pelo modelo de IA (ex: "Front-end", "DevOps")
  * @param probabilidade Percentual/grau de confiança do modelo na classificação feita (0.0 a 1.0)
  * @param informacoesAdicionais Tags e termos adicionais identificados sobre o conteúdo
+ * @param explicabilidade Lista de pares termo/peso que explicam a classificação realizada
  */
 public record ConteudoResponseDTO(
         @JsonProperty("categoria") String categoria,
         double probabilidade,
-        @JsonProperty("informacoes_adicionais") List<String> informacoesAdicionais
+        @JsonProperty("informacoes_adicionais") List<String> informacoesAdicionais,
+        @JsonProperty("explicabilidade") List<ExplicabilidadeDTO> explicabilidade
 ){
+    public ConteudoResponseDTO(String categoria, double probabilidade, List<String> informacoesAdicionais) {
+        this(categoria, probabilidade, informacoesAdicionais, List.of());
+    }
 }
 
 

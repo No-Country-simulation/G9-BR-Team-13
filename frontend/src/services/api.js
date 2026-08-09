@@ -30,6 +30,8 @@ function normalizeResponse(data) {
     data?.informacoesAdicionais ??
     data?.informacoes_adicionais;
 
+  const explicabilidade = data?.explicabilidade;
+
   return {
     categoria:
       typeof data?.categoria === "string" &&
@@ -46,6 +48,10 @@ function normalizeResponse(data) {
       additionalInformation,
     )
       ? additionalInformation
+      : [],
+
+    explicabilidade: Array.isArray(explicabilidade)
+      ? explicabilidade
       : [],
   };
 }
