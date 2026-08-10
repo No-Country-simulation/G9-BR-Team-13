@@ -1,4 +1,6 @@
 /temp/
+.DS_Store
+**/.DS_Store
 
 HELP.md
 target/

@@ -40,6 +40,9 @@ public class Conteudo {
     @Column(name = "informacoes_adicionais", length = 500)
     private String informacoesAdicionais;
 
+    @Column(columnDefinition = "TEXT")
+    private String explicabilidade;
+
     @Column(name = "criado_em", nullable = false)
     private LocalDateTime criadoEm;
 
@@ -62,13 +65,20 @@ public class Conteudo {
     private List<Tags> tagsSugeridas;
 
     public Conteudo(String titulo, String texto, LocalDateTime criadoEm, String categoria, Double probabilidade, String informacoesAdicionais,
-                                        List<Tags> tagsSugeridas) {
+                    List<Tags> tagsSugeridas) {
+        this(titulo, texto, criadoEm, categoria, probabilidade, informacoesAdicionais, null, tagsSugeridas);
+    }
+
+    public Conteudo(String titulo, String texto, LocalDateTime criadoEm, String categoria, Double probabilidade, String informacoesAdicionais,
+                    String explicabilidade, List<Tags> tagsSugeridas) {
         this.titulo = titulo;
         this.texto = texto;
         this.criadoEm = criadoEm;
         this.categoria = categoria;
         this.probabilidade = probabilidade;
         this.informacoesAdicionais = informacoesAdicionais;
+        this.explicabilidade = explicabilidade;
         this.tagsSugeridas = tagsSugeridas;
     }
-}
+}
+
