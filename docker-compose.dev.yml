@@ -40,7 +40,7 @@ services:
       # Sincroniza arquivos do frontend em tempo real
       - ./frontend:/app
       # Evita que o node_modules local da máquina sobrescreva os pacotes do container
-      - /app/node_modules
+      - frontend_node_modules:/app/node_modules
     environment:
       - VITE_API_URL=http://localhost:8080
     ports:
@@ -73,7 +73,9 @@ services:
     ports:
       - "5432:5432"
 
-# Cache persistente do Maven para aceleração de builds
+# Cache persistente do Maven e Node para aceleração de builds e prevenção de volumes anônimos órfãos
 volumes:
   maven_cache:
+  frontend_node_modules:
+
 

@@ -8,6 +8,13 @@
 # 4. frontend: Aplicação Web em React/Vite servida via Nginx.
 # ==============================================================================
 
+# Rotação de logs padrão (evita que arquivos de log estourem o disco rígido)
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   # ----------------------------------------------------------------------------
   # BANCO DE DADOS: PostgreSQL 16
@@ -32,6 +39,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging: *default-logging
 
   # ----------------------------------------------------------------------------
   # BACKEND: Java Spring Boot API
@@ -58,6 +66,7 @@ services:
       ia-service:
         condition: service_healthy
     restart: on-failure
+    logging: *default-logging
 
   # ----------------------------------------------------------------------------
   # IA & MACHINE LEARNING: Python FastAPI Service
@@ -86,6 +95,7 @@ services:
       retries: 5
       start_period: 30s
     restart: on-failure
+    logging: *default-logging
 
   # ----------------------------------------------------------------------------
   # FRONTEND: React / Vite App
@@ -103,10 +113,12 @@ services:
     depends_on:
       - backend
     restart: on-failure
+    logging: *default-logging
 
 # ------------------------------------------------------------------------------
 # VOLUMES PERSISTENTES NOMEADOS
 # ------------------------------------------------------------------------------
 volumes:
   postgres_data:
+
 

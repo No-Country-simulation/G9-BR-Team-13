@@ -9,9 +9,9 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from app.schemas import TextInput, PredictionOutput
+from app.schemas import TextInput, PredictionOutput, ExplicabilidadeItem
 from app import model_loader
-from app.keywords import extract_keywords
+from app.keywords import extract_keywords, extract_keywords_with_weights
 from app.logging_config import setup_json_logging
 
 # Configuração de logs estruturados em JSON para produção
@@ -65,7 +65,7 @@ async def predict(input_data: TextInput):
         input_data (TextInput): Objeto JSON de entrada contendo 'titulo' e 'texto'.
 
     Returns:
-        PredictionOutput: Objeto JSON de resposta contendo 'categoria', 'probabilidade' e 'informacoes_adicionais'.
+        PredictionOutput: Objeto JSON de resposta contendo 'categoria', 'probabilidade', 'informacoes_adicionais' e 'explicabilidade'.
 
     Raises:
         HTTPException(503): Caso o modelo ou vetorizador não tenham sido carregados na memória.
@@ -88,13 +88,18 @@ async def predict(input_data: TextInput):
         class_idx = list(model_loader.modelo.classes_).index(pred_class)
         probability = float(probs[class_idx])
 
-        # Extrai as 5 palavras-chave mais influentes para o resultado
-        keywords = extract_keywords(full_text, model_loader.vectorizer, model_loader.modelo, top_n=5)
+        # Extrai os 3 principais termos com seus respectivos pesos (explicabilidade)
+        raw_explicabilidade = extract_keywords_with_weights(full_text, model_loader.vectorizer, model_loader.modelo, top_n=3)
+        explicabilidade_items = [ExplicabilidadeItem(**item) for item in raw_explicabilidade]
+
+        # Palavras-chave simples (lista de strings)
+        keywords = [item.termo for item in explicabilidade_items]
 
         return PredictionOutput(
             categoria=pred_class,
             probabilidade=round(probability, 4),
-            informacoes_adicionais=keywords
+            informacoes_adicionais=keywords,
+            explicabilidade=explicabilidade_items
         )
     except Exception as e:
         logger.error(f"Erro na predicao: {e}")

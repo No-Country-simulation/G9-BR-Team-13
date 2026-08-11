@@ -49,11 +49,15 @@ No Windows, você pode rodar os scripts através de:
 # Executar a suíte completa de testes em containers isolados
 ./scripts/test.sh
 
-# Compilar todas as imagens Docker de produção sem cache
+# Compilar todas as imagens Docker de produção
 ./scripts/build.sh
 
 # Parar todos os contêineres e remover volumes temporários
 ./scripts/stop.sh
+
+# Executar limpeza de manutenção no Docker (remove imagens pendentes e cache do BuildKit)
+./scripts/clean.sh             # Limpeza padrão sem apagar dados do banco
+./scripts/clean.sh --all       # Limpeza completa (apaga volumes não utilizados)
 ```
 
 ---

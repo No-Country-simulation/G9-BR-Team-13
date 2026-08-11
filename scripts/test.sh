@@ -8,7 +8,7 @@ cd "$(dirname "$0")/.."
 echo "🧪 Executando testes nos contêineres..."
 
 echo "📦 1/3 Executando testes do Backend (Java Maven)..."
-docker compose -f docker-compose.yml -f docker-compose.dev.yml run --rm backend ./mvnw test
+docker compose -f docker-compose.yml -f docker-compose.dev.yml run --rm --entrypoint "./mvnw" backend test
 
 echo "🐍 2/3 Executando testes da IA (Python Pytest)..."
 docker compose -f docker-compose.yml -f docker-compose.dev.yml run --rm ia-service pytest tests/ -v

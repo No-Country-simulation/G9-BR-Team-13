@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  BarChart2,
   Calendar,
   Check,
   Clock3,
@@ -67,6 +68,12 @@ function History() {
     setAnalysisToDelete(null);
   }
 
+  const getPercentage = (peso) => {
+    const num = Number(peso);
+    if (!Number.isFinite(num)) return 0;
+    return num > 1 ? Math.min(100, Math.round(num)) : Math.round(num * 100);
+  };
+
   return (
     <section>
       <div className="mb-5 sm:mb-6">
@@ -118,6 +125,10 @@ function History() {
 
             const keywords =
               item.response?.informacoesAdicionais ?? [];
+
+            const explicabilidade = Array.isArray(item.response?.explicabilidade)
+              ? item.response.explicabilidade
+              : [];
 
             const wasCopied =
               copiedAnalysisId === item.id;
@@ -172,32 +183,67 @@ function History() {
                   </div>
                 </div>
 
-                <div className="mt-4 sm:mt-6">
-                  <div className="mb-2.5 flex items-center gap-2 text-slate-300 sm:mb-3">
-                    <Tag size={16} />
-
-                    <span className="text-sm font-medium">
-                      Palavras-chave
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    {keywords.length > 0 ? (
-                      keywords.map((keyword, index) => (
-                        <span
-                          key={`${keyword}-${index}`}
-                          className="rounded-full bg-cyan-500/10 px-2.5 py-1 text-xs text-cyan-300 sm:px-3 sm:text-sm"
-                        >
-                          {keyword}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-slate-500 sm:text-sm">
-                        Nenhuma palavra-chave encontrada.
+                {explicabilidade.length > 0 ? (
+                  <div className="mt-4 sm:mt-6">
+                    <div className="mb-2.5 flex items-center gap-2 text-slate-300 sm:mb-3">
+                      <BarChart2 size={16} />
+                      <span className="text-sm font-medium">
+                        Explicabilidade dos Termos
                       </span>
-                    )}
+                    </div>
+
+                    <div className="space-y-2">
+                      {explicabilidade.map((expItem) => {
+                        const itemPercentage = getPercentage(expItem.peso);
+                        return (
+                          <div key={expItem.termo}>
+                            <div className="mb-1 flex items-center justify-between text-xs sm:text-sm">
+                              <span className="font-medium text-cyan-300">
+                                {expItem.termo}
+                              </span>
+                              <span className="font-bold text-purple-300">
+                                {itemPercentage}%
+                              </span>
+                            </div>
+                            <div className="h-2 rounded-full bg-slate-800">
+                              <div
+                                className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 transition-all duration-300"
+                                style={{ width: `${itemPercentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="mt-4 sm:mt-6">
+                    <div className="mb-2.5 flex items-center gap-2 text-slate-300 sm:mb-3">
+                      <Tag size={16} />
+
+                      <span className="text-sm font-medium">
+                        Palavras-chave
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                      {keywords.length > 0 ? (
+                        keywords.map((keyword, index) => (
+                          <span
+                            key={`${keyword}-${index}`}
+                            className="rounded-full bg-cyan-500/10 px-2.5 py-1 text-xs text-cyan-300 sm:px-3 sm:text-sm"
+                          >
+                            {keyword}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-slate-500 sm:text-sm">
+                          Nenhuma palavra-chave encontrada.
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 <div className="mt-5 flex flex-wrap gap-2 sm:mt-8 sm:gap-3">
                   <button

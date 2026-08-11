@@ -1,11 +1,16 @@
 package com.time13.techcontentclassifier.mapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.time13.techcontentclassifier.dto.ConteudoHistoricoDTO;
 import com.time13.techcontentclassifier.dto.ConteudoRequestDTO;
 import com.time13.techcontentclassifier.dto.ConteudoResponseDTO;
+import com.time13.techcontentclassifier.dto.ExplicabilidadeDTO;
 import com.time13.techcontentclassifier.entity.Conteudo;
 import com.time13.techcontentclassifier.entity.Tags;
 import org.springframework.stereotype.Component;
+
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -17,6 +22,16 @@ import java.util.List;
  */
 @Component
 public class ConteudoMapper {
+
+    private final ObjectMapper objectMapper;
+
+    public ConteudoMapper() {
+        this(new ObjectMapper());
+    }
+
+    public ConteudoMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     /**
      * Reúne os dados recebidos pela API (ConteudoRequestDTO) e o resultado da classificação (ConteudoResponseDTO)
@@ -37,12 +52,16 @@ public class ConteudoMapper {
                     .map(Tags::new)
                     .toList();
         }
+
+        String explicabilidadeJson = serializarExplicabilidade(resposta.explicabilidade());
+
         return Conteudo.builder()
                 .titulo(request.titulo())
                 .texto(request.texto())
                 .categoria(resposta.categoria())
                 .probabilidade(resposta.probabilidade())
                 .informacoesAdicionais(null)
+                .explicabilidade(explicabilidadeJson)
                 .tagsSugeridas(tags) // Atribui as tags convertidas à entidade
                 .build();
     }
@@ -58,7 +77,8 @@ public class ConteudoMapper {
         return new ConteudoResponseDTO(
                 entity.getCategoria(),
                 entity.getProbabilidade(),
-                montarInformacoesAdicionais(entity)
+                montarInformacoesAdicionais(entity),
+                desserializarExplicabilidade(entity.getExplicabilidade())
         );
     }
 
@@ -86,6 +106,7 @@ public class ConteudoMapper {
                 entity.getCategoria(),
                 entity.getProbabilidade(),
                 montarInformacoesAdicionais(entity),
+                desserializarExplicabilidade(entity.getExplicabilidade()),
                 criadoEm
         );
     }
@@ -107,5 +128,28 @@ public class ConteudoMapper {
         }
         return infoAdicionais;
     }
+
+    private String serializarExplicabilidade(List<ExplicabilidadeDTO> explicabilidade) {
+        if (explicabilidade == null || explicabilidade.isEmpty()) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(explicabilidade);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    private List<ExplicabilidadeDTO> desserializarExplicabilidade(String json) {
+        if (json == null || json.isBlank()) {
+            return List.of();
+        }
+        try {
+            return objectMapper.readValue(json, new TypeReference<List<ExplicabilidadeDTO>>() {});
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
 }
+
 
