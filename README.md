@@ -32,17 +32,19 @@ A plataforma recebe um conteúdo composto por um **título** e um **texto**, ana
 
 ## 🎯 Principais funcionalidades
 
-* 🤖 Classificação automática de conteúdos técnicos
+* 🤖 Classificação automática de conteúdos técnicos (10 categorias)
 * 📊 Cálculo da probabilidade da classificação
-* 🔍 Extração de palavras-chave relevantes
+* 🔍 Extração de palavras-chave relevantes, com peso de explicabilidade por termo
 * 💾 Persistência do histórico das análises
+* 🔎 Busca por palavra-chave na Base de Conhecimento
 * ☁️ Integração com Oracle Cloud Infrastructure (OCI)
 * 🔗 API REST para integração com outros sistemas
 
----                             mesma VM OCI Compute)                     vectorizer.joblib)
-```
+## 2. Arquitetura
 
-O Backend valida a entrada, chama o serviço de ML, formata a resposta no contrato do edital e grava o histórico no banco sem bloquear a resposta ao usuário. Detalhes completos do fluxo: seção 3 da [documentação](docs/DOCUMENTACAO_PROJETO.md).
+O Frontend (React) fala só com o Backend (Java/Spring Boot), nunca diretamente com o serviço de ML. O Backend valida a entrada, chama o serviço de ML (Python/FastAPI) via HTTP interno, formata a resposta no contrato do edital e grava o histórico no banco (PostgreSQL) sem bloquear a resposta ao usuário. O modelo (`.joblib`) é publicado no OCI Object Storage e a aplicação roda em containers Docker numa instância OCI Compute. Detalhes completos do fluxo: seção 3 da [documentação](docs/DOCUMENTACAO_PROJETO.md).
+
+🔗 **Aplicação no ar**: [tech-mind.duckdns.org](https://tech-mind.duckdns.org)
 
 ## 3. Estrutura do monorepo
 
@@ -51,42 +53,49 @@ G9-BR-Team-13/
 ├── frontend/   # React + Vite - consome só o Backend, nunca o ML Service direto
 ├── backend/    # Java 17 + Spring Boot - API pública, validação, persistência
 ├── ia/         # Python + FastAPI + Scikit-Learn — notebook de treino e serviço de inferência
-├── infra/      # scripts de deploy e integração OCI (Object Storage / Compute)
+├── infra/      # aponta para onde a infraestrutura (Docker Compose, deploy) realmente vive no repositório
+├── scripts/    # scripts de Docker Compose (dev/prod), testes e deploy na OCI
 ├── docs/       # documentação completa do projeto
 ├── README.md         # este arquivo
 └── CONTRIBUTING.md    # fluxo de branches, commits e Pull Requests
 ```
 
-Cada pasta (`frontend/`, `ia/`, `infra/`) tem seu próprio README com o passo a passo de como começar — comece por ali se você for o Tech Lead daquela área.
+Cada pasta (`frontend/`, `backend/`, `ia/`, `infra/`) tem seu próprio README com detalhes de como rodar e a estrutura interna daquela área.
 
 ## 4. Como executar localmente
 
-### Backend (Spring Boot)
+### Opção recomendada: Docker Compose (sobe tudo de uma vez)
 
-Pré-requisitos: Java 17+, Maven (ou use o wrapper incluído).
+Pré-requisitos: Docker e Docker Compose instalados.
 
 ```bash
-cd backend
-./mvnw.cmd spring-boot:run    # Windows
-./mvnw spring-boot:run         # Linux/Mac
+cp .env.example .env.dev   # ajuste as variáveis se quiser valores diferentes dos padrões
+./scripts/dev.sh
 ```
 
-A API sobe em `http://localhost:8080`.
+Isso sobe PostgreSQL, backend, serviço de IA e frontend juntos, com hot reload. Backend em `http://localhost:8080`, frontend em `http://localhost:5173` (ver [`scripts/README.md`](scripts/README.md) para os demais scripts disponíveis: `test.sh`, `build.sh`, `stop.sh`, `clean.sh`).
 
-### Frontend e serviço de ML
+### Opção manual (serviço por serviço)
 
-Ainda não têm código neste repositório — siga as instruções em [`frontend/README.md`](frontend/README.md) e [`ia/README.md`](ia/README.md) para bootstrapar cada um.
+Cada pasta tem instruções próprias de execução sem Docker: [`backend/README.md`](backend/README.md), [`frontend/README.md`](frontend/README.md), [`ia/README.md`](ia/README.md).
 
 ## 5. Como usar a API
 
 Ver especificação completa (endpoints, contrato de request/response, validações, códigos de erro) na seção 14 de [`docs/DOCUMENTACAO_PROJETO.md`](docs/DOCUMENTACAO_PROJETO.md).
 
-Contrato principal:
+Classificar um conteúdo novo:
 
 ```
 POST /conteudo
 Request:  { "titulo": "...", "texto": "..." }
-Response: { "categoria": "Backend", "probabilidade": 0.89, "informacoes_adicionais": ["Java", "Spring Boot"] }
+Response: { "categoria": "Backend", "probabilidade": 0.89, "informacoes_adicionais": ["Java", "Spring Boot"], "explicabilidade": [{"termo": "spring", "peso": 1.0}] }
+```
+
+Buscar conteúdos já classificados (Base de Conhecimento):
+
+```
+GET /conteudo?palavra-chave=spring
+Response: [{ "id": 1, "titulo": "...", "texto": "...", "categoria": "Backend", "probabilidade": 0.89, "informacoes_adicionais": [...], "explicabilidade": [...], "criado_em": "2026-08-07T23:28:41Z" }]
 ```
 
 ## 6. Exemplos de uso (obrigatórios pelo edital)
