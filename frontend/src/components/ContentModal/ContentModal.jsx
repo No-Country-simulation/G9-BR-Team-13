@@ -1,4 +1,4 @@
-import { BookOpen, Tag, X } from "lucide-react";
+import { BarChart2, BookOpen, Tag, X } from "lucide-react";
 
 function formatConfidence(probability) {
   const numericProbability = Number(probability);
@@ -13,6 +13,18 @@ function formatConfidence(probability) {
       : numericProbability;
 
   return `${percentage.toFixed(1)}%`;
+}
+
+function getPercentage(peso) {
+  const numericPeso = Number(peso);
+
+  if (!Number.isFinite(numericPeso)) {
+    return 0;
+  }
+
+  return numericPeso > 1
+    ? numericPeso
+    : Math.round(numericPeso * 100);
 }
 
 function formatDate(dateValue) {
@@ -44,6 +56,9 @@ function ContentModal({ item, onClose }) {
   const createdAt = formatDate(item.criadoEm);
   const keywords = Array.isArray(item.informacoesAdicionais)
     ? item.informacoesAdicionais
+    : [];
+  const explicabilidade = Array.isArray(item.explicabilidade)
+    ? item.explicabilidade
     : [];
 
   return (
@@ -113,25 +128,61 @@ function ContentModal({ item, onClose }) {
           )}
         </div>
 
-        {keywords.length > 0 && (
+        {explicabilidade.length > 0 ? (
           <div className="mt-4">
-            <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-300">
-              <Tag size={15} />
-              Palavras-chave
+            <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-300">
+              <BarChart2 size={15} />
+              Explicabilidade dos Termos
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {keywords.map((keyword, index) => (
-                <span
-                  key={`${keyword}-${index}`}
-                  className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300"
-                >
-                  <Tag size={12} />
-                  {keyword}
-                </span>
-              ))}
+            <div className="space-y-2.5">
+              {explicabilidade.map((explicabilidadeItem, index) => {
+                const percentage = getPercentage(
+                  explicabilidadeItem.peso,
+                );
+
+                return (
+                  <div key={`${explicabilidadeItem.termo}-${index}`}>
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <span className="text-xs font-medium text-cyan-300">
+                        {explicabilidadeItem.termo}
+                      </span>
+                      <span className="text-xs font-bold text-purple-300">
+                        {percentage}%
+                      </span>
+                    </div>
+                    <div className="h-2 rounded-full bg-slate-800">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 transition-all duration-300"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
+        ) : (
+          keywords.length > 0 && (
+            <div className="mt-4">
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-300">
+                <Tag size={15} />
+                Palavras-chave
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {keywords.map((keyword, index) => (
+                  <span
+                    key={`${keyword}-${index}`}
+                    className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300"
+                  >
+                    <Tag size={12} />
+                    {keyword}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )
         )}
       </div>
     </div>
