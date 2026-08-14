@@ -6,7 +6,7 @@
 
 Versão 1.0 · Product Owner: Você · Equipe: 8 pessoas
 
-> Nota: este arquivo é a transcrição em Markdown da documentação oficial do projeto (originalmente um PDF), adaptada em um único ponto explícito: a **seção 10 (Estratégia Git)** foi simplificada para remover a branch `develop`, por decisão do time — ver detalhes na própria seção. Todo o restante reflete o documento original.
+> Nota: este arquivo nasceu como transcrição em Markdown da documentação oficial do projeto (originalmente um PDF). Desde então, o projeto foi concluído — as seções que descreviam planos ("o time vai...", "a recomendação é...") foram atualizadas para refletir o que foi de fato construído e decidido ao longo da execução; onde o raciocínio da decisão original ainda é útil, ele foi preservado com uma nota indicando o resultado final.
 
 ---
 
@@ -20,7 +20,7 @@ Este documento é a fonte única de verdade do projeto do Time 13 para o Hackath
 
 **Critério de sucesso nº 2:** manter a arquitetura simples o suficiente para uma equipe júnior concluir em 5 semanas, sem abrir mão de organização e qualidade de código.
 
-**Decisão central de arquitetura:** um serviço de Backend em Java/Spring Boot expõe a API pública, valida e trata erros, delega a inferência a um serviço interno de Machine Learning em Python/Flask ou FastAPI (que carrega o modelo TF-IDF + Regressão Logística a partir do OCI Object Storage) e, após obter a classificação, persiste o resultado em um banco relacional (PostgreSQL ou MySQL) hospedado na própria instância OCI Compute. Essa separação espelha exatamente os dois papéis técnicos que a equipe já possui (Tech Lead Java/Spring e Tech Lead Python/Data Science), reduz o acoplamento e permite que as duas frentes trabalhem em paralelo desde a Semana 1.
+**Decisão central de arquitetura:** um serviço de Backend em Java/Spring Boot expõe a API pública (nome final do produto: **TechMind**), valida e trata erros, delega a inferência a um serviço interno de Machine Learning em Python/FastAPI (que carrega o modelo TF-IDF + Regressão Logística) e, após obter a classificação, persiste o resultado em um banco PostgreSQL hospedado na própria instância OCI Compute. Essa separação espelha exatamente os dois papéis técnicos que a equipe já possui (Tech Lead Java/Spring e Tech Lead Python/Data Science), reduz o acoplamento e permite que as duas frentes trabalhem em paralelo desde a Semana 1. Detalhe de implementação sobre o artefato do modelo (`.joblib`): ver seção 16.1.
 
 As seções seguintes detalham cada decisão, sempre explicando o motivo técnico e priorizando o que maximiza a nota e a chance de vitória em um hackathon de curta duração.
 
@@ -76,11 +76,11 @@ O edital deixa explícito que "a estrutura final da resposta poderá variar de a
 
 A organização do hackathon compartilhou o diagrama de referência: Frontend (React/Vue) → REST API (Spring Boot) → Serviço de IA (Flask/FastAPI) → modelo TF-IDF + Regressão Logística carregado do OCI Object Storage, com um Banco de Dados (Oracle/MySQL) desenhado no caminho principal.
 
-Essa sugestão foi avaliada com a equipe. O time decidiu manter o banco de dados no fluxo, por ser útil para o histórico de classificações e para os recursos opcionais de consulta/busca do edital — mas substituindo o Oracle Autonomous Database por um banco relacional open-source (PostgreSQL ou MySQL), rodando como container Docker na mesma instância OCI Compute que hospeda o Backend e o serviço de IA. A integração obrigatória com OCI continua garantida por dois serviços nativos da Oracle Cloud: Object Storage (artefato do modelo) e Compute (hospedagem de toda a aplicação, incluindo o banco) — o requisito do edital é "pelo menos um serviço OCI", e nada exige que o banco de dados em si seja um serviço Oracle.
+Essa sugestão foi avaliada com a equipe. O time decidiu manter o banco de dados no fluxo, por ser útil para o histórico de classificações e para os recursos opcionais de consulta/busca do edital — mas substituindo o Oracle Autonomous Database por um banco relacional open-source, rodando como container Docker na mesma instância OCI Compute que hospeda o Backend e o serviço de IA. A integração obrigatória com OCI continua garantida por dois serviços nativos da Oracle Cloud: Object Storage (artefato do modelo) e Compute (hospedagem de toda a aplicação, incluindo o banco) — o requisito do edital é "pelo menos um serviço OCI", e nada exige que o banco de dados em si seja um serviço Oracle.
 
 A única mudança em relação ao diagrama oficial é a ordem das chamadas: em vez de escrever no banco antes e depois de chamar o serviço de IA (como sugere a seta de retorno do diagrama), o Backend grava apenas uma vez, já com o resultado final da classificação em mãos. Isso elimina o risco de registro incompleto e mantém a escrita em banco fora do caminho crítico da resposta — se o banco falhar, a API ainda responde a classificação ao usuário (escrita "melhor esforço", com log do erro).
 
-**PostgreSQL ou MySQL:** a recomendação é PostgreSQL, por ter suporte de primeira classe no Spring Boot (driver e dialect do Hibernate maduros), imagem Docker oficial leve e tipos de dado mais expressivos para texto longo (TEXT nativo). MySQL é uma alternativa igualmente válida caso o time já tenha mais familiaridade com ele — a troca é transparente, já que o Spring Data JPA abstrai o dialeto do banco por trás dos Repositories.
+**PostgreSQL, decisão final:** entre PostgreSQL e MySQL (ambos cogitados originalmente), o time seguiu com **PostgreSQL 16** — suporte de primeira classe no Spring Boot (driver e dialect do Hibernate maduros), imagem Docker oficial leve e tipos de dado mais expressivos para texto longo (TEXT nativo).
 
 ### 3.2 Opções avaliadas
 
@@ -108,7 +108,7 @@ A Opção B é a ideal para um hackathon de poucas semanas com uma equipe de ní
 ```
 ┌──────────────┐   HTTPS    ┌───────────────────────┐
 │   Frontend    │ ─────────► │   Backend API (Java)  │
-│  React (SPA)  │ ◄───────── │      Spring Boot       │
+│ React (TechMind)│◄───────── │      Spring Boot       │
 └──────────────┘    JSON     │ - Validação de entrada │
                               │ - Tratamento de erros  │
                               │ - Regras de negócio     │
@@ -118,24 +118,26 @@ A Opção B é a ideal para um hackathon de poucas semanas com uma equipe de ní
                                          ▼
                               ┌───────────────────────┐
                               │   ML Service (Python)  │
-                              │    Flask ou FastAPI     │
+                              │       FastAPI            │
                               │ - Carrega modelo         │
                               │   (joblib) em memória    │
                               │ - TF-IDF + LogReg         │
                               │ - Extrai keywords          │
+                              │   e explicabilidade         │
                               └──────────┬─────────────┘
                                          │ lê artefato na subida
                                          ▼
-                              ┌───────────────────────┐
-                              │  OCI Object Storage    │
-                              │   modelo.joblib          │
-                              │   vectorizer.joblib       │
-                              └───────────────────────┘
+                              ┌───────────────────────────────┐
+                              │ modelo.joblib / vectorizer.joblib │
+                              │ (versionados no repositório;      │
+                              │  publicados também no OCI Object   │
+                              │  Storage como backup, ver 16.1)     │
+                              └───────────────────────────────┘
 
 Após receber a classificação, o Backend grava o resultado final (uma única vez):
 
   Backend API (Java) ──────► ┌───────────────────────┐
-   grava resultado final      │  PostgreSQL / MySQL    │
+   grava resultado final      │      PostgreSQL 16      │
    (best-effort, fora do       │  container Docker na   │
     caminho crítico)            │  mesma VM OCI Compute  │
                                 └───────────────────────┘
@@ -145,12 +147,12 @@ Após receber a classificação, o Backend grava o resultado final (uma única v
 
 1. O usuário envia título e texto pelo Frontend (React), que faz uma chamada HTTPS ao Backend.
 2. O Spring Boot valida a entrada (campos obrigatórios, tamanho mínimo/máximo de texto) antes de qualquer processamento.
-3. O Spring Boot chama internamente o serviço Flask/FastAPI, que já carregou o modelo (`.joblib`) e o vetorizador TF-IDF na memória no momento em que o serviço subiu.
-4. O serviço de IA executa a predição, gera a probabilidade e extrai as palavras mais relevantes (maiores pesos TF-IDF do próprio texto), devolvendo um JSON simples ao Backend.
-5. O Spring Boot formata a resposta final no contrato do edital e persiste o registro (título, texto, categoria, probabilidade, palavras-chave) no banco PostgreSQL/MySQL — em modo melhor-esforço, sem bloquear a resposta caso o banco falhe.
+3. O Spring Boot chama internamente o serviço FastAPI, que já carregou o modelo (`.joblib`) e o vetorizador TF-IDF na memória no momento em que o serviço subiu.
+4. O serviço de IA executa a predição, gera a probabilidade, extrai as palavras mais relevantes e o peso de explicabilidade de cada termo (coeficientes da Regressão Logística × TF-IDF do texto), devolvendo um JSON ao Backend.
+5. O Spring Boot formata a resposta final no contrato do edital e persiste o registro (título, texto, categoria, probabilidade, palavras-chave, explicabilidade) no banco PostgreSQL — em modo melhor-esforço, sem bloquear a resposta caso o banco falhe.
 6. A resposta é devolvida ao Frontend imediatamente após a classificação, sem esperar a confirmação da escrita em banco.
-7. O artefato do modelo treinado (`.joblib`) é publicado no OCI Object Storage ao final de cada retreinamento, garantindo a integração obrigatória com OCI e servindo como backup versionado do modelo.
-8. Backend, serviço de IA e o container do banco de dados rodam na mesma instância OCI Compute (Free Tier), completando a segunda integração com serviços OCI.
+7. O artefato do modelo treinado (`.joblib`) é versionado no próprio repositório Git e reconstruído na imagem Docker do serviço de IA a cada deploy — é esse arquivo que o serviço realmente carrega em produção hoje. O upload para o OCI Object Storage (script `ia/scripts/upload_to_oci.py`) também é feito a cada retreinamento, cumprindo o requisito obrigatório de integração OCI como artefato publicado/versionado — mas o `model_loader.py` só efetivamente baixa do bucket quando o arquivo não está presente localmente (cenário de disaster recovery ou de uma instância nova sem o repositório). Ver seção 16.1 para o detalhe completo desse fluxo e por que ele é assim.
+8. Backend, serviço de IA e o container do banco de dados rodam na mesma instância OCI Compute (Free Tier) — essa é a integração OCI que efetivamente sustenta a aplicação em produção.
 
 ---
 
@@ -160,16 +162,16 @@ Cada tecnologia foi escolhida por reduzir risco e curva de aprendizado para uma 
 
 | Camada | Tecnologia escolhida | Motivo técnico |
 |---|---|---|
-| Frontend | React + Vite + fetch nativo | Setup rápido (Vite), sem necessidade de framework CSS pesado; time já viu React na formação |
-| Backend API | Java 17 + Spring Boot 3 (Web, Validation) | Robusto para validação/tratamento de erro; citado explicitamente no edital como exemplo (Spring Boot) |
+| Frontend | React 19 + React Router + Vite + Tailwind CSS + Lucide React | Setup rápido (Vite), Tailwind acelerou a estilização das 5 telas (Analisar, Dashboard, Base de Conhecimento, Histórico, Configurações); time já viu React na formação |
+| Backend API | Java 17 + Spring Boot 3.5 (Web, Validation, Data JPA) | Robusto para validação/tratamento de erro; citado explicitamente no edital como exemplo (Spring Boot) |
 | Serviço de ML | Python 3.11 + FastAPI + Scikit-Learn | FastAPI gera validação e docs automáticas (Swagger) com pouquíssimo código; Scikit-Learn é o sugerido pelo edital |
-| Vetorização/Modelo | TF-IDF (`TfidfVectorizer`) + Regressão Logística | Sugestão direta do edital; leve, rápido de treinar, interpretável, ótimo para datasets pequenos (60-100 exemplos) |
+| Vetorização/Modelo | TF-IDF (`TfidfVectorizer`) + Regressão Logística | Sugestão direta do edital; leve, rápido de treinar, interpretável — dataset final cresceu bem além do mínimo (ver seção 13) |
 | Serialização do modelo | `joblib` | Citado no edital; padrão para objetos Scikit-Learn, mais eficiente que pickle puro para arrays NumPy |
-| Banco de dados | PostgreSQL (ou MySQL) em container Docker na OCI Compute | Open-source, sem custo, integração madura com Spring Data JPA; escolhido no lugar do Oracle Autonomous DB por simplicidade de operação dentro da mesma VM |
+| Banco de dados | PostgreSQL 16 em container Docker na OCI Compute | Open-source, sem custo, integração madura com Spring Data JPA; escolhido no lugar do Oracle Autonomous DB por simplicidade de operação dentro da mesma VM |
 | Cloud | OCI Object Storage (obrigatório) + OCI Compute (hospedagem) | Menor caminho para cumprir a integração obrigatória com OCI; Compute simples com `VM.Standard.E2.1.Micro` (always-free) |
-| Deploy | Docker (obrigatório para o banco) + Docker Compose (opcional para os demais serviços) | O banco PostgreSQL/MySQL roda como container Docker na VM da OCI; empacotar Backend e ML Service também em Docker Compose é opcional e só entra se sobrar tempo (seção 21) |
-| Documentação | Markdown (README) + Swagger/OpenAPI automático do FastAPI e springdoc-openapi no Spring | Gera parte da documentação da API automaticamente, economizando tempo do time |
-| Testes | JUnit 5 (Backend) + Pytest (ML Service) — cobertura mínima dos endpoints críticos | Frameworks padrão de cada stack, zero configuração extra |
+| Deploy | Docker Compose para os 4 serviços (Postgres, backend, ML, frontend/Nginx) | O plano original previa Compose como opcional só para o banco — na prática o time containerizou tudo (ver seção 21, item já entregue), com scripts próprios em `scripts/` (dev/prod/test/build/clean) e HTTPS via Let's Encrypt em produção |
+| Documentação | Markdown (READMEs por área) + Swagger/OpenAPI automático do FastAPI e springdoc-openapi no Spring | Gera parte da documentação da API automaticamente, economizando tempo do time |
+| Testes | JUnit 5 + Mockito (Backend) + Pytest (ML Service) | Cobertura foi além dos endpoints críticos: inclui testes de mapper (serialização/desserialização), de service (ciclo completo com mocks) e de integração HTTP contra um stub server |
 | Versionamento | Git + GitHub | Já definido pela plataforma do hackathon (ver print de "Links do Projeto") |
 
 **Tecnologias deliberadamente evitadas:** Kubernetes, mensageria (Kafka/RabbitMQ), microsserviços adicionais, bancos NoSQL, frameworks de frontend mais pesados (Next.js/Angular) e qualquer LLM/embeddings — todos aumentam risco sem aumentar nota no MVP.
@@ -178,65 +180,71 @@ Cada tecnologia foi escolhida por reduzir risco e curva de aprendizado para uma 
 
 ## 5. Estrutura de Repositórios
 
-Monorepo único (mais simples de gerenciar por uma equipe júnior e por evitar sincronizar múltiplos repositórios com pouco tempo disponível):
+Monorepo único (mais simples de gerenciar por uma equipe júnior e por evitar sincronizar múltiplos repositórios com pouco tempo disponível). Estrutura final, como o projeto foi de fato construído:
 
 ```
 G9-BR-Team-13/
 ├── frontend/
 │   ├── src/
-│   │   ├── components/   # componentes reutilizáveis (Form, ResultCard, Loader)
-│   │   ├── pages/         # telas (Home)
-│   │   ├── services/       # chamadas à API (api.js)
-│   │   └── App.jsx
+│   │   ├── components/    # AnalysisForm, ResultCard, ContentModal, JsonViewer, Sidebar, Header, StatusCards...
+│   │   ├── pages/          # Analysis (tela inicial), Dashboard, Library (Base de Conhecimento), History, Settings
+│   │   ├── layouts/         # MainLayout
+│   │   ├── services/        # api.js (chamadas HTTP), history.js (localStorage), theme.js, preferences.js
+│   │   └── App.jsx           # rotas (react-router-dom)
 │   └── package.json
 │
 ├── backend/                          # Java / Spring Boot
-│   └── src/main/java/com/example/TechContentClassifier/
-│       ├── controller/    # ConteudoController (expõe POST /conteudo)
-│       ├── service/        # ConteudoService (orquestra chamada ao ML Service)
-│       ├── client/          # MlServiceClient (RestClient/WebClient para o FastAPI)
-│       ├── dto/              # ConteudoRequestDTO, ConteudoResponseDTO
-│       ├── entity/           # Conteudo (JPA)
-│       ├── repository/       # ConteudoRepository
-│       ├── exception/        # GlobalExceptionHandler, ValidationException
-│       └── config/            # OpenApiConfig, CorsConfig
+│   └── src/main/java/com/time13/techcontentclassifier/
+│       ├── controller/    # ConteudoController — POST /conteudo e GET /conteudo
+│       ├── service/        # ConteudoService (orquestra) + ClassificadorService (interface)
+│       │   └── impl/        # MlServiceClassificadorService (RestClient para o FastAPI)
+│       ├── dto/              # ConteudoRequestDTO, ConteudoResponseDTO, ConteudoHistoricoDTO, ExplicabilidadeDTO
+│       ├── entity/           # Conteudo (JPA), Tags
+│       ├── mapper/           # ConteudoMapper (DTO ↔ Entity, serializa/desserializa explicabilidade)
+│       ├── repository/       # ConteudoRepository, TagsRepository
+│       ├── exception/        # GlobalExceptionHandler, RespostaErros, MlServiceException
+│       └── config/            # CorsConfig
 │
 ├── ia/                                # Python / Ciência de Dados + FastAPI
 │   ├── notebooks/
-│   │   └── eda_treino_modelo.ipynb
+│   │   └── eda_treino_modelo.ipynb   # entregável obrigatório: EDA + treino + avaliação
 │   ├── app/
-│   │   ├── main.py          # FastAPI app, endpoint /predict
-│   │   ├── model_loader.py  # carrega .joblib na subida
-│   │   ├── schemas.py        # Pydantic (request/response)
-│   │   └── keywords.py       # extração de palavras-chave via pesos TF-IDF
+│   │   ├── main.py            # FastAPI app, endpoints /predict, /categorias, /health
+│   │   ├── model_loader.py    # carrega .joblib na subida (local ou OCI, ver seção 16.1)
+│   │   ├── schemas.py          # Pydantic (TextInput, PredictionOutput, ExplicabilidadeItem)
+│   │   └── keywords.py         # extração de palavras-chave + peso de explicabilidade
+│   ├── scripts/                 # ingest_wikipedia.py, aumentar_dataset.py, train.py, evaluate.py, upload_to_oci.py
+│   ├── tests/                    # pytest (test_predict.py, test_keywords.py)
 │   ├── models/
 │   │   ├── modelo.joblib
-│   │   └── vectorizer.joblib
+│   │   ├── vectorizer.joblib
+│   │   └── metrics.json          # métricas do último treino (precision/recall/f1 por categoria)
+│   ├── data/dataset.csv           # dataset de treino
+│   ├── config.yaml                 # hiperparâmetros + stopwords
 │   └── requirements.txt
 │
-├── infra/                             # scripts de deploy e integração OCI
-│   ├── oci/                # scripts de upload para Object Storage
-│   ├── docker-compose.yml  # opcional (ver seção 21)
-│   └── deploy.sh
+├── infra/                             # não guarda arquivos — aponta pra onde a infra realmente vive (ver seção 16.2)
+│
+├── scripts/                           # Docker Compose (dev/prod), testes, build, deploy — ver seção 16.2
 │
 ├── docs/
-│   ├── DOCUMENTACAO_PROJETO.md   (este arquivo)
-│   ├── roteiro_demo.md
-│   └── arquitetura.png
+│   └── DOCUMENTACAO_PROJETO.md   (este arquivo)
 │
+├── docker-compose.yml / .dev.yml / .prod.yml
 ├── README.md
 └── CONTRIBUTING.md
 ```
 
-> Nota: o nome do diretório raiz e o caminho de pacote Java (`com.example.TechContentClassifier`) refletem o projeto real já iniciado no repositório; o restante da estrutura segue exatamente o que foi definido aqui.
+> Nota: o nome do diretório raiz e o pacote Java final (`com.time13.techcontentclassifier`, não `com.example`) refletem o que foi realmente implementado.
 
 ### 5.1 Explicação das pastas principais
 
 - **`frontend/`**: aplicação React isolada; consome apenas o Backend Java, nunca o FastAPI diretamente
 - **`backend/`**: segue o padrão em camadas Controller → Service → Repository, com DTOs separados de Entities e um handler global de exceções — organização que qualquer novo integrante reconhece de imediato
 - **`ia/`**: contém o notebook (entregável obrigatório do edital) e o serviço FastAPI que reaproveita o mesmo modelo treinado, sem duplicar lógica de pré-processamento
-- **`infra/`**: concentra tudo relacionado a subir os serviços na OCI e publicar o modelo no Object Storage, isolando essa responsabilidade do código de aplicação
-- **`docs/`**: toda documentação viva do projeto, incluindo este documento e o roteiro do demo day
+- **`infra/`**: pasta mantida só pra preservar a estrutura de 5 áreas documentada aqui; o Docker Compose precisa estar na raiz do repositório pra ter acesso ao contexto de build de `backend/`, `frontend/` e `ia/` ao mesmo tempo — ver seção 16.2 pra onde cada coisa realmente está
+- **`scripts/`**: scripts operacionais (subir/parar/testar/limpar o ambiente, build de produção) — não fazia parte da estrutura originalmente planejada, mas centraliza toda a operação do Docker Compose
+- **`docs/`**: documentação viva do projeto
 
 ---
 
@@ -262,6 +270,8 @@ Como o time tem 8 pessoas mas 8 áreas, algumas pessoas podem acumular papéis (
 ## 7. Backlog do Produto
 
 O backlog segue a hierarquia Épico → Feature → User Story → Task → Subtask. Abaixo estão os 5 épicos que cobrem 100% do MVP obrigatório do edital, com o detalhamento de cada nível.
+
+> **Status:** os 5 épicos foram concluídos. Preservado abaixo como planejamento original — alguns detalhes específicos mudaram durante a execução e valem registro: o dataset final ficou muito maior que os 60-100 exemplos estimados (seção 13); o cliente HTTP para o ML Service (`MlServiceClient`, Feature 2.2) foi implementado como `MlServiceClassificadorService`, seguindo um padrão de interface (`ClassificadorService`) que permite trocar a implementação sem tocar no resto da camada; o `GET /conteudo/{id}` (Feature 2.4) não foi implementado — a busca por palavra-chave (`GET /conteudo?palavra-chave=`) cobriu o mesmo caso de uso de forma mais flexível; e a extração de palavras-chave (Épico 1) ganhou também o peso de explicabilidade por termo, além da lista simples originalmente prevista.
 
 ### Épico 1 — Pipeline de Classificação de Conteúdo (Ciência de Dados)
 
@@ -486,6 +496,8 @@ Formato completo recomendado: prefixo, escopo entre parênteses e descrição cu
 
 ## 13. Estratégia de Ciência de Dados
 
+> **Status final:** o dataset cresceu muito além dos 60-100 exemplos mínimos planejados abaixo — a versão final tem **6.496 exemplos em 10 categorias exclusivamente tech** (Backend, Dados, DevOps, Frontend, Mobile, Cibersegurança, Cloud/Infra, QA, Blockchain, UX/UI), combinando artigos reais da Wikipédia (coletados via `ia/scripts/ingest_wikipedia.py`, com filtros anti-alucinação pra evitar conteúdo fora do domínio tech) com exemplos curtos sintéticos no formato real de uso da API (`ia/scripts/aumentar_dataset.py`) — a mistura foi necessária porque um modelo treinado só com artigos longos da Wikipédia classificava mal os textos curtos que a API realmente recebe. Acurácia final: **91.9%** (F1-weighted), métricas completas em `ia/models/metrics.json`.
+
 | Etapa | O que fazer | Por quê |
 |---|---|---|
 | Coleta | Reunir 60-100 exemplos de conteúdo técnico rotulados por categoria (Backend, Frontend, Dados, DevOps/Cloud, etc.), de fontes públicas de documentação e produção própria da equipe | Volume mínimo do edital; múltiplas fontes evitam viés de vocabulário |
@@ -507,12 +519,14 @@ Em vez de um segundo modelo, o time reaproveita o próprio vetorizador TF-IDF: p
 
 ### 14.1 Endpoints
 
+Endpoints do Backend (API pública, consumida pelo Frontend):
+
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/conteudo` | Recebe título e texto, devolve categoria, probabilidade e informações adicionais (obrigatório) |
-| GET | `/categorias` | Lista as categorias suportadas pelo modelo (facilita o Frontend montar filtros) |
-| GET | `/conteudo/{id}` | Consulta um resultado já processado, persistido no banco (seção 15) |
-| GET | `/conteudo?palavra-chave=` | Busca simples por palavra-chave nos conteúdos já processados (recurso opcional) |
+| POST | `/conteudo` | Recebe título e texto, devolve categoria, probabilidade, informações adicionais e explicabilidade (contrato fixo do edital) |
+| GET | `/conteudo?palavra-chave=` | Busca nos conteúdos já persistidos (título, texto, categoria, tags); termo vazio devolve tudo. Devolve também `id`, `titulo`, `texto` e `criado_em` de cada item — usado pela Base de Conhecimento do frontend |
+
+> Nota: o plano original também previa `GET /categorias` e `GET /conteudo/{id}` — nenhum dos dois foi exposto pelo Backend (o `/categorias` existe só internamente no serviço de ML, não repassado pro Frontend; e a busca por `id` acabou não sendo necessária depois que a busca por palavra-chave foi implementada, que já cobre o caso de uso de encontrar um conteúdo específico).
 
 ### 14.2 Contrato principal — `POST /conteudo`
 
@@ -529,25 +543,15 @@ Response 200:
 {
   "categoria": "Backend",
   "probabilidade": 0.89,
-  "informacoes_adicionais": ["Java", "Spring Boot", "API REST"]
+  "informacoes_adicionais": ["Java", "Spring Boot", "API REST"],
+  "explicabilidade": [
+    { "termo": "spring", "peso": 1.0 },
+    { "termo": "boot", "peso": 0.85 }
+  ]
 }
 ```
 
-Response 400 (validação):
-```json
-{
-  "erro": "VALIDATION_ERROR",
-  "mensagem": "O campo texto é obrigatório e deve ter entre 20 e 5000 caracteres."
-}
-```
-
-Response 500 (falha no serviço de ML):
-```json
-{
-  "erro": "ML_SERVICE_UNAVAILABLE",
-  "mensagem": "Não foi possível processar o conteúdo no momento. Tente novamente."
-}
-```
+O campo `explicabilidade` (peso relativo de 0 a 1 de cada termo na decisão do modelo) foi adicionado depois da versão original deste contrato — é aditivo, não quebra quem só lê os 3 campos originais.
 
 ### 14.3 Validações
 
@@ -557,9 +561,28 @@ Response 500 (falha no serviço de ML):
 
 ### 14.4 Tratamento de erros
 
-- 400 — corpo malformado ou JSON inválido
-- 422 — campos presentes mas fora das regras de validação (ex.: texto com 5 caracteres)
-- 503 — serviço de ML indisponível ou timeout na chamada interna (o Backend nunca deixa a exceção vazar sem tratamento)
+O formato final de erro ficou mais detalhado que o rascunho original do edital — inclui `status`, `titulo` (curto, tipo do erro), `mensagem`, `timestamp` e, quando aplicável, a lista `erros` com o detalhe por campo:
+
+```json
+{
+  "status": 400,
+  "titulo": "Erro de Validação",
+  "mensagem": "Um ou mais campos contêm valores inválidos.",
+  "timestamp": "2026-08-07T23:28:41",
+  "erros": [
+    { "campo": "texto", "mensagem": "O texto deve ter entre 20 e 5000 caracteres" }
+  ]
+}
+```
+
+Casos tratados pelo `GlobalExceptionHandler`:
+
+- **400** — campos inválidos (`erros` detalhado por campo), JSON malformado, ou parâmetro obrigatório ausente (ex.: `GET /conteudo` sem `palavra-chave`)
+- **415** — `Content-Type` diferente de `application/json`
+- **503** — serviço de ML indisponível ou timeout na chamada interna (o Backend nunca deixa a exceção vazar sem tratamento)
+- **500** — qualquer erro não previsto explicitamente, como rede de segurança
+
+O edital só especifica o formato da resposta de sucesso (seção 2.4) — o formato de erro ficou a critério do time, e esse é o que foi implementado.
 
 ### 14.5 Três exemplos obrigatórios de uso
 
@@ -573,21 +596,28 @@ Response 500 (falha no serviço de ML):
 
 ## 15. Modelagem de Banco de Dados
 
-O edital cita persistência como recurso opcional, mas o time optou por incluí-la no MVP, usando PostgreSQL ou MySQL (seção 3) em vez de um banco gerenciado da Oracle — cobrindo o histórico de classificações e servindo de base para o recurso opcional de busca por palavra-chave (Épico 2, Feature 2.3/2.4).
+O edital cita persistência como recurso opcional, mas o time optou por incluí-la no MVP, usando PostgreSQL (seção 3) em vez de um banco gerenciado da Oracle — cobrindo o histórico de classificações e servindo de base para o recurso opcional de busca por palavra-chave.
+
+Diferente do plano original, o schema não é criado por migration manual — `spring.jpa.hibernate.ddl-auto=update` deixa o Hibernate criar/atualizar as tabelas automaticamente a partir das entidades JPA a cada subida da aplicação (não há Flyway/Liquibase nesse projeto).
 
 ### 15.1 Tabela `conteudos`
 
-| Campo | Tipo (PostgreSQL / MySQL) | Observação |
+| Campo | Tipo (PostgreSQL) | Observação |
 |---|---|---|
-| id | BIGINT, PK, auto-incremento (SERIAL ou IDENTITY) | Identificador único |
+| id | BIGINT, PK, auto-incremento (IDENTITY) | Identificador único |
 | titulo | VARCHAR(200) | Título recebido na requisição |
 | texto | TEXT | Texto completo recebido |
-| categoria | VARCHAR(50), indexado | Resultado da classificação — principal filtro de consulta |
-| probabilidade | NUMERIC(5,4) / DECIMAL(5,4) | Confiança do modelo na predição |
+| categoria | VARCHAR(50) | Resultado da classificação |
+| probabilidade | DOUBLE | Confiança do modelo na predição |
 | informacoes_adicionais | VARCHAR(500) | Palavras-chave separadas por vírgula |
-| criado_em | TIMESTAMP | Data/hora do processamento, preenchido pela aplicação (Spring) |
+| explicabilidade | TEXT | Lista termo/peso serializada em JSON (ver seção 14.2) — campo adicionado depois do MVP inicial; conteúdo salvo antes disso fica com este campo vazio |
+| criado_em | TIMESTAMP | Data/hora do processamento, preenchido pela aplicação (Spring), exposta pela API como `Instant` em UTC |
 
-Sem relacionamentos adicionais no MVP — uma única tabela é suficiente para o escopo pedido. Relacionamentos com uma tabela `categorias` só fariam sentido se o cadastro de categorias se tornasse dinâmico, o que foge do MVP. Como a escrita é best-effort (seção 3.5), a tabela não bloqueia o fluxo principal caso o banco esteja temporariamente indisponível.
+### 15.2 Relacionamento com `tags`
+
+Diferente do plano original ("sem relacionamentos adicionais no MVP"), o time acabou criando uma segunda tabela, `tags`, com relação `@ManyToMany` a partir de `conteudos` (tabela de junção `conteudo_tags`) — cada palavra-chave identificada vira uma `Tag` reaproveitável entre conteúdos diferentes, em vez de só texto solto. Isso é usado pela busca por palavra-chave (`GET /conteudo`), que também considera o nome das tags associadas, além do texto/título/categoria.
+
+Como a escrita é best-effort (seção 3.5), a tabela não bloqueia o fluxo principal caso o banco esteja temporariamente indisponível.
 
 ---
 
@@ -596,17 +626,35 @@ Sem relacionamentos adicionais no MVP — uma única tabela é suficiente para o
 | Serviço OCI | Uso no projeto | Por quê |
 |---|---|---|
 | Object Storage | Armazenar `modelo.joblib` e `vectorizer.joblib` versionados | Cumpre o requisito obrigatório de integração OCI da forma mais simples e barata (tier always-free) |
-| Compute (`VM.Standard.E2.1.Micro`) | Hospedar Backend, ML Service e o container do banco (PostgreSQL/MySQL) | Instância always-free suficiente para uma API de demonstração de hackathon; um único host simplifica a rede interna entre os três componentes |
+| Compute (`VM.Standard.E2.1.Micro`) | Hospedar Backend, Frontend, ML Service e o container do banco (PostgreSQL) | Instância always-free suficiente para uma API de demonstração de hackathon; um único host simplifica a rede interna entre os componentes |
 
-O banco de dados (PostgreSQL ou MySQL) não é um serviço Oracle gerenciado — é um container Docker rodando dentro da própria instância Compute. Isso mantém a stack simples de operar e ainda assim garante que a integração obrigatória com a OCI (Object Storage + Compute) está coberta com folga.
+O banco de dados (PostgreSQL) não é um serviço Oracle gerenciado — é um container Docker rodando dentro da própria instância Compute. Isso mantém a stack simples de operar e ainda assim garante que a integração obrigatória com a OCI (Object Storage + Compute) está coberta com folga — **o Compute sozinho já cumpre o "pelo menos um serviço OCI" do edital**, hospedando a aplicação inteira (backend, ML, frontend e banco) em `tech-mind.duckdns.org`.
 
-### 16.1 Fluxo de integração
+### 16.1 Fluxo de integração — como foi planejado vs. como funciona hoje
 
-1. Ao final do treino, o notebook (ou um script) faz upload de `modelo.joblib` e `vectorizer.joblib` para um bucket do Object Storage
-2. O ML Service, ao subir na instância Compute, baixa os artefatos mais recentes do bucket (ou os lê de um volume local sincronizado) antes de aceitar requisições
-3. O Backend, o ML Service e o container do banco rodam na mesma instância Compute, comunicando-se por rede interna/localhost
-4. O Backend persiste cada resultado no banco após a resposta do ML Service, em modo melhor-esforço (seção 3.5)
-5. O Frontend é publicado separadamente (ex.: como estático) e aponta para o IP/DNS público do Backend
+O plano original prometia: modelo publicado no Object Storage ao final de cada treino, e o serviço de ML baixando de lá a cada subida. Na prática, isso não é bem o que acontece, e vale registrar com honestidade o porquê, já que essa foi uma correção feita depois de uma auditoria específica sobre esse ponto:
+
+1. `modelo.joblib` e `vectorizer.joblib` são **versionados no próprio repositório Git** — cada retreinamento comita a nova versão junto com o código, prática natural do fluxo de trabalho de Ciência de Dados do time.
+2. O Dockerfile do serviço de ML copia todo o diretório `ia/` (incluindo os `.joblib`) pra dentro da imagem no build. Como esses arquivos já vêm do Git, eles estão sempre presentes localmente.
+3. `model_loader.py` só tenta baixar do OCI Object Storage **quando o arquivo não existe localmente** — como o passo 2 garante que sempre existe, esse download nunca é de fato acionado em produção hoje. O código e a integração existem e funcionam (testável isoladamente), mas esse caminho específico não é o que sustenta a aplicação no dia a dia.
+4. O upload pro Object Storage (`ia/scripts/upload_to_oci.py`) continua sendo executado a cada retreinamento — isso por si só já cumpre o requisito de "integração com serviço OCI" (o artefato é publicado e versionado lá), mesmo que o download de volta não seja o caminho ativo.
+5. O Backend, o ML Service e o container do banco rodam na mesma instância Compute, comunicando-se por rede interna via Docker Compose.
+6. O Backend persiste cada resultado no banco após a resposta do ML Service, em modo melhor-esforço (seção 3.5).
+7. O Frontend é publicado na mesma instância, servido via Nginx com HTTPS (Let's Encrypt).
+
+**Por que isso não compromete o requisito obrigatório**: o edital pede "integração com pelo menos um serviço OCI", e o Compute sozinho — hospedando a aplicação inteira, ao vivo — já satisfaz isso com folga, como o parágrafo acima já registra. O Object Storage é uma segunda integração real (upload funciona, artefato fica lá versionado), só não é o mecanismo que efetivamente entrega o modelo em produção hoje. Fazer o download do OCI ser o caminho realmente usado é uma melhoria possível (remover os `.joblib` do Git, forçar o download), mas envolve risco em produção — ver seção 21.
+
+### 16.2 Onde a infraestrutura vive no repositório
+
+A pasta `infra/` (seção 5) foi pensada originalmente pra concentrar Docker Compose e scripts de deploy, mas isso nunca aconteceu ali na prática — o Docker Compose precisa estar na **raiz do repositório** pra ter acesso ao contexto de build de `backend/`, `frontend/` e `ia/` ao mesmo tempo (`context: ./backend`, etc.). A infraestrutura real está em:
+
+| O que | Onde |
+|---|---|
+| Orquestração dos containers | `docker-compose.yml` + overrides `docker-compose.dev.yml` / `docker-compose.prod.yml`, na raiz |
+| Scripts operacionais (subir/parar/testar/limpar/build) | `scripts/` |
+| Configuração do Nginx (proxy + HTTPS) | `frontend/nginx.conf` |
+| Upload do modelo pro Object Storage | `ia/scripts/upload_to_oci.py` |
+| Download do modelo a partir do Object Storage | `ia/app/model_loader.py` (ver 16.1 sobre quando isso é de fato acionado) |
 
 ---
 
@@ -675,16 +723,25 @@ Tempo total recomendado: 5 a 7 minutos, considerando que múltiplos times aprese
 
 ## 21. Melhorias Futuras (fora do MVP)
 
-Ideias tecnicamente interessantes, mas que fogem do escopo obrigatório do edital ou aumentam risco desnecessário para 5 semanas. Documentadas aqui para não se perderem e para serem citadas no fechamento da demo (seção 18).
+Ideias tecnicamente interessantes, listadas originalmente como fora do escopo obrigatório do edital. Várias acabaram sendo entregues de qualquer forma, porque o tempo sobrou ou porque a necessidade apareceu no meio do caminho — marcadas abaixo.
+
+**Já entregues** (deixadas aqui só como registro do plano original):
+
+- ~~Containerização completa com Docker Compose para todos os serviços~~ — feito; os 4 serviços (Postgres, backend, ML, frontend) sobem juntos via `docker-compose.yml`
+- ~~Explicabilidade do modelo~~ — feito; cada termo vem com peso relativo (`explicabilidade`, seção 14.2), calculado a partir dos coeficientes da Regressão Logística × TF-IDF, exibido como barra de porcentagem na tela Analisar, no Histórico e na Base de Conhecimento
+- ~~Consulta e filtro avançado por categoria~~ — feito, o filtro por categoria existe na Base de Conhecimento; a parte de **paginação** continua pendente (ver abaixo)
+
+**Ainda pendentes:**
 
 - Busca semântica com embeddings (ex.: sentence-transformers) para recomendação de conteúdos relacionados
 - Uso de LLM/RAG para gerar resumos automáticos do conteúdo processado
 - Chat conversacional sobre a base de conhecimento
 - Dashboard avançado com gráficos de distribuição de categorias ao longo do tempo
-- Containerização completa com Docker Compose para todos os serviços
-- Suíte de testes automatizados end-to-end (hoje restrita aos endpoints críticos)
-- Explicabilidade do modelo (ex.: exibir os termos que mais pesaram na decisão, via coeficientes da Regressão Logística)
+- Suíte de testes automatizados end-to-end cross-serviço (hoje cada serviço tem sua própria suíte — backend com JUnit/Mockito incluindo testes de integração HTTP, ML service com Pytest — mas não existe um teste que percorra Frontend → Backend → ML → Banco de ponta a ponta)
 - Processamento em lote via upload de CSV
-- Consulta e filtro avançado por categoria com paginação
+- Paginação na busca por palavra-chave (`GET /conteudo`) — hoje devolve a lista inteira de uma vez; não é problema com o volume atual de dados, mas precisaria de `Pageable` no backend e controles de página no frontend antes de escalar
+- Fazer o download do OCI Object Storage ser o caminho realmente usado pelo serviço de ML (hoje o artefato vem do Git, ver seção 16.1) — puramente uma melhoria de consistência arquitetural, não afeta o cumprimento do requisito obrigatório nem a nota
+- CI/CD (GitHub Actions): rodar os testes automaticamente em cada Pull Request, e opcionalmente automatizar o deploy — hoje ambos são manuais
+- Moderação/curadoria de conteúdo na Base de Conhecimento (hoje não existe endpoint de exclusão; limpeza de dados de teste é feita manualmente no banco)
 
-Nenhum item desta lista deve ser iniciado antes que todos os requisitos obrigatórios das seções 2.2 e 7 estejam 100% concluídos e testados.
+Nenhum item desta lista deve ser iniciado antes que todos os requisitos obrigatórios das seções 2.2 e 7 estejam 100% concluídos e testados — regra que continua valendo mesmo com o MVP entregue, pra qualquer ciclo futuro do projeto.
